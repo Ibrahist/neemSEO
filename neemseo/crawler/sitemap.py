@@ -135,3 +135,4 @@ class SitemapParser:
                 continue
 
         return list(collected_urls)
+

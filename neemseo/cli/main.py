@@ -22,7 +22,12 @@ from neemseo.db.session import init_db, SessionLocal
 from neemseo.crawler.schemas import CrawlConfig, CrawlStatus, CrawlSummaryReport
 from neemseo.crawler.engine import SiteCrawler
 from neemseo.crawler.analyzer import CrawlAnalyzer
-from neemseo.db.models import AuditRun, Crawl, CrawlPage, CrawlLink
+from neemseo.db.models import AuditRun, Crawl, CrawlPage, CrawlLink, KeywordList, KeywordEntry
+from neemseo.keywords.schemas import KeywordResearchRequest, SearchIntent
+from neemseo.keywords.service import KeywordResearchService
+from neemseo.keywords.clustering import KeywordClusterer
+from neemseo.keywords.intent import IntentClassifier
+from neemseo.keywords.scoring import PriorityScorer
 
 app = typer.Typer(
     name="neemseo",
@@ -375,6 +380,142 @@ def crawl_compare_cmd(
             f"[bold]New Broken Links:[/bold] [red]{len(diff.new_broken_links)}[/red] | [bold]Resolved Broken Links:[/bold] [green]{len(diff.resolved_broken_links)}[/green]"
         )
         console.print(Panel(comp_text, title="[bold cyan]Crawl Comparison Diff[/bold cyan]", border_style="cyan"))
+
+
+def format_intent(intent: SearchIntent) -> Text:
+    if intent == SearchIntent.TRANSACTIONAL:
+        return Text("Transactional", style="bold green")
+    elif intent == SearchIntent.COMMERCIAL:
+        return Text("Commercial", style="bold cyan")
+    elif intent == SearchIntent.NAVIGATIONAL:
+        return Text("Navigational", style="bold magenta")
+    else:
+        return Text("Informational", style="bold blue")
+
+
+@app.command(name="keywords")
+def keywords_cmd(
+    seed: str = typer.Argument(..., help="Seed keyword (e.g. 'seo tools' or 'python web framework')"),
+    country: str = typer.Option("US", "--country", "-c", help="Country code for Google suggest (e.g. US, UK, DE)"),
+    expand_az: bool = typer.Option(True, "--expand-az/--no-expand-az", help="Expand with A-Z alphabet modifiers"),
+    questions: bool = typer.Option(True, "--questions/--no-questions", help="Expand with question intent modifiers"),
+    paid: bool = typer.Option(False, "--paid", help="Query DataForSEO API if configured (BYOK)"),
+    limit: int = typer.Option(50, "--limit", "-n", help="Maximum keywords to display in table"),
+    export_csv: Optional[str] = typer.Option(None, "--csv", help="Export keyword ideas to CSV file"),
+):
+    """Run keyword research, auto-tag search intent, score priority, and cluster topics."""
+    init_db()
+
+    with console.status(f"[bold cyan]Expanding keywords for [white]'{seed}'[/white]...[/bold cyan]"):
+        service = KeywordResearchService()
+        req = KeywordResearchRequest(
+            seed_keyword=seed,
+            country_code=country,
+            expand_alphabet=expand_az,
+            expand_questions=questions,
+            use_paid_api=paid,
+            max_results=limit * 2,
+            save_to_db=True,
+        )
+        result = asyncio.run(service.research(req))
+
+    # Summary Panel
+    cost_str = f"${result.cost_usd:.4f}" if result.cost_usd > 0 else "$0.00 (Free Autocomplete)"
+    summary = (
+        f"[bold]Seed Keyword:[/bold] {seed}\n"
+        f"[bold]Total Keywords Discovered:[/bold] {result.total_found}\n"
+        f"[bold]Thematic Clusters:[/bold] {len(result.clusters)}\n"
+        f"[bold]API Cost:[/bold] {cost_str}\n"
+        f"[bold]Saved Run ID:[/bold] {result.id[:8] if result.id else 'None'}"
+    )
+    console.print(Panel(summary, title="[bold green]neemSEO Keyword Research Summary[/bold green]", border_style="green"))
+
+    # Clusters Overview Table
+    if result.clusters:
+        c_table = Table(title="Topic Clusters Overview", header_style="bold magenta")
+        c_table.add_column("Cluster Name", style="bold white")
+        c_table.add_column("Keywords", justify="center")
+        c_table.add_column("Est. Volume", justify="right")
+        c_table.add_column("Avg KD", justify="center")
+        c_table.add_column("Dominant Intent", style="bold")
+
+        for c in result.clusters[:8]:
+            kd_col = "green" if c.average_difficulty <= 30 else ("yellow" if c.average_difficulty <= 60 else "red")
+            c_table.add_row(
+                c.cluster_name,
+                str(c.keyword_count),
+                f"{c.total_volume:,}",
+                f"[{kd_col}]{c.average_difficulty:.0f}[/{kd_col}]",
+                format_intent(c.dominant_intent),
+            )
+        console.print(c_table)
+
+    # Keywords Detail Table
+    k_table = Table(title=f"Top Keyword Opportunities (Sorted by Priority Score)", header_style="bold cyan")
+    k_table.add_column("Priority", justify="center", style="bold")
+    k_table.add_column("Keyword", style="white")
+    k_table.add_column("Volume", justify="right")
+    k_table.add_column("KD", justify="center")
+    k_table.add_column("CPC", justify="right", style="dim")
+    k_table.add_column("Search Intent")
+    k_table.add_column("Cluster Theme", style="italic")
+
+    # Sort keywords by priority_score descending
+    sorted_keywords = sorted(result.keywords, key=lambda k: k.priority_score, reverse=True)
+
+    for item in sorted_keywords[:limit]:
+        p_col = "green" if item.priority_score >= 70 else ("yellow" if item.priority_score >= 50 else "white")
+        kd_col = "green" if item.difficulty <= 30 else ("yellow" if item.difficulty <= 60 else "red")
+        k_table.add_row(
+            f"[{p_col}]{item.priority_score}/100[/{p_col}]",
+            item.keyword,
+            f"{item.search_volume:,}",
+            f"[{kd_col}]{item.difficulty}[/{kd_col}]",
+            f"${item.cpc:.2f}",
+            format_intent(item.intent),
+            item.cluster,
+        )
+    console.print(k_table)
+
+    # CSV Export
+    if export_csv:
+        with open(export_csv, mode="w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(["Keyword", "Search Volume", "Keyword Difficulty", "CPC ($)", "Search Intent", "Cluster", "Priority Score", "Source"])
+            for item in sorted_keywords:
+                writer.writerow([item.keyword, item.search_volume, item.difficulty, f"{item.cpc:.2f}", item.intent.value, item.cluster, item.priority_score, item.source])
+        console.print(f"\n[green]✓ Exported {len(sorted_keywords)} keywords to {export_csv}[/green]\n")
+
+
+@app.command(name="keyword-lists")
+def keyword_lists_cmd(limit: int = typer.Option(10, "--limit", "-n", help="Number of saved runs")):
+    """Show recent keyword research runs saved in the database."""
+    init_db()
+    with SessionLocal() as db:
+        runs = db.query(KeywordList).order_by(KeywordList.created_at.desc()).limit(limit).all()
+        if not runs:
+            console.print("[yellow]No keyword research runs found in database.[/yellow]")
+            return
+
+        table = Table(title="Saved Keyword Research Runs", header_style="bold green")
+        table.add_column("ID", style="cyan")
+        table.add_column("Seed Keyword", style="bold white")
+        table.add_column("Country", justify="center")
+        table.add_column("Total Keywords", justify="right")
+        table.add_column("Cost (USD)", justify="right")
+        table.add_column("Date", style="dim")
+
+        for r in runs:
+            table.add_row(
+                r.id[:8],
+                r.seed_keyword,
+                r.country,
+                str(r.total_keywords),
+                f"${float(r.cost_usd or 0.0):.4f}",
+                r.created_at.strftime("%Y-%m-%d %H:%M") if r.created_at else "",
+            )
+        console.print(table)
+
 
 
 if __name__ == "__main__":

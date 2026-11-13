@@ -216,3 +216,4 @@ class CrawlAnalyzer:
             new_duplicates=new_duplicates,
             resolved_duplicates=resolved_duplicates,
         )
+

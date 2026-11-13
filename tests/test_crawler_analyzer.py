@@ -114,3 +114,4 @@ def test_compare_crawls():
     assert len(diff.resolved_broken_links) == 1
     assert diff.resolved_broken_links[0].target_url == "https://example.com/404-old"
     assert len(diff.new_broken_links) == 0
+

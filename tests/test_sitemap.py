@@ -56,3 +56,4 @@ def test_parse_invalid_xml():
 
     assert len(urls) == 0
     assert len(children) == 0
+

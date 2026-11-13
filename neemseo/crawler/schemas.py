@@ -115,3 +115,4 @@ class CrawlDiffReport(BaseModel):
     resolved_broken_links: List[BrokenLinkItem] = Field(default_factory=list)
     new_duplicates: int = 0
     resolved_duplicates: int = 0
+

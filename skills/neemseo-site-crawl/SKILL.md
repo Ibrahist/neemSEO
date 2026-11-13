@@ -40,3 +40,4 @@ Examine the following key SEO health signals:
 When the user deploys technical fixes and re-crawls:
 - Call `compare_site_crawls(base_crawl_id=old_id, target_crawl_id=new_id)`.
 - Highlight score movement, resolved 404 links, and eliminated duplicate titles.
+

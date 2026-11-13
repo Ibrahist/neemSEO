@@ -123,3 +123,4 @@ class CrawlerJobManager:
 
 # Global job manager singleton
 crawler_manager = CrawlerJobManager()
+

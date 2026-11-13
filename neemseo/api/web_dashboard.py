@@ -21,7 +21,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     [x-cloak] { display: none !important; }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased" x-data="seoApp()" x-init="loadRecentCrawls()" x-cloak>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased" x-data="seoApp()" x-init="loadRecentCrawls(); loadRecentKeywordRuns()" x-cloak>
 
   <!-- Top Navigation -->
   <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
@@ -29,7 +29,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       <div class="flex items-center space-x-3">
         <div class="h-9 w-9 bg-emerald-500 rounded-lg flex items-center justify-center font-bold text-slate-950 text-xl shadow-lg shadow-emerald-500/20">n</div>
         <span class="text-xl font-bold tracking-tight text-white">neem<span class="text-emerald-400">SEO</span></span>
-        <span class="text-xs bg-slate-800 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded font-mono">v0.1.0 (Week 2)</span>
+        <span class="text-xs bg-slate-800 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded font-mono">v0.1.0 (Week 3: Keywords)</span>
       </div>
 
       <!-- Main Navigation Tabs -->
@@ -47,6 +47,13 @@ DASHBOARD_HTML = """<!DOCTYPE html>
           class="px-4 py-1.5 rounded-lg text-sm transition"
         >
           Site Crawler
+        </button>
+        <button 
+          @click="activeTab = 'keywords'"
+          :class="activeTab === 'keywords' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-400 hover:text-white'"
+          class="px-4 py-1.5 rounded-lg text-sm transition"
+        >
+          Keyword Research
         </button>
       </nav>
 
@@ -402,6 +409,275 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       </div>
     </div>
 
+    <!-- ================= TAB 3: KEYWORD RESEARCH ================= -->
+    <div x-show="activeTab === 'keywords'" class="space-y-8">
+      <!-- Input Card -->
+      <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 shadow-xl">
+        <div class="flex items-center justify-between mb-2">
+          <h1 class="text-2xl font-bold text-white">Keyword Research & Intent Clustering</h1>
+          <span class="text-xs bg-emerald-950 text-emerald-400 border border-emerald-800 px-3 py-1 rounded-full font-semibold">
+            Google Autocomplete + A-Z Expansion
+          </span>
+        </div>
+        <p class="text-slate-400 text-sm mb-6">Discover long-tail keyword opportunities, classify search intent (Informational, Commercial, Transactional, Navigational), cluster semantic themes, and calculate priority scores.</p>
+
+        <form @submit.prevent="runKeywordResearch()" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+            <div class="md:col-span-8">
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Seed Keyword</label>
+              <input 
+                type="text" 
+                x-model="kwSeed" 
+                placeholder="e.g. seo tools, best hiking boots, crm software" 
+                required
+                class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+              />
+            </div>
+            <div class="md:col-span-4">
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Country Market</label>
+              <select 
+                x-model="kwCountry" 
+                class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+              >
+                <option value="US">United States (US)</option>
+                <option value="GB">United Kingdom (UK)</option>
+                <option value="CA">Canada (CA)</option>
+                <option value="AU">Australia (AU)</option>
+                <option value="DE">Germany (DE)</option>
+                <option value="FR">France (FR)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
+            <div class="flex flex-wrap items-center gap-5">
+              <label class="flex items-center space-x-2 text-sm text-slate-300 cursor-pointer">
+                <input type="checkbox" x-model="kwExpandAZ" class="rounded border-slate-700 text-emerald-500 focus:ring-emerald-500 bg-slate-900">
+                <span>A-Z Alphabet Modifiers</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm text-slate-300 cursor-pointer">
+                <input type="checkbox" x-model="kwExpandQuestions" class="rounded border-slate-700 text-emerald-500 focus:ring-emerald-500 bg-slate-900">
+                <span>Questions & Prepositions (how, best, vs)</span>
+              </label>
+              <label class="flex items-center space-x-2 text-sm text-slate-300 cursor-pointer">
+                <input type="checkbox" x-model="kwUsePaid" class="rounded border-slate-700 text-emerald-500 focus:ring-emerald-500 bg-slate-900">
+                <span class="text-amber-400 font-medium">DataForSEO BYOK</span>
+              </label>
+            </div>
+
+            <button 
+              type="submit" 
+              :disabled="kwLoading"
+              class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition duration-150 flex items-center space-x-2 disabled:opacity-50 shadow-lg shadow-emerald-500/20"
+            >
+              <span x-show="!kwLoading">Discover Keywords</span>
+              <span x-show="kwLoading" class="flex items-center space-x-2">
+                <svg class="animate-spin h-4 w-4 text-slate-950" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                <span>Expanding Ideas...</span>
+              </span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Keyword Results Section -->
+      <template x-if="kwResult">
+        <div class="space-y-6">
+          <!-- Overview Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+              <span class="text-xs uppercase font-semibold text-slate-400">Total Keywords</span>
+              <p class="text-3xl font-extrabold text-white mt-1" x-text="kwResult.total_found"></p>
+            </div>
+            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+              <span class="text-xs uppercase font-semibold text-slate-400">Topic Clusters</span>
+              <p class="text-3xl font-extrabold text-emerald-400 mt-1" x-text="kwResult.clusters.length"></p>
+            </div>
+            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+              <span class="text-xs uppercase font-semibold text-slate-400">API Cost (USD)</span>
+              <p class="text-3xl font-extrabold text-cyan-400 mt-1" x-text="'$' + (kwResult.cost_usd || 0).toFixed(4)"></p>
+            </div>
+            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl flex items-center justify-between">
+              <div>
+                <span class="text-xs uppercase font-semibold text-slate-400">Export Report</span>
+                <p class="text-xs text-slate-500 mt-1">Full dataset with intent & scores</p>
+              </div>
+              <button @click="downloadKeywordCSV()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold px-4 py-2 rounded-lg transition">
+                CSV Export
+              </button>
+            </div>
+          </div>
+
+          <!-- Clusters Carousel / Pills -->
+          <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Semantic Topic Clusters</span>
+              <span class="text-xs text-slate-400">Click a cluster to filter keywords</span>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button 
+                @click="kwFilterCluster = 'all'" 
+                :class="kwFilterCluster === 'all' ? 'bg-emerald-500 text-slate-950 font-bold' : 'bg-slate-900 text-slate-300 hover:bg-slate-700 border border-slate-700'"
+                class="px-3 py-1 rounded-lg text-xs transition"
+              >
+                All Clusters (<span x-text="kwResult.total_found"></span>)
+              </button>
+              <template x-for="c in kwResult.clusters" :key="c.cluster_name">
+                <button 
+                  @click="kwFilterCluster = c.cluster_name"
+                  :class="kwFilterCluster === c.cluster_name ? 'bg-emerald-500 text-slate-950 font-bold' : 'bg-slate-900 text-slate-300 hover:bg-slate-700 border border-slate-700'"
+                  class="px-3 py-1 rounded-lg text-xs transition flex items-center space-x-1.5"
+                >
+                  <span x-text="c.cluster_name"></span>
+                  <span class="opacity-60 text-[10px]" x-text="'(' + c.keyword_count + ')'"></span>
+                </button>
+              </template>
+            </div>
+          </div>
+
+          <!-- Filter & Search Toolbar -->
+          <div class="flex flex-wrap items-center justify-between gap-4 bg-slate-800/50 p-3 rounded-xl border border-slate-700/50">
+            <!-- Intent Filter Pills -->
+            <div class="flex items-center space-x-1">
+              <span class="text-xs text-slate-400 mr-2">Intent:</span>
+              <button 
+                @click="kwFilterIntent = 'all'" 
+                :class="kwFilterIntent === 'all' ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'" 
+                class="px-2.5 py-1 rounded text-xs transition"
+              >All</button>
+              <button 
+                @click="kwFilterIntent = 'informational'" 
+                :class="kwFilterIntent === 'informational' ? 'bg-blue-900/60 text-blue-300 border border-blue-700' : 'text-slate-400 hover:text-white'" 
+                class="px-2.5 py-1 rounded text-xs transition"
+              >Informational</button>
+              <button 
+                @click="kwFilterIntent = 'commercial'" 
+                :class="kwFilterIntent === 'commercial' ? 'bg-cyan-900/60 text-cyan-300 border border-cyan-700' : 'text-slate-400 hover:text-white'" 
+                class="px-2.5 py-1 rounded text-xs transition"
+              >Commercial</button>
+              <button 
+                @click="kwFilterIntent = 'transactional'" 
+                :class="kwFilterIntent === 'transactional' ? 'bg-emerald-900/60 text-emerald-300 border border-emerald-700' : 'text-slate-400 hover:text-white'" 
+                class="px-2.5 py-1 rounded text-xs transition"
+              >Transactional</button>
+              <button 
+                @click="kwFilterIntent = 'navigational'" 
+                :class="kwFilterIntent === 'navigational' ? 'bg-purple-900/60 text-purple-300 border border-purple-700' : 'text-slate-400 hover:text-white'" 
+                class="px-2.5 py-1 rounded text-xs transition"
+              >Navigational</button>
+            </div>
+
+            <!-- Search input -->
+            <div class="w-full sm:w-64">
+              <input 
+                type="text" 
+                x-model="kwSearchQuery" 
+                placeholder="Filter keywords..." 
+                class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+              />
+            </div>
+          </div>
+
+          <!-- Keywords Data Table -->
+          <div class="bg-slate-800/80 border border-slate-700 rounded-xl overflow-hidden shadow-xl">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm">
+                <thead class="bg-slate-950/60 border-b border-slate-700 text-xs uppercase text-slate-400 font-semibold tracking-wider">
+                  <tr>
+                    <th class="py-3 px-4 text-center">Priority</th>
+                    <th class="py-3 px-4">Keyword Opportunity</th>
+                    <th class="py-3 px-4 text-right">Est. Volume</th>
+                    <th class="py-3 px-4 text-center">KD (Difficulty)</th>
+                    <th class="py-3 px-4 text-right">CPC ($)</th>
+                    <th class="py-3 px-4 text-center">Search Intent</th>
+                    <th class="py-3 px-4">Cluster Theme</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-700/50">
+                  <template x-for="item in filteredKeywords()" :key="item.keyword">
+                    <tr class="hover:bg-slate-700/30 transition">
+                      <!-- Priority Score -->
+                      <td class="py-3 px-4 text-center">
+                        <span 
+                          class="px-2 py-0.5 rounded text-xs font-bold font-mono"
+                          :class="item.priority_score >= 70 ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : (item.priority_score >= 50 ? 'bg-amber-950 text-amber-400 border border-amber-800' : 'bg-slate-800 text-slate-300')"
+                          x-text="item.priority_score + '/100'"
+                        ></span>
+                      </td>
+                      <!-- Keyword -->
+                      <td class="py-3 px-4 font-semibold text-white" x-text="item.keyword"></td>
+                      <!-- Search Volume -->
+                      <td class="py-3 px-4 text-right font-mono font-bold text-slate-200" x-text="item.search_volume.toLocaleString()"></td>
+                      <!-- KD Badge -->
+                      <td class="py-3 px-4 text-center">
+                        <span 
+                          class="px-2 py-0.5 rounded text-xs font-bold font-mono"
+                          :class="item.difficulty <= 30 ? 'bg-emerald-950 text-emerald-400' : (item.difficulty <= 60 ? 'bg-amber-950 text-amber-400' : 'bg-red-950 text-red-400')"
+                          x-text="item.difficulty"
+                        ></span>
+                      </td>
+                      <!-- CPC -->
+                      <td class="py-3 px-4 text-right font-mono text-slate-400 text-xs" x-text="'$' + item.cpc.toFixed(2)"></td>
+                      <!-- Intent Pill -->
+                      <td class="py-3 px-4 text-center">
+                        <span 
+                          class="px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider"
+                          :class="{
+                            'bg-emerald-900/40 text-emerald-400 border border-emerald-800/60': item.intent === 'transactional',
+                            'bg-cyan-900/40 text-cyan-400 border border-cyan-800/60': item.intent === 'commercial',
+                            'bg-blue-900/40 text-blue-400 border border-blue-800/60': item.intent === 'informational',
+                            'bg-purple-900/40 text-purple-400 border border-purple-800/60': item.intent === 'navigational'
+                          }"
+                          x-text="item.intent"
+                        ></span>
+                      </td>
+                      <!-- Cluster -->
+                      <td class="py-3 px-4 text-slate-300 text-xs italic" x-text="item.cluster"></td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </template>
+
+      <!-- Saved Keyword Runs -->
+      <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 shadow-xl">
+        <h2 class="text-lg font-bold text-white mb-4">Historical Keyword Research Runs</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-950/60 border-b border-slate-700 text-xs uppercase text-slate-400 font-semibold tracking-wider">
+              <tr>
+                <th class="py-3 px-4">Date</th>
+                <th class="py-3 px-4">Seed Keyword</th>
+                <th class="py-3 px-4 text-center">Country</th>
+                <th class="py-3 px-4 text-center">Total Ideas</th>
+                <th class="py-3 px-4 text-right">Cost (USD)</th>
+                <th class="py-3 px-4 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-700/50">
+              <template x-for="r in recentKeywordRuns" :key="r.id">
+                <tr class="hover:bg-slate-700/30">
+                  <td class="py-3 px-4 text-slate-400 text-xs" x-text="new Date(r.created_at).toLocaleString()"></td>
+                  <td class="py-3 px-4 font-semibold text-white" x-text="r.seed_keyword"></td>
+                  <td class="py-3 px-4 text-center uppercase text-xs font-mono" x-text="r.country"></td>
+                  <td class="py-3 px-4 text-center font-mono font-bold" x-text="r.total_keywords"></td>
+                  <td class="py-3 px-4 text-right font-mono text-cyan-400 text-xs" x-text="'$' + r.cost_usd.toFixed(4)"></td>
+                  <td class="py-3 px-4 text-right">
+                    <button @click="loadKeywordRun(r.id)" class="text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded transition">
+                      View Results
+                    </button>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <script>
@@ -425,6 +701,19 @@ DASHBOARD_HTML = """<!DOCTYPE html>
         crawlProgress: null,
         crawlReport: null,
         recentCrawls: [],
+
+        // Keyword research state
+        kwSeed: '',
+        kwCountry: 'US',
+        kwExpandAZ: true,
+        kwExpandQuestions: true,
+        kwUsePaid: false,
+        kwLoading: false,
+        kwResult: null,
+        kwFilterIntent: 'all',
+        kwFilterCluster: 'all',
+        kwSearchQuery: '',
+        recentKeywordRuns: [],
 
         async runAudit() {
           this.loading = true;
@@ -489,6 +778,69 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             const res = await fetch('/api/v1/crawls?limit=10');
             this.recentCrawls = await res.json();
           } catch(e) {}
+        },
+
+        async runKeywordResearch() {
+          this.kwLoading = true;
+          this.kwResult = null;
+          try {
+            const res = await fetch('/api/v1/keywords/research', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                seed_keyword: this.kwSeed,
+                country_code: this.kwCountry,
+                expand_alphabet: this.kwExpandAZ,
+                expand_questions: this.kwExpandQuestions,
+                use_paid_api: this.kwUsePaid,
+                max_results: 120
+              })
+            });
+            this.kwResult = await res.json();
+            this.loadRecentKeywordRuns();
+          } catch (e) {
+            alert('Keyword research error: ' + e.message);
+          } finally {
+            this.kwLoading = false;
+          }
+        },
+
+        async loadRecentKeywordRuns() {
+          try {
+            const res = await fetch('/api/v1/keywords/runs?limit=10');
+            this.recentKeywordRuns = await res.json();
+          } catch(e) {}
+        },
+
+        async loadKeywordRun(runId) {
+          try {
+            const res = await fetch(`/api/v1/keywords/runs/${runId}`);
+            const data = await res.json();
+            this.kwResult = {
+              id: data.id,
+              seed_keyword: data.seed_keyword,
+              country_code: data.country,
+              total_found: data.total_keywords,
+              cost_usd: data.cost_usd,
+              clusters: data.clusters_summary || [],
+              keywords: data.keywords || []
+            };
+          } catch(e) {}
+        },
+
+        downloadKeywordCSV() {
+          if (!this.kwResult || !this.kwResult.id) return;
+          window.location.href = `/api/v1/keywords/runs/${this.kwResult.id}/export.csv`;
+        },
+
+        filteredKeywords() {
+          if (!this.kwResult || !this.kwResult.keywords) return [];
+          return this.kwResult.keywords.filter(k => {
+            const matchesIntent = this.kwFilterIntent === 'all' || k.intent === this.kwFilterIntent;
+            const matchesCluster = this.kwFilterCluster === 'all' || k.cluster === this.kwFilterCluster;
+            const matchesSearch = !this.kwSearchQuery || k.keyword.toLowerCase().includes(this.kwSearchQuery.toLowerCase());
+            return matchesIntent && matchesCluster && matchesSearch;
+          });
         },
 
         downloadAuditCSV() {

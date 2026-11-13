@@ -16,6 +16,11 @@ from neemseo.crawler.manager import crawler_manager
 from neemseo.crawler.analyzer import CrawlAnalyzer
 from neemseo.db.models import Crawl
 from neemseo.db.session import SessionLocal
+from neemseo.keywords.schemas import KeywordResearchRequest, ClusterRequest, KeywordItem
+from neemseo.keywords.service import KeywordResearchService
+from neemseo.keywords.clustering import KeywordClusterer
+from neemseo.keywords.intent import IntentClassifier
+from neemseo.keywords.scoring import PriorityScorer
 
 # Initialize FastMCP server with exact naming requirement
 mcp = FastMCP("neemseo")
@@ -179,6 +184,99 @@ def compare_site_crawls(base_crawl_id: str, target_crawl_id: str) -> Dict[str, A
         r2 = CrawlSummaryReport(**c2.report_summary)
         diff = CrawlAnalyzer.compare_crawls(r1, r2)
         return diff.model_dump()
+
+
+@mcp.tool()
+async def research_keywords(
+    seed_keyword: str,
+    country: str = "US",
+    expand_alphabet: bool = True,
+    expand_questions: bool = True,
+    use_paid_api: bool = False,
+    max_results: int = 100,
+) -> Dict[str, Any]:
+    """
+    Research keyword opportunities from a seed term with intent labeling, topic clustering, and priority scoring.
+    Free mode ($0.00) uses Google Autocomplete + A-Z expansion.
+    """
+    service = KeywordResearchService()
+    req = KeywordResearchRequest(
+        seed_keyword=seed_keyword,
+        country_code=country,
+        expand_alphabet=expand_alphabet,
+        expand_questions=expand_questions,
+        use_paid_api=use_paid_api,
+        max_results=max_results,
+        save_to_db=True,
+    )
+    result = await service.research(req)
+    return {
+        "id": result.id,
+        "seed_keyword": result.seed_keyword,
+        "total_found": result.total_found,
+        "cost_usd": result.cost_usd,
+        "clusters": [
+            {
+                "cluster_name": c.cluster_name,
+                "keyword_count": c.keyword_count,
+                "total_volume": c.total_volume,
+                "average_difficulty": c.average_difficulty,
+                "dominant_intent": c.dominant_intent.value,
+            }
+            for c in result.clusters
+        ],
+        "top_keywords": [
+            {
+                "keyword": k.keyword,
+                "priority_score": k.priority_score,
+                "search_volume": k.search_volume,
+                "difficulty": k.difficulty,
+                "cpc": k.cpc,
+                "intent": k.intent.value,
+                "cluster": k.cluster,
+            }
+            for k in sorted(result.keywords, key=lambda x: x.priority_score, reverse=True)[:30]
+        ],
+    }
+
+
+@mcp.tool()
+def cluster_keywords(keywords: List[str]) -> Dict[str, Any]:
+    """
+    Group arbitrary list of keywords into thematic topic clusters with intent classification.
+    """
+    items = []
+    for kw in keywords:
+        clean = kw.strip()
+        if not clean:
+            continue
+        intent, conf = IntentClassifier.classify(clean)
+        priority = PriorityScorer.calculate(search_volume=1000, difficulty=35, intent=intent)
+        items.append(
+            KeywordItem(
+                keyword=clean,
+                search_volume=1000,
+                difficulty=35,
+                intent=intent,
+                priority_score=priority,
+                cluster="General",
+                intent_confidence=conf,
+            )
+        )
+
+    clusters = KeywordClusterer.cluster(items)
+    return {
+        "total_keywords": len(items),
+        "clusters": [
+            {
+                "cluster_name": c.cluster_name,
+                "keyword_count": c.keyword_count,
+                "dominant_intent": c.dominant_intent.value,
+                "keywords": [k.keyword for k in c.keywords],
+            }
+            for c in clusters
+        ],
+    }
 
 
 def main():

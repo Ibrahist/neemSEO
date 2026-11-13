@@ -149,3 +149,38 @@ class CrawlLink(Base):
 
     crawl = relationship("Crawl", back_populates="links")
 
+
+class KeywordList(Base):
+    __tablename__ = "keyword_lists"
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=True)
+    seed_keyword = Column(String(255), nullable=False, index=True)
+    country = Column(String(10), default="US")
+    language = Column(String(10), default="en")
+    total_keywords = Column(Integer, default=0)
+    cost_usd = Column(Numeric(10, 4), default=0.0)
+    clusters_summary = Column(JSON, default=list)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+
+    entries = relationship("KeywordEntry", back_populates="keyword_list", cascade="all, delete-orphan")
+
+
+class KeywordEntry(Base):
+    __tablename__ = "keyword_entries"
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    list_id = Column(String(36), ForeignKey("keyword_lists.id", ondelete="CASCADE"), nullable=False, index=True)
+    keyword = Column(String(512), nullable=False, index=True)
+    search_volume = Column(Integer, default=0)
+    cpc = Column(Float, default=0.0)
+    difficulty = Column(Integer, default=0)  # 0-100
+    intent = Column(String(50), default="informational")  # informational, commercial, transactional, navigational
+    cluster = Column(String(255), default="General")
+    priority_score = Column(Integer, default=50)  # 0-100
+    source = Column(String(50), default="autocomplete")  # autocomplete, dataforseo, manual
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    keyword_list = relationship("KeywordList", back_populates="entries")
+
+
