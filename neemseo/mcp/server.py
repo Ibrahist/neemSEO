@@ -21,6 +21,10 @@ from neemseo.keywords.service import KeywordResearchService
 from neemseo.keywords.clustering import KeywordClusterer
 from neemseo.keywords.intent import IntentClassifier
 from neemseo.keywords.scoring import PriorityScorer
+from neemseo.ranker.schemas import AddTargetRequest, CheckRankRequest, DeviceType
+from neemseo.ranker.service import RankTrackerService
+from neemseo.backlinks.schemas import BacklinkResearchRequest
+from neemseo.backlinks.service import BacklinkTrackerService
 
 # Initialize FastMCP server with exact naming requirement
 mcp = FastMCP("neemseo")
@@ -279,10 +283,173 @@ def cluster_keywords(keywords: List[str]) -> Dict[str, Any]:
     }
 
 
+@mcp.tool()
+def add_rank_target(
+    keyword: str,
+    target_url: str,
+    location_code: int = 2840,
+    location_name: str = "United States",
+    device: str = "desktop",
+) -> Dict[str, Any]:
+    """
+    Add a keyword + URL + location + device combination to the rank tracker.
+    Rankings vary by location and device, so all four fields are required.
+    Estimated Cost: $0.00 (Free — cost only incurred on SERP check)
+    """
+    svc = RankTrackerService()
+    target = svc.add_target(AddTargetRequest(
+        keyword=keyword,
+        target_url=target_url,
+        location_code=location_code,
+        location_name=location_name,
+        device=DeviceType(device),
+    ))
+    return {
+        "target_id": target.id,
+        "keyword": target.keyword,
+        "target_url": target.target_url,
+        "device": target.device.value,
+        "location": target.location_name,
+        "message": f"Tracking target created. Run check_serp_positions to record first position.",
+    }
+
+
+@mcp.tool()
+def list_rank_targets() -> Dict[str, Any]:
+    """List all active keyword rank tracking targets."""
+    svc = RankTrackerService()
+    targets = svc.list_targets()
+    return {
+        "total": len(targets),
+        "targets": [
+            {
+                "id": t.id,
+                "keyword": t.keyword,
+                "target_url": t.target_url,
+                "device": t.device.value,
+                "location": t.location_name,
+            }
+            for t in targets
+        ],
+    }
+
+
+@mcp.tool()
+async def check_serp_positions(
+    target_ids: Optional[List[str]] = None,
+    confirm_cost: bool = False,
+) -> Dict[str, Any]:
+    """
+    Run SERP position checks for tracked keywords via DataForSEO (BYOK).
+    Shows cost estimate first. Set confirm_cost=True to execute the paid check.
+    Free-mode generates simulated positions at $0.00 when no key is configured.
+    """
+    svc = RankTrackerService()
+    est = svc.estimate_check_cost(target_ids=target_ids)
+
+    if not confirm_cost and est.estimated_cost_usd > 0:
+        return {
+            "status": "confirmation_required",
+            "estimated_cost_usd": est.estimated_cost_usd,
+            "target_count": est.target_count,
+            "explanation": est.explanation,
+            "hint": "Set confirm_cost=True to authorize this paid check.",
+        }
+
+    results = await svc.run_checks(target_ids=target_ids)
+    return {
+        "checked": len(results),
+        "total_cost_usd": sum(r.cost_usd for r in results),
+        "results": [
+            {
+                "keyword": r.keyword,
+                "position": r.position,
+                "previous_position": r.previous_position,
+                "change": r.position_change,
+                "device": r.device.value,
+                "source": r.source,
+            }
+            for r in results
+        ],
+    }
+
+
+@mcp.tool()
+def get_rank_trend(target_id: str, limit: int = 30) -> Dict[str, Any]:
+    """
+    Get historical position trend and drop alerts for a rank tracking target.
+    """
+    svc = RankTrackerService()
+    trend = svc.get_trend(target_id, limit=limit)
+    if not trend:
+        return {"error": "Target not found or no position history yet."}
+    return {
+        "keyword": trend.keyword,
+        "target_url": trend.target_url,
+        "current_position": trend.current_position,
+        "best_position": trend.best_position,
+        "worst_position": trend.worst_position,
+        "has_alert": trend.has_alert,
+        "alert_message": trend.alert_message,
+        "history": [
+            {"position": c.position, "checked_at": c.checked_at.isoformat() if c.checked_at else None}
+            for c in trend.checks
+        ],
+    }
+
+
+@mcp.tool()
+async def fetch_backlinks(
+    target_domain: str,
+    max_backlinks: int = 100,
+    confirm_cost: bool = False,
+) -> Dict[str, Any]:
+    """
+    Fetch a backlink profile snapshot for a domain.
+    Free-mode generates realistic demo data at $0.00.
+    Requires confirm_cost=True when DataForSEO credentials are configured (paid call: ~$0.02).
+    """
+    svc = BacklinkTrackerService()
+    est = svc.estimate_cost(target_domain)
+
+    from neemseo.adapters.dataforseo import DataForSEOAdapter
+    adapter = DataForSEOAdapter()
+    if adapter.is_configured() and not confirm_cost:
+        return {
+            "status": "confirmation_required",
+            "estimated_cost_usd": est.estimated_cost_usd,
+            "explanation": est.explanation,
+            "hint": "Set confirm_cost=True to authorize this paid snapshot.",
+        }
+
+    req = BacklinkResearchRequest(
+        target_domain=target_domain,
+        max_backlinks=max_backlinks,
+        confirm_cost=confirm_cost,
+    )
+    snapshot = await svc.fetch_snapshot(req)
+    return {
+        "snapshot_id": snapshot.id,
+        "target_domain": snapshot.target_domain,
+        "total_backlinks": snapshot.total_backlinks,
+        "total_referring_domains": snapshot.total_referring_domains,
+        "dofollow_count": snapshot.dofollow_count,
+        "nofollow_count": snapshot.nofollow_count,
+        "new_links_since_last": snapshot.new_links_since_last,
+        "lost_links_since_last": snapshot.lost_links_since_last,
+        "cost_usd": snapshot.cost_usd,
+        "source": snapshot.source,
+        "top_anchors": snapshot.top_anchor_texts[:5],
+        "top_referring_domains": [
+            {"domain": d.domain, "links": d.total_links, "dr": d.domain_rank}
+            for d in snapshot.referring_domains[:10]
+        ],
+    }
+
+
 def main():
     mcp.run()
 
 
 if __name__ == "__main__":
     main()
-

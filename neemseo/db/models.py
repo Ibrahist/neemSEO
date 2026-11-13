@@ -184,3 +184,85 @@ class KeywordEntry(Base):
     keyword_list = relationship("KeywordList", back_populates="entries")
 
 
+# ─────────────────────────── Rank Tracker Tables ───────────────────────────
+
+class RankTrackerTarget(Base):
+    __tablename__ = "rank_tracker_targets"
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=True)
+    keyword = Column(String(512), nullable=False, index=True)
+    target_url = Column(String(2048), nullable=False)
+    location_code = Column(Integer, default=2840)       # 2840 = United States
+    location_name = Column(String(255), default="United States")
+    language_code = Column(String(10), default="en")
+    device = Column(String(20), default="desktop")       # desktop | mobile
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+
+    checks = relationship("RankCheck", back_populates="target", cascade="all, delete-orphan")
+
+
+class RankCheck(Base):
+    __tablename__ = "rank_checks"
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    target_id = Column(String(36), ForeignKey("rank_tracker_targets.id", ondelete="CASCADE"), nullable=False, index=True)
+    keyword = Column(String(512), nullable=False)
+    target_url = Column(String(2048), nullable=False)
+    position = Column(Integer, nullable=True)            # None = not in top 100
+    previous_position = Column(Integer, nullable=True)
+    position_change = Column(Integer, nullable=True)     # positive = moved up
+    url_found = Column(String(2048), nullable=True)
+    is_featured_snippet = Column(Boolean, default=False)
+    is_local_pack = Column(Boolean, default=False)
+    location_code = Column(Integer, default=2840)
+    device = Column(String(20), default="desktop")
+    cost_usd = Column(Float, default=0.0)
+    source = Column(String(50), default="dataforseo")
+    checked_at = Column(DateTime, default=datetime.utcnow, index=True)
+
+    target = relationship("RankTrackerTarget", back_populates="checks")
+
+
+# ─────────────────────────── Backlink Tracker Tables ───────────────────────
+
+class BacklinkSnapshotRecord(Base):
+    __tablename__ = "backlink_snapshots"
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=True)
+    target_domain = Column(String(512), nullable=False, index=True)
+    total_backlinks = Column(Integer, default=0)
+    total_referring_domains = Column(Integer, default=0)
+    dofollow_count = Column(Integer, default=0)
+    nofollow_count = Column(Integer, default=0)
+    new_links_since_last = Column(Integer, default=0)
+    lost_links_since_last = Column(Integer, default=0)
+    top_anchor_texts = Column(JSON, default=list)
+    cost_usd = Column(Float, default=0.0)
+    source = Column(String(50), default="dataforseo")
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+
+    backlinks = relationship("BacklinkRecord", back_populates="snapshot", cascade="all, delete-orphan")
+
+
+class BacklinkRecord(Base):
+    __tablename__ = "backlink_records"
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    snapshot_id = Column(String(36), ForeignKey("backlink_snapshots.id", ondelete="CASCADE"), nullable=False, index=True)
+    source_url = Column(String(2048), nullable=False)
+    source_domain = Column(String(512), nullable=False, index=True)
+    target_url = Column(String(2048), nullable=False)
+    anchor_text = Column(String(512), default="")
+    link_type = Column(String(20), default="dofollow")  # dofollow, nofollow, sponsored, ugc
+    domain_rank = Column(Integer, default=0)
+    page_rank = Column(Integer, default=0)
+    is_new = Column(Boolean, default=False)
+    is_lost = Column(Boolean, default=False)
+
+    snapshot = relationship("BacklinkSnapshotRecord", back_populates="backlinks")
+
+
+

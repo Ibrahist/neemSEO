@@ -28,6 +28,10 @@ from neemseo.keywords.service import KeywordResearchService
 from neemseo.keywords.clustering import KeywordClusterer
 from neemseo.keywords.intent import IntentClassifier
 from neemseo.keywords.scoring import PriorityScorer
+from neemseo.ranker.schemas import AddTargetRequest, CheckRankRequest, DeviceType
+from neemseo.ranker.service import RankTrackerService
+from neemseo.backlinks.schemas import BacklinkResearchRequest
+from neemseo.backlinks.service import BacklinkTrackerService
 
 app = typer.Typer(
     name="neemseo",
@@ -516,6 +520,306 @@ def keyword_lists_cmd(limit: int = typer.Option(10, "--limit", "-n", help="Numbe
             )
         console.print(table)
 
+
+# ═══════════════════════════════════════════════════════
+#  RANK TRACKER CLI COMMANDS
+# ═══════════════════════════════════════════════════════
+
+@app.command(name="rank-add")
+def rank_add_cmd(
+    keyword: str = typer.Argument(..., help="Target keyword to track"),
+    url: str = typer.Argument(..., help="Your page URL that should rank for this keyword"),
+    location: str = typer.Option("United States", "--location", "-l", help="Target location name"),
+    location_code: int = typer.Option(2840, "--location-code", help="DataForSEO location code (2840 = US)"),
+    device: str = typer.Option("desktop", "--device", "-d", help="Device type: desktop or mobile"),
+):
+    """Add a keyword + URL + location + device tracking target."""
+    init_db()
+    svc = RankTrackerService()
+    target = svc.add_target(AddTargetRequest(
+        keyword=keyword,
+        target_url=url,
+        location_code=location_code,
+        location_name=location,
+        device=DeviceType(device),
+    ))
+    console.print(Panel(
+        f"[bold]Keyword:[/bold] {target.keyword}\n"
+        f"[bold]Target URL:[/bold] {target.target_url}\n"
+        f"[bold]Location:[/bold] {target.location_name}\n"
+        f"[bold]Device:[/bold] {target.device.value}\n"
+        f"[bold]Target ID:[/bold] {target.id[:8]}",
+        title="[bold green]✓ Rank Target Added[/bold green]",
+        border_style="green",
+    ))
+    console.print("[dim]Run [cyan]neemseo rank-check[/cyan] to record first position.[/dim]")
+
+
+@app.command(name="rank-targets")
+def rank_targets_cmd():
+    """List all active keyword rank tracking targets."""
+    init_db()
+    svc = RankTrackerService()
+    targets = svc.list_targets()
+
+    if not targets:
+        console.print("[yellow]No rank tracking targets found. Use [cyan]neemseo rank-add[/cyan] to add one.[/yellow]")
+        return
+
+    table = Table(title="Active Rank Tracker Targets", header_style="bold cyan")
+    table.add_column("ID", style="dim")
+    table.add_column("Keyword", style="bold white")
+    table.add_column("Target URL", style="white")
+    table.add_column("Location", style="green")
+    table.add_column("Device", justify="center")
+    table.add_column("Created", style="dim")
+
+    for t in targets:
+        table.add_row(
+            t.id[:8],
+            t.keyword,
+            t.target_url,
+            t.location_name,
+            t.device.value,
+            t.created_at.strftime("%Y-%m-%d") if t.created_at else "",
+        )
+    console.print(table)
+
+
+@app.command(name="rank-check")
+def rank_check_cmd(
+    target_id: Optional[str] = typer.Option(None, "--target", "-t", help="Specific target ID prefix (checks all if omitted)"),
+    confirm: bool = typer.Option(False, "--confirm", help="Confirm paid DataForSEO SERP check"),
+):
+    """Run SERP position checks for tracked keywords. Shows cost estimate first."""
+    init_db()
+    svc = RankTrackerService()
+    ids = [target_id] if target_id else None
+
+    # Pre-flight estimate
+    est = svc.estimate_check_cost(target_ids=ids)
+    if est.target_count == 0:
+        console.print("[yellow]No active targets to check. Add targets with [cyan]neemseo rank-add[/cyan].[/yellow]")
+        return
+
+    console.print(Panel(
+        f"[bold]Targets to Check:[/bold] {est.target_count}\n"
+        f"[bold]Estimated Cost:[/bold] [cyan]${est.estimated_cost_usd:.4f}[/cyan]\n"
+        f"{est.explanation}",
+        title="[bold yellow]💰 Pre-flight Cost Estimate[/bold yellow]",
+        border_style="yellow",
+    ))
+
+    if est.estimated_cost_usd > 0 and not confirm:
+        console.print("[dim]Add [cyan]--confirm[/cyan] flag to authorize this paid check.[/dim]")
+        return
+
+    with console.status("[bold cyan]Checking SERP positions...[/bold cyan]"):
+        results = asyncio.run(svc.run_checks(target_ids=ids))
+
+    table = Table(title="SERP Position Check Results", header_style="bold green")
+    table.add_column("Keyword", style="bold white")
+    table.add_column("URL", style="dim")
+    table.add_column("Position", justify="center", style="bold")
+    table.add_column("Previous", justify="center")
+    table.add_column("Change", justify="center")
+    table.add_column("Device", justify="center")
+    table.add_column("Source", style="dim")
+
+    for r in results:
+        pos_color = "green" if (r.position and r.position <= 10) else ("yellow" if (r.position and r.position <= 30) else "red")
+        pos_str = f"[{pos_color}]#{r.position}[/{pos_color}]" if r.position else "[dim]Not Found[/dim]"
+        prev_str = f"#{r.previous_position}" if r.previous_position else "-"
+        change_str = "-"
+        if r.position_change is not None:
+            ch = r.position_change
+            change_str = f"[green]+{ch}[/green]" if ch > 0 else (f"[red]{ch}[/red]" if ch < 0 else "[dim]0[/dim]")
+
+        table.add_row(r.keyword, r.target_url[:45], pos_str, prev_str, change_str, r.device.value, r.source)
+
+    console.print(table)
+    total_cost = sum(r.cost_usd for r in results)
+    console.print(f"\n[dim]Total cost: ${total_cost:.4f} | Checked: {len(results)} targets[/dim]")
+
+
+@app.command(name="rank-trend")
+def rank_trend_cmd(
+    target_id: str = typer.Argument(..., help="Target ID prefix (from rank-targets list)"),
+    limit: int = typer.Option(10, "--limit", "-n", help="Number of historical checks to display"),
+):
+    """Show position history trend and alerts for a rank target."""
+    init_db()
+    svc = RankTrackerService()
+
+    # Find target by ID prefix
+    targets = svc.list_targets(active_only=False)
+    target = next((t for t in targets if t.id.startswith(target_id)), None)
+    if not target:
+        console.print(f"[red]Target '{target_id}' not found.[/red]")
+        return
+
+    trend = svc.get_trend(target.id, limit=limit)
+    if not trend:
+        console.print("[yellow]No position history found for this target yet.[/yellow]")
+        return
+
+    # Header panel
+    pos_color = "green" if (trend.current_position and trend.current_position <= 10) else ("yellow" if trend.current_position else "dim")
+    alert_text = f"\n[bold red]⚠ ALERT: {trend.alert_message}[/bold red]" if trend.has_alert else ""
+
+    console.print(Panel(
+        f"[bold]Keyword:[/bold] {trend.keyword}\n"
+        f"[bold]Target URL:[/bold] {trend.target_url}\n"
+        f"[bold]Current Position:[/bold] [{pos_color}]#{trend.current_position or 'N/A'}[/{pos_color}]\n"
+        f"[bold]Best Position:[/bold] [green]#{trend.best_position or 'N/A'}[/green]  "
+        f"[bold]Worst:[/bold] [red]#{trend.worst_position or 'N/A'}[/red]"
+        f"{alert_text}",
+        title="[bold cyan]Rank Position Trend[/bold cyan]",
+        border_style="cyan",
+    ))
+
+    table = Table(header_style="bold blue")
+    table.add_column("Date Checked", style="dim")
+    table.add_column("Position", justify="center", style="bold")
+    table.add_column("Change", justify="center")
+
+    for c in reversed(trend.checks[-limit:]):
+        p = c.position
+        pos_color = "green" if (p and p <= 10) else ("yellow" if p else "dim")
+        pos_str = f"[{pos_color}]#{p}[/{pos_color}]" if p else "[dim]N/A[/dim]"
+        change_str = "-"
+        if c.position_change is not None:
+            ch = c.position_change
+            change_str = f"[green]▲ {ch}[/green]" if ch > 0 else (f"[red]▼ {abs(ch)}[/red]" if ch < 0 else "[dim]─[/dim]")
+        date_str = c.checked_at.strftime("%Y-%m-%d %H:%M") if c.checked_at else ""
+        table.add_row(date_str, pos_str, change_str)
+
+    console.print(table)
+
+
+# ═══════════════════════════════════════════════════════
+#  BACKLINK TRACKER CLI COMMANDS
+# ═══════════════════════════════════════════════════════
+
+@app.command(name="backlinks")
+def backlinks_cmd(
+    domain: str = typer.Argument(..., help="Root domain to analyze (e.g. example.com)"),
+    limit: int = typer.Option(20, "--limit", "-n", help="Max backlinks to display in table"),
+    confirm: bool = typer.Option(False, "--confirm", help="Confirm paid DataForSEO backlink snapshot"),
+    export_csv: Optional[str] = typer.Option(None, "--csv", help="Export full backlink list to CSV file"),
+):
+    """Fetch a backlink profile snapshot for a domain. Free mode generates demo data at $0."""
+    init_db()
+    svc = BacklinkTrackerService()
+    est = svc.estimate_cost(domain)
+
+    from neemseo.adapters.dataforseo import DataForSEOAdapter
+    adapter = DataForSEOAdapter()
+    if adapter.is_configured() and not confirm:
+        console.print(Panel(
+            f"[bold]Domain:[/bold] {domain}\n"
+            f"[bold]Estimated Cost:[/bold] [cyan]${est.estimated_cost_usd:.4f}[/cyan]\n"
+            f"{est.explanation}",
+            title="[bold yellow]💰 Pre-flight Cost Estimate[/bold yellow]",
+            border_style="yellow",
+        ))
+        console.print("[dim]Add [cyan]--confirm[/cyan] to authorize this paid snapshot.[/dim]")
+        return
+
+    with console.status(f"[bold cyan]Fetching backlinks for [white]{domain}[/white]...[/bold cyan]"):
+        req = BacklinkResearchRequest(target_domain=domain, max_backlinks=limit * 3, confirm_cost=confirm)
+        snapshot = asyncio.run(svc.fetch_snapshot(req))
+
+    # Summary panel
+    source_badge = "[green]DataForSEO[/green]" if snapshot.source == "dataforseo" else "[dim]Simulated (Free Mode)[/dim]"
+    console.print(Panel(
+        f"[bold]Domain:[/bold] {snapshot.target_domain}\n"
+        f"[bold]Total Backlinks:[/bold] [cyan]{snapshot.total_backlinks}[/cyan]  "
+        f"[bold]Referring Domains:[/bold] [cyan]{snapshot.total_referring_domains}[/cyan]\n"
+        f"[bold]Dofollow:[/bold] [green]{snapshot.dofollow_count}[/green]  "
+        f"[bold]Nofollow:[/bold] [yellow]{snapshot.nofollow_count}[/yellow]\n"
+        f"[bold]New (since last):[/bold] [green]+{snapshot.new_links_since_last}[/green]  "
+        f"[bold]Lost:[/bold] [red]-{snapshot.lost_links_since_last}[/red]\n"
+        f"[bold]Cost:[/bold] ${snapshot.cost_usd:.4f}  |  [bold]Source:[/bold] {source_badge}",
+        title="[bold green]Backlink Snapshot Summary[/bold green]",
+        border_style="green",
+    ))
+
+    # Top anchor texts
+    if snapshot.top_anchor_texts:
+        a_table = Table(title="Top Anchor Texts", header_style="bold magenta")
+        a_table.add_column("Anchor Text", style="white")
+        a_table.add_column("Count", justify="right")
+        a_table.add_column("Share", justify="right")
+        for a in snapshot.top_anchor_texts[:8]:
+            a_table.add_row(a.get("text", ""), str(a.get("count", 0)), f"{a.get('percentage', 0):.1f}%")
+        console.print(a_table)
+
+    # Top referring domains
+    if snapshot.referring_domains:
+        d_table = Table(title="Top Referring Domains", header_style="bold cyan")
+        d_table.add_column("Domain", style="bold white")
+        d_table.add_column("Links", justify="center")
+        d_table.add_column("DR", justify="center")
+        d_table.add_column("Dofollow", justify="center")
+        d_table.add_column("Nofollow", justify="center")
+        for d in snapshot.referring_domains[:limit]:
+            dr_color = "green" if d.domain_rank >= 70 else ("yellow" if d.domain_rank >= 40 else "dim")
+            d_table.add_row(
+                d.domain,
+                str(d.total_links),
+                f"[{dr_color}]{d.domain_rank}[/{dr_color}]",
+                str(d.dofollow_count),
+                str(d.nofollow_count),
+            )
+        console.print(d_table)
+
+    # CSV export
+    if export_csv:
+        with open(export_csv, mode="w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(["Source URL", "Source Domain", "Target URL", "Anchor Text", "Link Type", "DR", "PR", "New", "Lost"])
+            for b in snapshot.backlinks:
+                writer.writerow([b.source_url, b.source_domain, b.target_url, b.anchor_text, b.link_type.value, b.domain_rank, b.page_rank, b.is_new, b.is_lost])
+        console.print(f"\n[green]✓ Exported {len(snapshot.backlinks)} backlinks to {export_csv}[/green]")
+
+
+@app.command(name="backlink-history")
+def backlink_history_cmd(
+    domain: Optional[str] = typer.Option(None, "--domain", "-d", help="Filter by domain"),
+    limit: int = typer.Option(10, "--limit", "-n"),
+):
+    """List historical backlink snapshots."""
+    init_db()
+    svc = BacklinkTrackerService()
+    rows = svc.list_snapshots(domain=domain, limit=limit)
+
+    if not rows:
+        console.print("[yellow]No backlink snapshots found. Run [cyan]neemseo backlinks <domain>[/cyan] first.[/yellow]")
+        return
+
+    table = Table(title="Backlink Snapshot History", header_style="bold green")
+    table.add_column("ID", style="dim")
+    table.add_column("Domain", style="bold white")
+    table.add_column("Total Links", justify="right")
+    table.add_column("Ref Domains", justify="right")
+    table.add_column("New", justify="center", style="green")
+    table.add_column("Lost", justify="center", style="red")
+    table.add_column("Source", style="dim")
+    table.add_column("Date", style="dim")
+
+    for r in rows:
+        table.add_row(
+            r.id[:8],
+            r.target_domain,
+            str(r.total_backlinks),
+            str(r.total_referring_domains),
+            f"+{r.new_links_since_last}",
+            f"-{r.lost_links_since_last}",
+            r.source or "",
+            r.created_at.strftime("%Y-%m-%d %H:%M") if r.created_at else "",
+        )
+    console.print(table)
 
 
 if __name__ == "__main__":

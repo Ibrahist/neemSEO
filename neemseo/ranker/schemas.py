@@ -100,3 +100,4 @@ class RankCheckCostEstimate(BaseModel):
     estimated_cost_usd: float
     explanation: str
     cost_per_check_usd: float = 0.002
+
