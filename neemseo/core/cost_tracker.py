@@ -66,3 +66,4 @@ class CostTracker:
 
 # Global in-memory cost tracker
 cost_tracker = CostTracker()
+

@@ -59,3 +59,4 @@ class OpenGraphRule(BaseRule):
             why_it_matters=self.why_it_matters,
             context={"found_tags": list(og.keys())},
         )
+

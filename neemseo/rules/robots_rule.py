@@ -59,3 +59,4 @@ class RobotsDirectivesRule(BaseRule):
             why_it_matters=self.why_it_matters,
             context={"robots_meta": page.robots_meta or "index, follow"},
         )
+

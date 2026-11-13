@@ -50,3 +50,4 @@ class BaseRule:
         Must return a RuleResult.
         """
         raise NotImplementedError
+

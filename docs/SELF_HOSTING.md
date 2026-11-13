@@ -39,3 +39,4 @@ The default `docker-compose.yml` provides:
 - **VPS**: Hetzner, DigitalOcean, Linode, OVH
 - **Self-hosted PaaS**: Coolify, Portainer, Dokploy
 - **Managed PaaS**: Railway, Render
+

@@ -122,3 +122,4 @@ class GooglePageSpeedAdapter(BaseProviderAdapter):
             params={"url": url, "strategy": strategy},
         )
         return CoreWebVitals(**{k: v for k, v in data.items() if k != "cost"})
+

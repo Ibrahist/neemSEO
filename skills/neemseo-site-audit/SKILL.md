@@ -42,3 +42,4 @@ Format your output cleanly:
    - What is wrong.
    - Exact code snippet or copy to insert.
 3. **Verification**: Offer to re-run the audit once the user implements the changes.
+

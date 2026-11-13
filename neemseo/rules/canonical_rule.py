@@ -58,3 +58,4 @@ class CanonicalRule(BaseRule):
             why_it_matters=self.why_it_matters,
             context={"canonical": canonical, "is_self_referential": is_self_referential},
         )
+

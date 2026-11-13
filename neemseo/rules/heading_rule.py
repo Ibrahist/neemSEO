@@ -85,3 +85,4 @@ class HeadingRule(BaseRule):
             why_it_matters=self.why_it_matters,
             context={"h1": page.h1_list[0], "total_headings": len(headings)},
         )
+

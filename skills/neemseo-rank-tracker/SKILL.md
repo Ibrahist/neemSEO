@@ -23,3 +23,4 @@ When a page drops in ranking:
    - Are canonical tags still pointing correctly?
 2. Check for competitor movement and SERP feature changes (e.g. AI Overview taking top screen real estate).
 3. Provide a clear remediation checklist.
+

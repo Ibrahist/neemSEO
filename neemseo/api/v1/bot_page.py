@@ -75,3 +75,4 @@ Disallow: /api/</pre>
 @router.get("/bot", response_class=HTMLResponse)
 def bot_info_page():
     return HTMLResponse(content=BOT_HTML)
+

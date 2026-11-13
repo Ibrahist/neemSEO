@@ -76,3 +76,4 @@ class MetaDescriptionRule(BaseRule):
             why_it_matters=self.why_it_matters,
             context={"description": desc, "length": length},
         )
+

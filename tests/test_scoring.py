@@ -71,3 +71,4 @@ def test_scorer_deductions_and_priority():
     assert len(report.prioritized_fixes) == 2
     # Critical FAIL must be first in prioritized fixes
     assert report.prioritized_fixes[0].rule_id == "r1"
+

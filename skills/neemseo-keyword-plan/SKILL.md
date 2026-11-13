@@ -26,3 +26,4 @@ Using the chosen primary keyword and secondary semantic variations:
 - Recommend an optimal `<meta name="description">` (120–160 characters).
 - Outline the `<h1>` and `<h2>` headings incorporating secondary intent clusters.
 - Define internal linking targets.
+

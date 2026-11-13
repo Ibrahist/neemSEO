@@ -68,3 +68,4 @@ class DataForSEOAdapter(BaseProviderAdapter):
             "cost": float(self.COST_SERP_CHECK),
             "data": {},
         }
+

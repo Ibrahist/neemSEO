@@ -46,3 +46,4 @@ class FaviconRule(BaseRule):
 - Formatter: `ruff format`
 - Linter: `ruff check`
 - Type hinting: Type hints on all public interfaces and Pydantic models.
+

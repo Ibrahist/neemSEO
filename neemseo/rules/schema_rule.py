@@ -56,3 +56,4 @@ class SchemaMarkupRule(BaseRule):
             why_it_matters=self.why_it_matters,
             context={"schema_count": len(schemas), "types": types},
         )
+

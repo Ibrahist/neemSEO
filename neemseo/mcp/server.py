@@ -11,6 +11,11 @@ from mcp.server.fastmcp import FastMCP
 from neemseo.core.auditor import OnPageAuditor
 from neemseo.rules.registry import registry
 from neemseo.adapters.dataforseo import DataForSEOAdapter
+from neemseo.crawler.schemas import CrawlConfig, CrawlSummaryReport
+from neemseo.crawler.manager import crawler_manager
+from neemseo.crawler.analyzer import CrawlAnalyzer
+from neemseo.db.models import Crawl
+from neemseo.db.session import SessionLocal
 
 # Initialize FastMCP server with exact naming requirement
 mcp = FastMCP("neemseo")
@@ -104,9 +109,82 @@ async def keyword_ideas(
     }
 
 
+@mcp.tool()
+def start_site_crawl(
+    seed_url: str,
+    max_pages: int = 50,
+    max_depth: int = 3,
+    check_sitemap: bool = True,
+) -> Dict[str, Any]:
+    """
+    Start an autonomous background crawl across an entire domain.
+    Inspects internal link architecture, finds broken links (4xx/5xx), duplicate titles, and orphan pages.
+    Estimated Cost: $0.00 (Free)
+    """
+    config = CrawlConfig(
+        seed_url=seed_url,
+        max_pages=max_pages,
+        max_depth=max_depth,
+        check_sitemap=check_sitemap,
+    )
+    crawl_id = crawler_manager.start_crawl(config)
+    return {
+        "crawl_id": crawl_id,
+        "seed_url": seed_url,
+        "status": "started",
+        "message": f"Crawl started for {seed_url}. Check progress with get_crawl_progress(crawl_id='{crawl_id}').",
+    }
+
+
+@mcp.tool()
+def get_crawl_progress(crawl_id: str) -> Dict[str, Any]:
+    """
+    Get live progress updates for an active or completed site crawl.
+    """
+    prog = crawler_manager.get_progress(crawl_id)
+    if not prog:
+        return {"error": "Crawl ID not found"}
+    return prog.model_dump()
+
+
+@mcp.tool()
+def get_site_crawl_report(crawl_id: str) -> Dict[str, Any]:
+    """
+    Retrieve full post-crawl audit report including broken links, duplicate titles, and orphan pages.
+    """
+    with SessionLocal() as db:
+        c = db.query(Crawl).filter(Crawl.id == crawl_id).first()
+        if not c:
+            return {"error": "Crawl ID not found"}
+        if not c.report_summary:
+            return {"status": c.status, "message": "Report generation in progress", "pages_crawled": c.pages_crawled}
+        return c.report_summary
+
+
+@mcp.tool()
+def compare_site_crawls(base_crawl_id: str, target_crawl_id: str) -> Dict[str, Any]:
+    """
+    Compare two completed crawls of the same website to identify SEO improvements, regressions, and resolved broken links.
+    """
+    with SessionLocal() as db:
+        c1 = db.query(Crawl).filter(Crawl.id == base_crawl_id).first()
+        c2 = db.query(Crawl).filter(Crawl.id == target_crawl_id).first()
+
+        if not c1 or not c2:
+            return {"error": "One or both crawl IDs not found"}
+        if not c1.report_summary or not c2.report_summary:
+            return {"error": "Both crawls must be completed with report summaries"}
+
+        r1 = CrawlSummaryReport(**c1.report_summary)
+        r2 = CrawlSummaryReport(**c2.report_summary)
+        diff = CrawlAnalyzer.compare_crawls(r1, r2)
+        return diff.model_dump()
+
+
 def main():
     mcp.run()
 
 
 if __name__ == "__main__":
     main()
+

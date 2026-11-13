@@ -67,3 +67,4 @@ class RuleRegistry:
 # Global singleton registry
 registry = RuleRegistry()
 register_rule = registry.register
+

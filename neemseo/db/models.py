@@ -95,11 +95,14 @@ class Crawl(Base):
     id = Column(String(36), primary_key=True, default=generate_uuid)
     user_id = Column(String(36), ForeignKey("users.id"), nullable=True)
     seed_url = Column(String(2048), nullable=False)
-    status = Column(String(50), default="pending")  # pending, running, completed, failed, paused
+    status = Column(String(50), default="pending")  # pending, running, completed, failed, cancelled, paused
     max_pages = Column(Integer, default=100)
     max_depth = Column(Integer, default=3)
     pages_crawled = Column(Integer, default=0)
+    sitemap_urls_found = Column(Integer, default=0)
+    total_links_found = Column(Integer, default=0)
     duration_seconds = Column(Float, default=0.0)
+    report_summary = Column(JSON, default=dict)
     created_at = Column(DateTime, default=datetime.utcnow, index=True)
     finished_at = Column(DateTime, nullable=True)
 
@@ -112,15 +115,21 @@ class CrawlPage(Base):
 
     id = Column(String(36), primary_key=True, default=generate_uuid)
     crawl_id = Column(String(36), ForeignKey("crawls.id", ondelete="CASCADE"), nullable=False, index=True)
-    url = Column(String(2048), nullable=False)
+    url = Column(String(2048), nullable=False, index=True)
     status_code = Column(Integer, default=200)
     depth = Column(Integer, default=0)
     title = Column(String(512), nullable=True)
+    meta_description = Column(String(1024), nullable=True)
+    overall_score = Column(Integer, default=100)
     word_count = Column(Integer, default=0)
+    inlinks_count = Column(Integer, default=0)
+    outlinks_count = Column(Integer, default=0)
     is_orphan = Column(Boolean, default=False)
     is_blocked_robots = Column(Boolean, default=False)
     is_noindex = Column(Boolean, default=False)
+    redirect_to = Column(String(2048), nullable=True)
     load_time_ms = Column(Float, default=0.0)
+    issues_summary = Column(JSON, default=list)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     crawl = relationship("Crawl", back_populates="pages")
@@ -131,11 +140,12 @@ class CrawlLink(Base):
 
     id = Column(String(36), primary_key=True, default=generate_uuid)
     crawl_id = Column(String(36), ForeignKey("crawls.id", ondelete="CASCADE"), nullable=False, index=True)
-    source_url = Column(String(2048), nullable=False)
-    target_url = Column(String(2048), nullable=False)
+    source_url = Column(String(2048), nullable=False, index=True)
+    target_url = Column(String(2048), nullable=False, index=True)
     anchor_text = Column(String(512), default="")
     is_internal = Column(Boolean, default=True)
     is_broken = Column(Boolean, default=False)
     status_code = Column(Integer, default=200)
 
     crawl = relationship("Crawl", back_populates="links")
+

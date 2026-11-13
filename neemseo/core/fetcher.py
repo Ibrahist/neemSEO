@@ -21,7 +21,7 @@ class RedirectHop(BaseModel):
 
 class FetchResult(BaseModel):
     url: str
-    initial_url: str
+    initial_url: str = ""
     status_code: int = 0
     html: str = ""
     headers: Dict[str, str] = Field(default_factory=dict)
@@ -185,3 +185,4 @@ class PageFetcher:
                 return result
 
         return result
+

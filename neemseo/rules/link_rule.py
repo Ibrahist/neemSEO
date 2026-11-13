@@ -90,3 +90,4 @@ class LinkAnalysisRule(BaseRule):
             why_it_matters=self.why_it_matters,
             context={"internal_links": internal_count, "external_links": external_count},
         )
+

@@ -75,3 +75,4 @@ class TitleRule(BaseRule):
             why_it_matters=self.why_it_matters,
             context={"title": title, "length": length},
         )
+

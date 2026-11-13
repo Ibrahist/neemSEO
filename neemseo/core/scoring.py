@@ -146,3 +146,4 @@ class AuditScorer:
             page_summary=page_summary,
             core_web_vitals=core_web_vitals,
         )
+

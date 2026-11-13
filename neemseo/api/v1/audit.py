@@ -157,3 +157,4 @@ def list_rules():
     List all registered check rules and their impact weights.
     """
     return registry.list_rules()
+

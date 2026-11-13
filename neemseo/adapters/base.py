@@ -84,3 +84,4 @@ class BaseProviderAdapter(ABC):
         cache.set(cache_key, raw_result, ttl_seconds=ttl_seconds)
 
         return raw_result
+

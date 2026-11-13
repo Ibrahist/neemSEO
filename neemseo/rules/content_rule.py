@@ -91,3 +91,4 @@ class ContentOptimizationRule(BaseRule):
             why_it_matters=self.why_it_matters,
             context={"word_count": word_count, "keyword": keyword or None},
         )
+

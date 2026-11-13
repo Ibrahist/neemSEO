@@ -113,3 +113,4 @@ Add this to your MCP configuration (`claude_desktop_config.json` or Cursor MCP s
 ## License
 
 neemSEO is released under the [MIT License](LICENSE).
+

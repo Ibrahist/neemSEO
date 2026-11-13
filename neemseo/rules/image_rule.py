@@ -78,3 +78,4 @@ class ImageAltRule(BaseRule):
             why_it_matters=self.why_it_matters,
             context={"total_images": total_images, "missing_count": 0},
         )
+

@@ -19,7 +19,10 @@ from neemseo.core.scoring import AuditReport
 from neemseo.rules.registry import registry
 from neemseo.rules.base import Severity
 from neemseo.db.session import init_db, SessionLocal
-from neemseo.db.models import AuditRun
+from neemseo.crawler.schemas import CrawlConfig, CrawlStatus, CrawlSummaryReport
+from neemseo.crawler.engine import SiteCrawler
+from neemseo.crawler.analyzer import CrawlAnalyzer
+from neemseo.db.models import AuditRun, Crawl, CrawlPage, CrawlLink
 
 app = typer.Typer(
     name="neemseo",
@@ -206,5 +209,174 @@ def audit_cmd(
         console.print("\n[bold green]✓ Outstanding! No critical issues or warnings found.[/bold green]\n")
 
 
+@app.command(name="crawls")
+def list_crawls_cmd(limit: int = typer.Option(10, "--limit", "-n", help="Number of crawls to display")):
+    """List past site crawls."""
+    init_db()
+    with SessionLocal() as db:
+        crawls = db.query(Crawl).order_by(Crawl.created_at.desc()).limit(limit).all()
+        if not crawls:
+            console.print("[yellow]No crawl history found.[/yellow]")
+            return
+
+        table = Table(title="neemSEO Site Crawl History", header_style="bold cyan")
+        table.add_column("Crawl ID", style="dim")
+        table.add_column("Date", style="dim")
+        table.add_column("Status", justify="center")
+        table.add_column("Domain / Seed URL", style="white")
+        table.add_column("Pages", justify="right", style="bold")
+        table.add_column("Duration", justify="right")
+
+        for c in crawls:
+            status_color = "green" if c.status == "completed" else ("yellow" if c.status == "running" else "red")
+            table.add_row(
+                c.id[:8] + "...",
+                c.created_at.strftime("%Y-%m-%d %H:%M"),
+                f"[{status_color}]{c.status.upper()}[/{status_color}]",
+                c.seed_url,
+                str(c.pages_crawled),
+                f"{c.duration_seconds:.1f}s",
+            )
+        console.print(table)
+
+
+@app.command(name="crawl")
+def crawl_cmd(
+    url: str = typer.Argument(..., help="Seed homepage URL (e.g. https://example.com)"),
+    max_pages: int = typer.Option(30, "--max-pages", "-m", help="Maximum pages to crawl"),
+    max_depth: int = typer.Option(3, "--max-depth", "-d", help="Maximum crawl depth"),
+    concurrency: int = typer.Option(4, "--concurrency", "-c", help="Concurrent fetch requests"),
+    sitemap: bool = typer.Option(True, "--sitemap/--no-sitemap", help="Discover and ingest sitemap.xml"),
+    export_csv: Optional[str] = typer.Option(None, "--csv", help="Export broken links to CSV"),
+):
+    """Run a whole-site crawl and audit across internal pages and sitemaps."""
+    init_db()
+    import uuid
+
+    crawl_id = str(uuid.uuid4())
+    config = CrawlConfig(
+        seed_url=url,
+        max_pages=max_pages,
+        max_depth=max_depth,
+        concurrency=concurrency,
+        check_sitemap=sitemap,
+    )
+
+    with SessionLocal() as db:
+        crawl_obj = Crawl(
+            id=crawl_id,
+            seed_url=url,
+            max_pages=max_pages,
+            max_depth=max_depth,
+            status=CrawlStatus.RUNNING.value,
+        )
+        db.add(crawl_obj)
+        db.commit()
+
+    crawler = SiteCrawler(config=config, crawl_id=crawl_id)
+
+    with console.status(f"[bold cyan]Crawling {url} (max {max_pages} pages, depth {max_depth})...[/bold cyan]"):
+        report: CrawlSummaryReport = asyncio.run(crawler.crawl())
+
+    # Summary Panel
+    avg_color = "bold green" if report.average_health_score >= 80 else ("bold yellow" if report.average_health_score >= 60 else "bold red")
+    summary = (
+        f"[bold]Seed Domain:[/bold] {report.seed_url}\n"
+        f"[bold]Crawl Status:[/bold] [green]{report.status.value.upper()}[/green] | [bold]Duration:[/bold] {report.duration_seconds}s\n"
+        f"[bold]Pages Crawled:[/bold] {report.total_pages_crawled} | [bold]Links Discovered:[/bold] {report.total_links_found}\n"
+        f"[bold]Sitemap URLs Discovered:[/bold] {report.sitemap_urls_discovered}\n"
+        f"[bold]Average On-Page Score:[/bold] [{avg_color}]{report.average_health_score}/100[/{avg_color}]\n"
+        f"[bold]Broken Links Found:[/bold] [red]{report.broken_links_count}[/red] | [bold]Duplicate Titles:[/bold] [yellow]{len(report.duplicate_titles)}[/yellow] | [bold]Orphans:[/bold] [magenta]{report.orphan_pages_count}[/magenta]"
+    )
+    console.print(Panel(summary, title="[bold cyan]neemSEO Site Crawl Audit Report[/bold cyan]", border_style="cyan"))
+
+    # Broken links table
+    if report.broken_links:
+        broken_table = Table(title="Broken Links Detected (4xx / 5xx)", header_style="bold red")
+        broken_table.add_column("Status", justify="center", style="bold red")
+        broken_table.add_column("Target URL", style="white")
+        broken_table.add_column("Found on Source Page", style="dim")
+        broken_table.add_column("Anchor Text", style="italic")
+
+        for b in report.broken_links[:15]:
+            broken_table.add_row(
+                str(b.status_code),
+                b.target_url,
+                b.source_url,
+                b.anchor_text or "[dim]No anchor[/dim]",
+            )
+        console.print(broken_table)
+    else:
+        console.print("[green]✓ No broken internal or external links detected.[/green]")
+
+    # Duplicate titles table
+    if report.duplicate_titles:
+        dup_table = Table(title="Duplicate Page Titles", header_style="bold yellow")
+        dup_table.add_column("Duplicate Count", justify="center", style="bold yellow")
+        dup_table.add_column("Title String", style="white")
+        dup_table.add_column("Affected Pages", style="dim")
+
+        for d in report.duplicate_titles[:10]:
+            dup_table.add_row(str(d.count), d.content, ", ".join(d.urls[:2]))
+        console.print(dup_table)
+
+    # Click depth distribution
+    if report.depth_distribution:
+        depth_table = Table(title="Click Depth Architecture", header_style="bold blue")
+        depth_table.add_column("Crawl Depth", justify="center")
+        depth_table.add_column("Pages Discovered", justify="center")
+        for depth_lvl, count in sorted(report.depth_distribution.items()):
+            depth_table.add_row(f"Depth {depth_lvl}", str(count))
+        console.print(depth_table)
+
+    # Export CSV if requested
+    if export_csv:
+        with open(export_csv, mode="w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(["Broken URL", "Source Page", "Anchor Text", "Status", "Internal"])
+            for b in report.broken_links:
+                writer.writerow([b.target_url, b.source_url, b.anchor_text, b.status_code, b.is_internal])
+        console.print(f"\n[green]✓ Exported broken links to {export_csv}[/green]\n")
+
+
+@app.command(name="crawl-compare")
+def crawl_compare_cmd(
+    base_id: str = typer.Argument(..., help="Earlier crawl ID"),
+    target_id: str = typer.Argument(..., help="Recent crawl ID"),
+):
+    """Compare two crawl audits of the same domain to highlight regressions and fixes."""
+    init_db()
+    with SessionLocal() as db:
+        c1 = db.query(Crawl).filter(Crawl.id.like(f"{base_id}%")).first()
+        c2 = db.query(Crawl).filter(Crawl.id.like(f"{target_id}%")).first()
+
+        if not c1 or not c2:
+            console.print("[red]Error: One or both crawl IDs not found.[/red]")
+            return
+
+        if not c1.report_summary or not c2.report_summary:
+            console.print("[red]Error: Both crawls must be completed with report summaries.[/red]")
+            return
+
+        r1 = CrawlSummaryReport(**c1.report_summary)
+        r2 = CrawlSummaryReport(**c2.report_summary)
+
+        diff = CrawlAnalyzer.compare_crawls(r1, r2)
+
+        change_color = "green" if diff.score_change >= 0 else "red"
+        sign = "+" if diff.score_change > 0 else ""
+
+        comp_text = (
+            f"[bold]Domain:[/bold] {diff.seed_url}\n"
+            f"[bold]Base Crawl:[/bold] {c1.id[:8]} ({c1.created_at.strftime('%Y-%m-%d %H:%M')})\n"
+            f"[bold]Target Crawl:[/bold] {c2.id[:8]} ({c2.created_at.strftime('%Y-%m-%d %H:%M')})\n"
+            f"[bold]Health Score Trend:[/bold] [{change_color}]{sign}{diff.score_change} pts[/{change_color}]\n"
+            f"[bold]Pages Crawled Change:[/bold] {diff.pages_change:+d}\n"
+            f"[bold]New Broken Links:[/bold] [red]{len(diff.new_broken_links)}[/red] | [bold]Resolved Broken Links:[/bold] [green]{len(diff.resolved_broken_links)}[/green]"
+        )
+        console.print(Panel(comp_text, title="[bold cyan]Crawl Comparison Diff[/bold cyan]", border_style="cyan"))
+
+
 if __name__ == "__main__":
     app()
+

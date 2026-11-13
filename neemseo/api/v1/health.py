@@ -21,3 +21,4 @@ def health_check():
         "user_agent": settings.USER_AGENT,
         "spend_summary": cost_tracker.get_summary(),
     }
+
