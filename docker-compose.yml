@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: neemseo-api
+    ports:
+      - "8000:8000"
+    environment:
+      - NEEMSEO_ENV=production
+      - NEEMSEO_DATABASE_URL=postgresql://neemseo:neemseo_secret@postgres:5432/neemseo
+      - NEEMSEO_REDIS_URL=redis://redis:6379/0
+      - NEEMSEO_SECRET_KEY=${NEEMSEO_SECRET_KEY:-default_secret_key_change_me}
+      - NEEMSEO_BASE_URL=${NEEMSEO_BASE_URL:-http://localhost:8000}
+      - NEEMSEO_DATAFORSEO_LOGIN=${NEEMSEO_DATAFORSEO_LOGIN}
+      - NEEMSEO_DATAFORSEO_PASSWORD=${NEEMSEO_DATAFORSEO_PASSWORD}
+      - NEEMSEO_PAGESPEED_API_KEY=${NEEMSEO_PAGESPEED_API_KEY}
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: neemseo-postgres
+    environment:
+      - POSTGRES_USER=neemseo
+      - POSTGRES_PASSWORD=neemseo_secret
+      - POSTGRES_DB=neemseo
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: neemseo-redis
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
