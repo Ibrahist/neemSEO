@@ -15,20 +15,66 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>neemSEO - Open-Source SEO Suite (Auditor & Crawler)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              blue: '#1D4ED8',
+              coral: '#FF6B4A',
+              navy: '#0B1226',
+              surface: '#0F1A36',
+              card: '#132145',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'sans-serif'],
+            heading: ['"IBM Plex Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
   <style>
     [x-cloak] { display: none !important; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: #0B1226;
+    }
+    h1, h2, h3, .font-heading {
+      font-family: 'IBM Plex Sans', sans-serif;
+    }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased" x-data="seoApp()" x-init="loadRecentCrawls(); loadRecentKeywordRuns(); loadRankTargets(); loadRankAlerts(); loadAIHistory(); loadTeam()" x-cloak>
+<body class="bg-[#0B1226] text-slate-100 min-h-screen font-sans antialiased" x-data="seoApp()" x-init="loadRecentCrawls(); loadRecentKeywordRuns(); loadRankTargets(); loadRankAlerts(); loadAIHistory(); loadTeam()" x-cloak>
 
   <!-- Top Navigation: Logo and Brand Name Only -->
-  <header class="border-b border-slate-800 bg-slate-950/90 backdrop-blur sticky top-0 z-50">
+  <header class="border-b border-slate-800/80 bg-[#0B1226]/90 backdrop-blur sticky top-0 z-50">
     <div class="px-6 h-16 flex items-center">
       <div class="flex items-center space-x-3">
-        <div class="h-9 w-9 bg-emerald-500 rounded-lg flex items-center justify-center font-bold text-slate-950 text-xl shadow-lg shadow-emerald-500/20">n</div>
-        <span class="text-xl font-bold tracking-tight text-white">neem<span class="text-emerald-400">SEO</span></span>
+        <!-- neemSEO SVG Logo Mark -->
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="w-9 h-9" role="img" aria-label="neemSEO">
+          <title>neemSEO</title>
+          <circle cx="27" cy="27" r="20" fill="none" stroke="#1D4ED8" stroke-width="5"/>
+          <path d="M41.5 41.5 L56 56" fill="none" stroke="#FF6B4A" stroke-width="7" stroke-linecap="round"/>
+          <g transform="translate(27 27) rotate(40) scale(0.9)" fill="#2FA05A">
+            <path d="M0 15 V-14" fill="none" stroke="#2FA05A" stroke-width="1.8" stroke-linecap="round"/>
+            <ellipse cx="0" cy="-14" rx="2.7" ry="6"/>
+            <ellipse cx="5.5" cy="7" rx="2.7" ry="6" transform="rotate(50 5.5 7)"/>
+            <ellipse cx="-5.5" cy="7" rx="2.7" ry="6" transform="rotate(-50 -5.5 7)"/>
+            <ellipse cx="5.2" cy="-1.5" rx="2.5" ry="5.6" transform="rotate(50 5.2 -1.5)"/>
+            <ellipse cx="-5.2" cy="-1.5" rx="2.5" ry="5.6" transform="rotate(-50 -5.2 -1.5)"/>
+            <ellipse cx="4.6" cy="-9.5" rx="2.3" ry="5" transform="rotate(50 4.6 -9.5)"/>
+            <ellipse cx="-4.6" cy="-9.5" rx="2.3" ry="5" transform="rotate(-50 -4.6 -9.5)"/>
+          </g>
+        </svg>
+        <span class="text-xl font-heading font-bold tracking-tight text-white">neem<span style="color: #FF6B4A;">SEO</span></span>
       </div>
     </div>
   </header>
@@ -36,14 +82,14 @@ DASHBOARD_HTML = """<!DOCTYPE html>
   <!-- Dashboard Container with Left Sidebar and Main Content -->
   <div class="flex min-h-[calc(100vh-4rem)]">
     <!-- Left Sidebar: All navigation items and secondary links -->
-    <aside class="w-64 shrink-0 bg-slate-950 border-r border-slate-800 flex flex-col justify-between p-4 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto">
+    <aside class="w-64 shrink-0 bg-[#0B1226] border-r border-slate-800/80 flex flex-col justify-between p-4 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto">
       <div class="space-y-6">
         <div>
           <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3">SEO Tools</span>
           <nav class="mt-2 space-y-1">
             <button 
               @click="activeTab = 'audit'"
-              :class="activeTab === 'audit' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-300 hover:text-white hover:bg-slate-900'"
+              :class="activeTab === 'audit' ? 'bg-[#1D4ED8] text-white font-bold shadow-md shadow-[#1D4ED8]/30' : 'text-slate-300 hover:text-white hover:bg-slate-800/60'"
               class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition text-left"
             >
               <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -51,7 +97,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             </button>
             <button 
               @click="activeTab = 'crawler'"
-              :class="activeTab === 'crawler' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-300 hover:text-white hover:bg-slate-900'"
+              :class="activeTab === 'crawler' ? 'bg-[#1D4ED8] text-white font-bold shadow-md shadow-[#1D4ED8]/30' : 'text-slate-300 hover:text-white hover:bg-slate-800/60'"
               class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition text-left"
             >
               <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
@@ -59,7 +105,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             </button>
             <button 
               @click="activeTab = 'keywords'"
-              :class="activeTab === 'keywords' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-300 hover:text-white hover:bg-slate-900'"
+              :class="activeTab === 'keywords' ? 'bg-[#1D4ED8] text-white font-bold shadow-md shadow-[#1D4ED8]/30' : 'text-slate-300 hover:text-white hover:bg-slate-800/60'"
               class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition text-left"
             >
               <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -67,7 +113,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             </button>
             <button 
               @click="activeTab = 'ranker'"
-              :class="activeTab === 'ranker' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-300 hover:text-white hover:bg-slate-900'"
+              :class="activeTab === 'ranker' ? 'bg-[#1D4ED8] text-white font-bold shadow-md shadow-[#1D4ED8]/30' : 'text-slate-300 hover:text-white hover:bg-slate-800/60'"
               class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition text-left"
             >
               <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
@@ -75,7 +121,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             </button>
             <button 
               @click="activeTab = 'backlinks'"
-              :class="activeTab === 'backlinks' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-300 hover:text-white hover:bg-slate-900'"
+              :class="activeTab === 'backlinks' ? 'bg-[#1D4ED8] text-white font-bold shadow-md shadow-[#1D4ED8]/30' : 'text-slate-300 hover:text-white hover:bg-slate-800/60'"
               class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition text-left"
             >
               <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
@@ -83,7 +129,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             </button>
             <button 
               @click="activeTab = 'competitors'"
-              :class="activeTab === 'competitors' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-300 hover:text-white hover:bg-slate-900'"
+              :class="activeTab === 'competitors' ? 'bg-[#1D4ED8] text-white font-bold shadow-md shadow-[#1D4ED8]/30' : 'text-slate-300 hover:text-white hover:bg-slate-800/60'"
               class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition text-left"
             >
               <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
@@ -91,7 +137,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             </button>
             <button 
               @click="activeTab = 'ai-visibility'"
-              :class="activeTab === 'ai-visibility' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-300 hover:text-white hover:bg-slate-900'"
+              :class="activeTab === 'ai-visibility' ? 'bg-[#1D4ED8] text-white font-bold shadow-md shadow-[#1D4ED8]/30' : 'text-slate-300 hover:text-white hover:bg-slate-800/60'"
               class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition text-left"
             >
               <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
@@ -99,7 +145,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             </button>
             <button 
               @click="activeTab = 'team'"
-              :class="activeTab === 'team' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-300 hover:text-white hover:bg-slate-900'"
+              :class="activeTab === 'team' ? 'bg-[#1D4ED8] text-white font-bold shadow-md shadow-[#1D4ED8]/30' : 'text-slate-300 hover:text-white hover:bg-slate-800/60'"
               class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition text-left"
             >
               <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
@@ -112,17 +158,17 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       <!-- Bottom sidebar items (formerly in navbar) -->
       <div class="pt-4 border-t border-slate-800/80 space-y-3">
         <div class="space-y-1">
-          <a href="/docs" target="_blank" class="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-900 transition">
+          <a href="/docs" target="_blank" class="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-800/60 transition">
             <span>FastAPI Docs</span>
             <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
           </a>
-          <a href="/bot" target="_blank" class="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-900 transition">
+          <a href="/bot" target="_blank" class="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-800/60 transition">
             <span>Bot Policy</span>
             <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
           </a>
         </div>
-        <div class="p-2.5 bg-slate-900/90 border border-slate-800 rounded-lg flex items-center space-x-2">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <div class="p-2.5 bg-[#0F1A36] border border-slate-800 rounded-lg flex items-center space-x-2">
+          <span class="w-2 h-2 rounded-full bg-[#FF6B4A] animate-pulse"></span>
           <span class="text-[11px] text-slate-300 font-medium">BYOK: Pay-as-you-go</span>
         </div>
       </div>
@@ -134,8 +180,8 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     <!-- ================= TAB 1: ON-PAGE AUDITOR ================= -->
     <div x-show="activeTab === 'audit'" class="space-y-8">
       <!-- Input Card -->
-      <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 shadow-xl">
-        <h1 class="text-2xl font-bold text-white mb-2">Instant On-Page SEO Auditor</h1>
+      <div class="bg-[#0F1A36] border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <h1 class="text-2xl font-bold font-heading text-white mb-2">Instant On-Page SEO Auditor</h1>
         <p class="text-slate-400 text-sm mb-6">Enter any public URL to inspect metadata, heading hierarchy, image alts, mobile viewport, canonical tags, and keyword placement.</p>
         
         <form @submit.prevent="runAudit()" class="space-y-4">
@@ -147,7 +193,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                 x-model="url" 
                 placeholder="https://example.com" 
                 required
-                class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
+                class="w-full bg-[#070C1B] border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] focus:border-transparent transition"
               />
             </div>
             <div class="md:col-span-5">
@@ -156,25 +202,25 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                 type="text" 
                 x-model="keyword" 
                 placeholder="e.g. open source seo tool" 
-                class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition"
+                class="w-full bg-[#070C1B] border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] focus:border-transparent transition"
               />
             </div>
           </div>
 
           <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
             <label class="flex items-center space-x-2 text-sm text-slate-300 cursor-pointer select-none">
-              <input type="checkbox" x-model="checkPagespeed" class="rounded border-slate-700 text-emerald-500 focus:ring-emerald-500 bg-slate-900">
+              <input type="checkbox" x-model="checkPagespeed" class="rounded border-slate-700 text-[#1D4ED8] focus:ring-[#1D4ED8] bg-[#070C1B]">
               <span>Include Google Core Web Vitals (LCP, CLS, INP)</span>
             </label>
 
             <button 
               type="submit" 
               :disabled="loading"
-              class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition duration-150 flex items-center space-x-2 disabled:opacity-50 shadow-lg shadow-emerald-500/20"
+              class="bg-[#1D4ED8] hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-lg transition duration-150 flex items-center space-x-2 disabled:opacity-50 shadow-lg shadow-[#1D4ED8]/25"
             >
               <span x-show="!loading">Run On-Page Audit</span>
               <span x-show="loading" class="flex items-center space-x-2">
-                <svg class="animate-spin h-4 w-4 text-slate-950" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
                 <span>Auditing...</span>
               </span>
             </button>
@@ -187,11 +233,11 @@ DASHBOARD_HTML = """<!DOCTYPE html>
         <div class="space-y-8">
           <!-- Overview Cards -->
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 flex items-center justify-between">
+            <div class="bg-[#0F1A36] border border-slate-800 rounded-2xl p-6 flex items-center justify-between">
               <div>
                 <p class="text-xs uppercase tracking-wider text-slate-400 mb-1">Health Score</p>
                 <div class="flex items-baseline space-x-2">
-                  <span class="text-4xl font-extrabold" :class="getScoreColor(report.overall_score)" x-text="report.overall_score"></span>
+                  <span class="text-4xl font-extrabold font-heading" :class="getScoreColor(report.overall_score)" x-text="report.overall_score"></span>
                   <span class="text-slate-500 text-sm">/ 100</span>
                 </div>
                 <p class="text-xs text-slate-400 mt-1">Grade: <span class="font-bold" :class="getScoreColor(report.overall_score)" x-text="report.grade"></span></p>
@@ -199,40 +245,40 @@ DASHBOARD_HTML = """<!DOCTYPE html>
               <div class="w-16 h-16 rounded-full border-4 flex items-center justify-center font-bold text-xl" :class="getScoreBorder(report.overall_score)" x-text="report.grade"></div>
             </div>
 
-            <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6">
+            <div class="bg-[#0F1A36] border border-slate-800 rounded-2xl p-6">
               <p class="text-xs uppercase tracking-wider text-slate-400 mb-1">Audit Checks</p>
-              <div class="text-2xl font-bold text-white mb-2" x-text="report.total_checks + ' Total Evaluated'"></div>
+              <div class="text-2xl font-bold font-heading text-white mb-2" x-text="report.total_checks + ' Total Evaluated'"></div>
               <div class="flex space-x-3 text-xs">
                 <span class="text-emerald-400 font-semibold" x-text="report.passed_count + ' Passed'"></span>
                 <span class="text-amber-400 font-semibold" x-text="report.warning_count + ' Warnings'"></span>
-                <span class="text-red-400 font-semibold" x-text="report.failure_count + ' Failures'"></span>
+                <span class="text-[#FF6B4A] font-semibold" x-text="report.failure_count + ' Failures'"></span>
               </div>
             </div>
 
-            <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6">
+            <div class="bg-[#0F1A36] border border-slate-800 rounded-2xl p-6">
               <p class="text-xs uppercase tracking-wider text-slate-400 mb-1">Server Response</p>
-              <div class="text-2xl font-bold text-white mb-1" x-text="report.response_time_ms + ' ms'"></div>
+              <div class="text-2xl font-bold font-heading text-white mb-1" x-text="report.response_time_ms + ' ms'"></div>
               <p class="text-xs text-slate-400">HTTP Status: <span class="text-emerald-400 font-mono" x-text="report.status_code"></span></p>
             </div>
 
-            <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6">
+            <div class="bg-[#0F1A36] border border-slate-800 rounded-2xl p-6">
               <p class="text-xs uppercase tracking-wider text-slate-400 mb-1">Content Depth</p>
-              <div class="text-2xl font-bold text-white mb-1" x-text="(report.page_summary.word_count || 0) + ' words'"></div>
+              <div class="text-2xl font-bold font-heading text-white mb-1" x-text="(report.page_summary.word_count || 0) + ' words'"></div>
               <p class="text-xs text-slate-400" x-text="'H1 tags: ' + (report.page_summary.h1_count || 0)"></p>
             </div>
           </div>
 
           <!-- Fixes Table -->
-          <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl overflow-hidden shadow-xl">
-            <div class="p-6 border-b border-slate-700 flex flex-wrap items-center justify-between gap-4">
-              <h2 class="text-xl font-bold text-white">Prioritized Action Items</h2>
-              <button @click="downloadAuditCSV()" class="text-xs bg-slate-700 hover:bg-slate-600 text-white font-semibold px-4 py-2 rounded-lg border border-slate-600 transition">
+          <div class="bg-[#0F1A36] border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+            <div class="p-6 border-b border-slate-800 flex flex-wrap items-center justify-between gap-4">
+              <h2 class="text-xl font-bold font-heading text-white">Prioritized Action Items</h2>
+              <button @click="downloadAuditCSV()" class="text-xs bg-[#132145] hover:bg-slate-700 text-white font-semibold px-4 py-2 rounded-lg border border-slate-700 transition">
                 Export Fixes (CSV)
               </button>
             </div>
             <div class="overflow-x-auto">
               <table class="w-full text-left text-sm text-slate-300">
-                <thead class="bg-slate-900/80 text-xs uppercase tracking-wider text-slate-400 border-b border-slate-700">
+                <thead class="bg-[#070C1B] text-xs uppercase tracking-wider text-slate-400 border-b border-slate-800">
                   <tr>
                     <th class="py-3 px-4 text-center">Impact</th>
                     <th class="py-3 px-4">Status</th>
@@ -241,21 +287,21 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                     <th class="py-3 px-4">Action Required</th>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-700/50">
+                <tbody class="divide-y divide-slate-800">
                   <template x-for="fix in report.prioritized_fixes" :key="fix.rule_id">
-                    <tr class="hover:bg-slate-700/30 transition">
+                    <tr class="hover:bg-slate-800/40 transition">
                       <td class="py-4 px-4 text-center font-bold font-mono">
-                        <span class="px-2 py-1 rounded bg-slate-900 border text-xs" :class="fix.impact_score >= 8 ? 'text-red-400 border-red-800' : 'text-amber-400 border-amber-800'" x-text="fix.impact_score + '/10'"></span>
+                        <span class="px-2 py-1 rounded border text-xs" :class="fix.impact_score >= 8 ? 'text-[#FF6B4A] border-[#FF6B4A]/50 bg-[#FF6B4A]/10' : 'text-amber-400 border-amber-800 bg-[#070C1B]'" x-text="fix.impact_score + '/10'"></span>
                       </td>
                       <td class="py-4 px-4 font-semibold text-xs">
-                        <span class="px-2 py-1 rounded uppercase tracking-wider" :class="fix.status === 'fail' ? 'bg-red-950 text-red-400 border border-red-800' : 'bg-amber-950 text-amber-400 border border-amber-800'" x-text="fix.status"></span>
+                        <span class="px-2 py-1 rounded uppercase tracking-wider" :class="fix.status === 'fail' ? 'bg-[#FF6B4A]/10 text-[#FF6B4A] border border-[#FF6B4A]/40' : 'bg-amber-950 text-amber-400 border border-amber-800'" x-text="fix.status"></span>
                       </td>
                       <td class="py-4 px-4 text-xs font-mono text-slate-400 capitalize" x-text="fix.category"></td>
                       <td class="py-4 px-4">
                         <div class="font-bold text-white" x-text="fix.title"></div>
                         <div class="text-xs text-slate-400 mt-1" x-text="fix.message"></div>
                       </td>
-                      <td class="py-4 px-4 text-xs text-emerald-300" x-text="fix.recommendation"></td>
+                      <td class="py-4 px-4 text-xs text-blue-300 font-medium" x-text="fix.recommendation"></td>
                     </tr>
                   </template>
                 </tbody>
@@ -269,8 +315,8 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     <!-- ================= TAB 2: SITE CRAWLER ================= -->
     <div x-show="activeTab === 'crawler'" class="space-y-8">
       <!-- Crawler Launch Card -->
-      <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 shadow-xl">
-        <h1 class="text-2xl font-bold text-white mb-2">Whole-Site Crawler & Link Graph Audit</h1>
+      <div class="bg-[#0F1A36] border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <h1 class="text-2xl font-bold font-heading text-white mb-2">Whole-Site Crawler & Link Graph Audit</h1>
         <p class="text-slate-400 text-sm mb-6">Discovers internal URLs from homepage & sitemaps, analyzes click depth, detects broken links (4xx/5xx), duplicate metadata, and orphan pages.</p>
         
         <form @submit.prevent="startCrawl()" class="space-y-4">
@@ -282,7 +328,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                 x-model="crawlSeedUrl" 
                 placeholder="https://example.com" 
                 required
-                class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+                class="w-full bg-[#070C1B] border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] transition"
               />
             </div>
             <div class="md:col-span-3">
@@ -292,7 +338,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                 x-model.number="crawlMaxPages" 
                 min="5" 
                 max="500" 
-                class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white transition"
+                class="w-full bg-[#070C1B] border border-slate-700 rounded-lg px-4 py-2.5 text-white transition focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]"
               />
             </div>
             <div class="md:col-span-3">
@@ -302,25 +348,25 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                 x-model.number="crawlMaxDepth" 
                 min="1" 
                 max="6" 
-                class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white transition"
+                class="w-full bg-[#070C1B] border border-slate-700 rounded-lg px-4 py-2.5 text-white transition focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]"
               />
             </div>
           </div>
 
           <div class="flex items-center justify-between pt-2">
             <label class="flex items-center space-x-2 text-sm text-slate-300 cursor-pointer">
-              <input type="checkbox" x-model="crawlSitemap" class="rounded border-slate-700 text-emerald-500 focus:ring-emerald-500 bg-slate-900">
+              <input type="checkbox" x-model="crawlSitemap" class="rounded border-slate-700 text-[#1D4ED8] focus:ring-[#1D4ED8] bg-[#070C1B]">
               <span>Automatically discover and ingest sitemap.xml</span>
             </label>
 
             <button 
               type="submit" 
               :disabled="crawlLoading"
-              class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition duration-150 flex items-center space-x-2 disabled:opacity-50 shadow-lg shadow-emerald-500/20"
+              class="bg-[#1D4ED8] hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-lg transition duration-150 flex items-center space-x-2 disabled:opacity-50 shadow-lg shadow-[#1D4ED8]/25"
             >
               <span x-show="!crawlLoading">Start Whole-Site Crawl</span>
               <span x-show="crawlLoading" class="flex items-center space-x-2">
-                <svg class="animate-spin h-4 w-4 text-slate-950" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
                 <span>Crawling Site...</span>
               </span>
             </button>
@@ -329,16 +375,16 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       </div>
 
       <!-- Live Progress Bar -->
-      <div x-show="crawlProgress" class="bg-slate-800/80 border border-slate-700 rounded-xl p-5 shadow-lg">
+      <div x-show="crawlProgress" class="bg-[#0F1A36] border border-slate-800 rounded-xl p-5 shadow-lg">
         <div class="flex items-center justify-between mb-2">
           <div class="flex items-center space-x-3">
-            <span class="inline-block w-3 h-3 rounded-full animate-ping bg-emerald-400" x-show="crawlProgress?.status === 'running'"></span>
+            <span class="inline-block w-3 h-3 rounded-full animate-ping bg-[#1D4ED8]" x-show="crawlProgress?.status === 'running'"></span>
             <span class="font-bold text-white text-sm" x-text="'Crawl Status: ' + (crawlProgress?.status || '').toUpperCase()"></span>
           </div>
           <span class="text-xs text-slate-400 font-mono" x-text="(crawlProgress?.pages_crawled || 0) + ' pages audited'"></span>
         </div>
-        <div class="w-full bg-slate-950 rounded-full h-2.5 overflow-hidden">
-          <div class="bg-emerald-500 h-2.5 rounded-full transition-all duration-300" :style="`width: ${Math.min(100, Math.round(((crawlProgress?.pages_crawled||0)/crawlMaxPages)*100))}%`"></div>
+        <div class="w-full bg-[#070C1B] rounded-full h-2.5 overflow-hidden border border-slate-800">
+          <div class="bg-[#1D4ED8] h-2.5 rounded-full transition-all duration-300" :style="`width: ${Math.min(100, Math.round(((crawlProgress?.pages_crawled||0)/crawlMaxPages)*100))}%`"></div>
         </div>
       </div>
 
@@ -347,27 +393,27 @@ DASHBOARD_HTML = """<!DOCTYPE html>
         <div class="space-y-8">
           <!-- Crawl Stats Overview -->
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-6">
+            <div class="bg-[#0F1A36] border border-slate-800 rounded-2xl p-6">
               <p class="text-xs uppercase tracking-wider text-slate-400 mb-1">Average Health Score</p>
-              <div class="text-3xl font-extrabold text-emerald-400" x-text="crawlReport.average_health_score + ' / 100'"></div>
+              <div class="text-3xl font-extrabold font-heading text-emerald-400" x-text="crawlReport.average_health_score + ' / 100'"></div>
               <p class="text-xs text-slate-400 mt-1" x-text="'Across ' + crawlReport.total_pages_crawled + ' crawled pages'"></p>
             </div>
 
-            <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-6">
+            <div class="bg-[#0F1A36] border border-slate-800 rounded-2xl p-6">
               <p class="text-xs uppercase tracking-wider text-slate-400 mb-1">Broken Links</p>
-              <div class="text-3xl font-extrabold text-red-400" x-text="crawlReport.broken_links_count"></div>
+              <div class="text-3xl font-extrabold font-heading text-[#FF6B4A]" x-text="crawlReport.broken_links_count"></div>
               <p class="text-xs text-slate-400 mt-1">4xx & 5xx HTTP response codes</p>
             </div>
 
-            <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-6">
+            <div class="bg-[#0F1A36] border border-slate-800 rounded-2xl p-6">
               <p class="text-xs uppercase tracking-wider text-slate-400 mb-1">Duplicate Titles</p>
-              <div class="text-3xl font-extrabold text-amber-400" x-text="crawlReport.duplicate_titles.length"></div>
+              <div class="text-3xl font-extrabold font-heading text-amber-400" x-text="crawlReport.duplicate_titles.length"></div>
               <p class="text-xs text-slate-400 mt-1">Duplicate metadata clusters</p>
             </div>
 
-            <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-6">
+            <div class="bg-[#0F1A36] border border-slate-800 rounded-2xl p-6">
               <p class="text-xs uppercase tracking-wider text-slate-400 mb-1">Orphan Pages</p>
-              <div class="text-3xl font-extrabold text-purple-400" x-text="crawlReport.orphan_pages_count"></div>
+              <div class="text-3xl font-extrabold font-heading text-purple-400" x-text="crawlReport.orphan_pages_count"></div>
               <p class="text-xs text-slate-400 mt-1">In sitemap but 0 internal links</p>
             </div>
           </div>
@@ -474,10 +520,10 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     <!-- ================= TAB 3: KEYWORD RESEARCH ================= -->
     <div x-show="activeTab === 'keywords'" class="space-y-8">
       <!-- Input Card -->
-      <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 shadow-xl">
+      <div class="bg-[#0F1A36] border border-slate-800 rounded-2xl p-6 shadow-xl">
         <div class="flex items-center justify-between mb-2">
-          <h1 class="text-2xl font-bold text-white">Keyword Research & Intent Clustering</h1>
-          <span class="text-xs bg-emerald-950 text-emerald-400 border border-emerald-800 px-3 py-1 rounded-full font-semibold">
+          <h1 class="text-2xl font-bold font-heading text-white">Keyword Research & Intent Clustering</h1>
+          <span class="text-xs bg-[#1D4ED8]/10 text-blue-400 border border-[#1D4ED8]/30 px-3 py-1 rounded-full font-semibold">
             Google Autocomplete + A-Z Expansion
           </span>
         </div>
@@ -492,14 +538,14 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                 x-model="kwSeed" 
                 placeholder="e.g. seo tools, best hiking boots, crm software" 
                 required
-                class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+                class="w-full bg-[#070C1B] border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] transition"
               />
             </div>
             <div class="md:col-span-4">
               <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Country Market</label>
               <select 
                 x-model="kwCountry" 
-                class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+                class="w-full bg-[#070C1B] border border-slate-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] transition"
               >
                 <option value="US">United States (US)</option>
                 <option value="GB">United Kingdom (UK)</option>
@@ -514,15 +560,15 @@ DASHBOARD_HTML = """<!DOCTYPE html>
           <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
             <div class="flex flex-wrap items-center gap-5">
               <label class="flex items-center space-x-2 text-sm text-slate-300 cursor-pointer">
-                <input type="checkbox" x-model="kwExpandAZ" class="rounded border-slate-700 text-emerald-500 focus:ring-emerald-500 bg-slate-900">
+                <input type="checkbox" x-model="kwExpandAZ" class="rounded border-slate-700 text-[#1D4ED8] focus:ring-[#1D4ED8] bg-[#070C1B]">
                 <span>A-Z Alphabet Modifiers</span>
               </label>
               <label class="flex items-center space-x-2 text-sm text-slate-300 cursor-pointer">
-                <input type="checkbox" x-model="kwExpandQuestions" class="rounded border-slate-700 text-emerald-500 focus:ring-emerald-500 bg-slate-900">
+                <input type="checkbox" x-model="kwExpandQuestions" class="rounded border-slate-700 text-[#1D4ED8] focus:ring-[#1D4ED8] bg-[#070C1B]">
                 <span>Questions & Prepositions (how, best, vs)</span>
               </label>
               <label class="flex items-center space-x-2 text-sm text-slate-300 cursor-pointer">
-                <input type="checkbox" x-model="kwUsePaid" class="rounded border-slate-700 text-emerald-500 focus:ring-emerald-500 bg-slate-900">
+                <input type="checkbox" x-model="kwUsePaid" class="rounded border-slate-700 text-[#1D4ED8] focus:ring-[#1D4ED8] bg-[#070C1B]">
                 <span class="text-amber-400 font-medium">DataForSEO BYOK</span>
               </label>
             </div>
@@ -530,11 +576,11 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             <button 
               type="submit" 
               :disabled="kwLoading"
-              class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition duration-150 flex items-center space-x-2 disabled:opacity-50 shadow-lg shadow-emerald-500/20"
+              class="bg-[#1D4ED8] hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-lg transition duration-150 flex items-center space-x-2 disabled:opacity-50 shadow-lg shadow-[#1D4ED8]/25"
             >
               <span x-show="!kwLoading">Discover Keywords</span>
               <span x-show="kwLoading" class="flex items-center space-x-2">
-                <svg class="animate-spin h-4 w-4 text-slate-950" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
                 <span>Expanding Ideas...</span>
               </span>
             </button>
@@ -547,31 +593,31 @@ DASHBOARD_HTML = """<!DOCTYPE html>
         <div class="space-y-6">
           <!-- Overview Cards -->
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+            <div class="bg-[#0F1A36] border border-slate-800 p-5 rounded-xl">
               <span class="text-xs uppercase font-semibold text-slate-400">Total Keywords</span>
-              <p class="text-3xl font-extrabold text-white mt-1" x-text="kwResult.total_found"></p>
+              <p class="text-3xl font-extrabold font-heading text-white mt-1" x-text="kwResult.total_found"></p>
             </div>
-            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+            <div class="bg-[#0F1A36] border border-slate-800 p-5 rounded-xl">
               <span class="text-xs uppercase font-semibold text-slate-400">Topic Clusters</span>
-              <p class="text-3xl font-extrabold text-emerald-400 mt-1" x-text="kwResult.clusters.length"></p>
+              <p class="text-3xl font-extrabold font-heading text-[#1D4ED8] mt-1" x-text="kwResult.clusters.length"></p>
             </div>
-            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+            <div class="bg-[#0F1A36] border border-slate-800 p-5 rounded-xl">
               <span class="text-xs uppercase font-semibold text-slate-400">API Cost (USD)</span>
-              <p class="text-3xl font-extrabold text-cyan-400 mt-1" x-text="'$' + (kwResult.cost_usd || 0).toFixed(4)"></p>
+              <p class="text-3xl font-extrabold font-heading text-cyan-400 mt-1" x-text="'$' + (kwResult.cost_usd || 0).toFixed(4)"></p>
             </div>
-            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl flex items-center justify-between">
+            <div class="bg-[#0F1A36] border border-slate-800 p-5 rounded-xl flex items-center justify-between">
               <div>
                 <span class="text-xs uppercase font-semibold text-slate-400">Export Report</span>
                 <p class="text-xs text-slate-500 mt-1">Full dataset with intent & scores</p>
               </div>
-              <button @click="downloadKeywordCSV()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold px-4 py-2 rounded-lg transition">
+              <button @click="downloadKeywordCSV()" class="bg-[#132145] hover:bg-slate-700 text-white text-xs font-semibold px-4 py-2 rounded-lg border border-slate-700 transition">
                 CSV Export
               </button>
             </div>
           </div>
 
           <!-- Clusters Carousel / Pills -->
-          <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+          <div class="bg-[#0F1A36] border border-slate-800 p-5 rounded-xl">
             <div class="flex items-center justify-between mb-3">
               <span class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Semantic Topic Clusters</span>
               <span class="text-xs text-slate-400">Click a cluster to filter keywords</span>
@@ -579,7 +625,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             <div class="flex flex-wrap gap-2">
               <button 
                 @click="kwFilterCluster = 'all'" 
-                :class="kwFilterCluster === 'all' ? 'bg-emerald-500 text-slate-950 font-bold' : 'bg-slate-900 text-slate-300 hover:bg-slate-700 border border-slate-700'"
+                :class="kwFilterCluster === 'all' ? 'bg-[#1D4ED8] text-white font-bold shadow-md shadow-[#1D4ED8]/30' : 'bg-[#070C1B] text-slate-300 hover:bg-slate-800 border border-slate-800'"
                 class="px-3 py-1 rounded-lg text-xs transition"
               >
                 All Clusters (<span x-text="kwResult.total_found"></span>)
@@ -587,7 +633,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
               <template x-for="c in kwResult.clusters" :key="c.cluster_name">
                 <button 
                   @click="kwFilterCluster = c.cluster_name"
-                  :class="kwFilterCluster === c.cluster_name ? 'bg-emerald-500 text-slate-950 font-bold' : 'bg-slate-900 text-slate-300 hover:bg-slate-700 border border-slate-700'"
+                  :class="kwFilterCluster === c.cluster_name ? 'bg-[#1D4ED8] text-white font-bold shadow-md shadow-[#1D4ED8]/30' : 'bg-[#070C1B] text-slate-300 hover:bg-slate-800 border border-slate-800'"
                   class="px-3 py-1 rounded-lg text-xs transition flex items-center space-x-1.5"
                 >
                   <span x-text="c.cluster_name"></span>
@@ -744,17 +790,17 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     <div x-show="activeTab === 'ranker'" class="space-y-8">
       <!-- Alerts Banner -->
       <template x-if="rankAlerts && rankAlerts.length > 0">
-        <div class="bg-amber-950/60 border border-amber-600/50 rounded-xl p-4 text-amber-200">
+        <div class="bg-[#FF6B4A]/10 border border-[#FF6B4A]/40 rounded-xl p-4 text-[#FF6B4A]">
           <div class="flex items-center space-x-2 font-bold mb-2">
-            <svg class="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-            <span>SERP Volatility & Position Drop Alerts (<span x-text="rankAlerts.length"></span>)</span>
+            <svg class="w-5 h-5 text-[#FF6B4A]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            <span class="font-heading">SERP Volatility & Position Drop Alerts (<span x-text="rankAlerts.length"></span>)</span>
           </div>
           <div class="space-y-1 text-xs">
             <template x-for="a in rankAlerts" :key="a.target_id">
               <div class="flex items-center space-x-2">
                 <span class="font-bold text-white" x-text="a.keyword"></span>
-                <span>dropped from #<span x-text="a.old_position"></span> to #<span x-text="a.new_position"></span></span>
-                <span class="text-red-400 font-bold" x-text="'(' + a.change + ' spots)'"></span>
+                <span class="text-slate-300">dropped from #<span x-text="a.old_position"></span> to #<span x-text="a.new_position"></span></span>
+                <span class="text-[#FF6B4A] font-bold" x-text="'(' + a.change + ' spots)'"></span>
               </div>
             </template>
           </div>
@@ -762,40 +808,40 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       </template>
 
       <!-- Add Target & SERP Check Card -->
-      <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 shadow-xl">
+      <div class="bg-[#0F1A36] border border-slate-800 rounded-2xl p-6 shadow-xl">
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h1 class="text-2xl font-bold text-white">Keyword Rank Tracker</h1>
+            <h1 class="text-2xl font-bold font-heading text-white">Keyword Rank Tracker</h1>
             <p class="text-slate-400 text-sm">Monitor SERP positions across desktop & mobile per target URL and location.</p>
           </div>
           <button 
             @click="checkRankPositions()" 
             :disabled="rankLoading || rankTargets.length === 0"
-            class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold px-5 py-2 rounded-lg text-sm transition flex items-center space-x-2 shadow-lg shadow-emerald-500/20 disabled:opacity-50"
+            class="bg-[#1D4ED8] hover:bg-blue-700 text-white font-bold px-5 py-2 rounded-lg text-sm transition flex items-center space-x-2 shadow-lg shadow-[#1D4ED8]/25 disabled:opacity-50"
           >
             <span x-show="!rankLoading">Run SERP Check</span>
             <span x-show="rankLoading">Checking SERPs...</span>
           </button>
         </div>
 
-        <form @submit.prevent="addRankTarget()" class="grid grid-cols-1 md:grid-cols-12 gap-3 pt-2 border-t border-slate-700/50">
+        <form @submit.prevent="addRankTarget()" class="grid grid-cols-1 md:grid-cols-12 gap-3 pt-2 border-t border-slate-800">
           <div class="md:col-span-4">
             <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Target Keyword</label>
-            <input type="text" x-model="newRankKeyword" placeholder="e.g. open source seo tool" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500" />
+            <input type="text" x-model="newRankKeyword" placeholder="e.g. open source seo tool" required class="w-full bg-[#070C1B] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#1D4ED8]" />
           </div>
           <div class="md:col-span-4">
             <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Page URL</label>
-            <input type="url" x-model="newRankUrl" placeholder="https://example.com/page" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500" />
+            <input type="url" x-model="newRankUrl" placeholder="https://example.com/page" required class="w-full bg-[#070C1B] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#1D4ED8]" />
           </div>
           <div class="md:col-span-2">
             <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Device</label>
-            <select x-model="newRankDevice" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-emerald-500">
+            <select x-model="newRankDevice" class="w-full bg-[#070C1B] border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[#1D4ED8]">
               <option value="desktop">Desktop</option>
               <option value="mobile">Mobile</option>
             </select>
           </div>
           <div class="md:col-span-2 flex items-end">
-            <button type="submit" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2 px-3 rounded-lg text-sm transition">
+            <button type="submit" class="w-full bg-[#132145] hover:bg-slate-700 border border-slate-700 text-white font-semibold py-2 px-3 rounded-lg text-sm transition">
               + Add Target
             </button>
           </div>
@@ -803,9 +849,9 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       </div>
 
       <!-- Tracked Targets Table -->
-      <div class="bg-slate-800/80 border border-slate-700 rounded-xl overflow-hidden shadow-xl">
-        <div class="p-4 border-b border-slate-700/60 flex items-center justify-between">
-          <h2 class="text-base font-bold text-white">Tracked Keywords (<span x-text="rankTargets.length"></span>)</h2>
+      <div class="bg-[#0F1A36] border border-slate-800 rounded-xl overflow-hidden shadow-xl">
+        <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+          <h2 class="text-base font-bold font-heading text-white">Tracked Keywords (<span x-text="rankTargets.length"></span>)</h2>
           <span class="text-xs text-slate-400">Pre-flight cost: $0.002 per check (DataForSEO BYOK)</span>
         </div>
         <div class="overflow-x-auto">
@@ -898,8 +944,8 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     <!-- ================= TAB 5: BACKLINK TRACKER ================= -->
     <div x-show="activeTab === 'backlinks'" class="space-y-8">
       <!-- Input Card -->
-      <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 shadow-xl">
-        <h1 class="text-2xl font-bold text-white mb-2">Backlink & Referring Domain Tracker</h1>
+      <div class="bg-[#0F1A36] border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <h1 class="text-2xl font-bold font-heading text-white mb-2">Backlink & Referring Domain Tracker</h1>
         <p class="text-slate-400 text-sm mb-6">Inspect backlink profile snapshots, referring domains, domain authority (DR proxy), anchor texts, and new/lost links.</p>
 
         <form @submit.prevent="fetchBacklinkSnapshot()" class="flex flex-wrap items-center gap-3">
@@ -908,12 +954,12 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             x-model="blDomain" 
             placeholder="e.g. example.com or mydomain.io" 
             required
-            class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+            class="flex-1 bg-[#070C1B] border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] transition"
           />
           <button 
             type="submit" 
             :disabled="blLoading"
-            class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition duration-150 flex items-center space-x-2 disabled:opacity-50 shadow-lg shadow-emerald-500/20"
+            class="bg-[#1D4ED8] hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-lg transition duration-150 flex items-center space-x-2 disabled:opacity-50 shadow-lg shadow-[#1D4ED8]/25"
           >
             <span x-show="!blLoading">Snapshot Backlinks</span>
             <span x-show="blLoading">Analyzing...</span>
@@ -926,26 +972,26 @@ DASHBOARD_HTML = """<!DOCTYPE html>
         <div class="space-y-6">
           <!-- Overview Cards -->
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+            <div class="bg-[#0F1A36] border border-slate-800 p-5 rounded-xl">
               <span class="text-xs uppercase font-semibold text-slate-400">Total Backlinks</span>
-              <p class="text-3xl font-extrabold text-white mt-1" x-text="blSnapshot.total_backlinks"></p>
+              <p class="text-3xl font-extrabold font-heading text-white mt-1" x-text="blSnapshot.total_backlinks"></p>
             </div>
-            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+            <div class="bg-[#0F1A36] border border-slate-800 p-5 rounded-xl">
               <span class="text-xs uppercase font-semibold text-slate-400">Referring Domains</span>
-              <p class="text-3xl font-extrabold text-emerald-400 mt-1" x-text="blSnapshot.total_referring_domains"></p>
+              <p class="text-3xl font-extrabold font-heading text-emerald-400 mt-1" x-text="blSnapshot.total_referring_domains"></p>
             </div>
-            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+            <div class="bg-[#0F1A36] border border-slate-800 p-5 rounded-xl">
               <span class="text-xs uppercase font-semibold text-slate-400">Dofollow / Nofollow</span>
-              <p class="text-xl font-bold text-cyan-400 mt-2">
+              <p class="text-xl font-bold font-heading text-cyan-400 mt-2">
                 <span x-text="blSnapshot.dofollow_count"></span> <span class="text-xs text-slate-400">/</span> <span class="text-slate-300" x-text="blSnapshot.nofollow_count"></span>
               </p>
             </div>
-            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl flex items-center justify-between">
+            <div class="bg-[#0F1A36] border border-slate-800 p-5 rounded-xl flex items-center justify-between">
               <div>
                 <span class="text-xs uppercase font-semibold text-slate-400">Export Report</span>
                 <p class="text-xs text-slate-500 mt-1">Full referring link data</p>
               </div>
-              <button @click="downloadBacklinkCSV()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold px-4 py-2 rounded-lg transition">
+              <button @click="downloadBacklinkCSV()" class="bg-[#132145] hover:bg-slate-700 text-white text-xs font-semibold px-4 py-2 rounded-lg border border-slate-700 transition">
                 CSV Export
               </button>
             </div>
@@ -954,19 +1000,19 @@ DASHBOARD_HTML = """<!DOCTYPE html>
           <!-- Referring Domains & Top Anchors Grid -->
           <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
             <!-- Referring Domains -->
-            <div class="md:col-span-8 bg-slate-800/80 border border-slate-700 rounded-xl p-5 shadow-xl">
-              <h3 class="text-base font-bold text-white mb-3">Top Referring Domains</h3>
+            <div class="md:col-span-8 bg-[#0F1A36] border border-slate-800 rounded-xl p-5 shadow-xl">
+              <h3 class="text-base font-bold font-heading text-white mb-3">Top Referring Domains</h3>
               <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs">
-                  <thead class="text-slate-400 uppercase border-b border-slate-700">
+                  <thead class="text-slate-400 uppercase border-b border-slate-800">
                     <tr><th class="py-2">Domain</th><th class="py-2 text-center">DR</th><th class="py-2 text-center">Links</th><th class="py-2 text-center">Type</th></tr>
                   </thead>
-                  <tbody class="divide-y divide-slate-700/50">
+                  <tbody class="divide-y divide-slate-800">
                     <template x-for="d in blSnapshot.referring_domains" :key="d.domain">
                       <tr>
                         <td class="py-2.5 font-semibold text-white" x-text="d.domain"></td>
                         <td class="py-2.5 text-center">
-                          <span class="px-2 py-0.5 rounded font-bold" :class="d.domain_rank >= 70 ? 'bg-emerald-950 text-emerald-400' : 'bg-slate-900 text-slate-300'" x-text="d.domain_rank"></span>
+                          <span class="px-2 py-0.5 rounded font-bold" :class="d.domain_rank >= 70 ? 'bg-emerald-950 text-emerald-400' : 'bg-[#070C1B] text-slate-300'" x-text="d.domain_rank"></span>
                         </td>
                         <td class="py-2.5 text-center font-mono" x-text="d.total_links"></td>
                         <td class="py-2.5 text-center text-slate-400" x-text="d.dofollow_count + ' dofollow'"></td>
@@ -978,13 +1024,13 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             </div>
 
             <!-- Anchor Text Profile -->
-            <div class="md:col-span-4 bg-slate-800/80 border border-slate-700 rounded-xl p-5 shadow-xl space-y-3">
-              <h3 class="text-base font-bold text-white mb-2">Anchor Text Profile</h3>
+            <div class="md:col-span-4 bg-[#0F1A36] border border-slate-800 rounded-xl p-5 shadow-xl space-y-3">
+              <h3 class="text-base font-bold font-heading text-white mb-2">Anchor Text Profile</h3>
               <div class="space-y-2">
                 <template x-for="a in blSnapshot.top_anchor_texts" :key="a.text">
-                  <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-700/60 flex items-center justify-between text-xs">
+                  <div class="bg-[#070C1B] p-2.5 rounded-lg border border-slate-800 flex items-center justify-between text-xs">
                     <span class="text-slate-200 truncate max-w-[150px]" x-text="a.text"></span>
-                    <span class="text-emerald-400 font-bold" x-text="a.percentage + '% (' + a.count + ')'"></span>
+                    <span class="text-[#1D4ED8] font-bold" x-text="a.percentage + '% (' + a.count + ')'"></span>
                   </div>
                 </template>
               </div>
@@ -996,21 +1042,21 @@ DASHBOARD_HTML = """<!DOCTYPE html>
 
     <!-- ================= TAB 6: COMPETITOR INSIGHTS ================= -->
     <div x-show="activeTab === 'competitors'" class="space-y-8">
-      <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 shadow-xl">
-        <h1 class="text-2xl font-bold text-white mb-2">Competitor Keyword & Backlink Gap Analysis</h1>
+      <div class="bg-[#0F1A36] border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <h1 class="text-2xl font-bold font-heading text-white mb-2">Competitor Keyword & Backlink Gap Analysis</h1>
         <p class="text-slate-400 text-sm mb-6">Compare your domain against competitors to find keywords they rank for that you are missing, and high-DR backlink opportunities.</p>
 
         <form @submit.prevent="runCompetitorAnalysis()" class="grid grid-cols-1 md:grid-cols-12 gap-3">
           <div class="md:col-span-5">
             <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Your Target Domain</label>
-            <input type="text" x-model="compTargetDomain" placeholder="e.g. neemseo.com" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500" />
+            <input type="text" x-model="compTargetDomain" placeholder="e.g. neemseo.com" required class="w-full bg-[#070C1B] border border-slate-700 rounded-lg px-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#1D4ED8]" />
           </div>
           <div class="md:col-span-5">
             <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Competitors (Comma-separated)</label>
-            <input type="text" x-model="compDomainsInput" placeholder="e.g. semrush.com, ahrefs.com" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500" />
+            <input type="text" x-model="compDomainsInput" placeholder="e.g. semrush.com, ahrefs.com" required class="w-full bg-[#070C1B] border border-slate-700 rounded-lg px-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#1D4ED8]" />
           </div>
           <div class="md:col-span-2 flex items-end">
-            <button type="submit" :disabled="compLoading" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold py-2 px-3 rounded-lg text-sm transition disabled:opacity-50">
+            <button type="submit" :disabled="compLoading" class="w-full bg-[#1D4ED8] hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-sm shadow-md shadow-[#1D4ED8]/25 transition disabled:opacity-50">
               <span x-show="!compLoading">Compare Gaps</span>
               <span x-show="compLoading">Analyzing...</span>
             </button>
@@ -1022,38 +1068,38 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       <template x-if="compReport">
         <div class="space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+            <div class="bg-[#0F1A36] border border-slate-800 p-5 rounded-xl">
               <span class="text-xs uppercase font-semibold text-slate-400">Shared Keywords</span>
-              <p class="text-3xl font-extrabold text-emerald-400 mt-1" x-text="compReport.total_shared_keywords"></p>
+              <p class="text-3xl font-extrabold font-heading text-[#1D4ED8] mt-1" x-text="compReport.total_shared_keywords"></p>
             </div>
-            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+            <div class="bg-[#0F1A36] border border-slate-800 p-5 rounded-xl">
               <span class="text-xs uppercase font-semibold text-slate-400">Missing Keyword Opportunities</span>
-              <p class="text-3xl font-extrabold text-amber-400 mt-1" x-text="compReport.total_missing_keywords"></p>
+              <p class="text-3xl font-extrabold font-heading text-[#FF6B4A] mt-1" x-text="compReport.total_missing_keywords"></p>
             </div>
-            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+            <div class="bg-[#0F1A36] border border-slate-800 p-5 rounded-xl">
               <span class="text-xs uppercase font-semibold text-slate-400">Backlink Gap Leads</span>
-              <p class="text-3xl font-extrabold text-cyan-400 mt-1" x-text="compReport.total_backlink_gaps"></p>
+              <p class="text-3xl font-extrabold font-heading text-cyan-400 mt-1" x-text="compReport.total_backlink_gaps"></p>
             </div>
           </div>
 
           <!-- Keyword Gaps Table -->
-          <div class="bg-slate-800/80 border border-slate-700 rounded-xl overflow-hidden shadow-xl">
-            <div class="p-4 border-b border-slate-700"><h3 class="text-base font-bold text-white">Keyword Gaps (Competitors Rank, You Don't)</h3></div>
+          <div class="bg-[#0F1A36] border border-slate-800 rounded-xl overflow-hidden shadow-xl">
+            <div class="p-4 border-b border-slate-800"><h3 class="text-base font-bold font-heading text-white">Keyword Gaps (Competitors Rank, You Don't)</h3></div>
             <div class="overflow-x-auto">
               <table class="w-full text-left text-xs">
-                <thead class="bg-slate-950/60 border-b border-slate-700 text-slate-400 uppercase">
+                <thead class="bg-[#070C1B] border-b border-slate-800 text-slate-400 uppercase">
                   <tr><th class="py-3 px-4">Keyword</th><th class="py-3 px-4 text-right">Volume</th><th class="py-3 px-4 text-center">KD</th><th class="py-3 px-4 text-center">Gap Status</th><th class="py-3 px-4 text-center">Priority</th></tr>
                 </thead>
-                <tbody class="divide-y divide-slate-700/50">
+                <tbody class="divide-y divide-slate-800">
                   <template x-for="k in compReport.keyword_gaps" :key="k.keyword">
-                    <tr class="hover:bg-slate-700/30">
+                    <tr class="hover:bg-slate-800/40">
                       <td class="py-2.5 px-4 font-semibold text-white" x-text="k.keyword"></td>
                       <td class="py-2.5 px-4 text-right font-mono" x-text="k.search_volume.toLocaleString()"></td>
                       <td class="py-2.5 px-4 text-center" x-text="k.difficulty"></td>
                       <td class="py-2.5 px-4 text-center">
-                        <span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold" :class="k.gap_type === 'missing' ? 'bg-red-950 text-red-400' : 'bg-emerald-950 text-emerald-400'" x-text="k.gap_type"></span>
+                        <span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold" :class="k.gap_type === 'missing' ? 'bg-[#FF6B4A]/20 text-[#FF6B4A] border border-[#FF6B4A]/50' : 'bg-blue-950 text-blue-400 border border-blue-800'" x-text="k.gap_type"></span>
                       </td>
-                      <td class="py-2.5 px-4 text-center font-bold text-emerald-400" x-text="k.priority_score"></td>
+                      <td class="py-2.5 px-4 text-center font-bold text-[#1D4ED8]" x-text="k.priority_score"></td>
                     </tr>
                   </template>
                 </tbody>
@@ -1066,10 +1112,10 @@ DASHBOARD_HTML = """<!DOCTYPE html>
 
     <!-- ================= TAB 7: AI VISIBILITY (GEO) ================= -->
     <div x-show="activeTab === 'ai-visibility'" class="space-y-8">
-      <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 shadow-xl">
+      <div class="bg-[#0F1A36] border border-slate-800 rounded-2xl p-6 shadow-xl">
         <div class="flex items-center justify-between mb-2">
-          <h1 class="text-2xl font-bold text-white">Generative Engine Optimization (GEO) & AI Visibility</h1>
-          <span class="text-xs bg-purple-500/10 text-purple-400 border border-purple-500/30 px-2.5 py-1 rounded-full font-mono">ChatGPT · Claude · Perplexity · Gemini · AI Overviews</span>
+          <h1 class="text-2xl font-bold font-heading text-white">Generative Engine Optimization (GEO) & AI Visibility</h1>
+          <span class="text-xs bg-[#1D4ED8]/10 text-blue-400 border border-[#1D4ED8]/30 px-2.5 py-1 rounded-full font-mono">ChatGPT · Claude · Perplexity · Gemini · AI Overviews</span>
         </div>
         <p class="text-slate-400 text-sm mb-6">Track brand mentions, citations, and recommendation sentiment when users query AI answer engines. Measure your AI Visibility Score (0–100) and receive actionable GEO fixes.</p>
 
@@ -1082,7 +1128,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                 x-model="aiDomain" 
                 placeholder="neemseo.com" 
                 required
-                class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                class="w-full bg-[#070C1B] border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]"
               />
             </div>
             <div class="md:col-span-6">
@@ -1092,7 +1138,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                 x-model="aiBrand" 
                 placeholder="neemSEO" 
                 required
-                class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                class="w-full bg-[#070C1B] border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]"
               />
             </div>
           </div>
@@ -1101,11 +1147,11 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             <button 
               type="submit" 
               :disabled="aiLoading"
-              class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition duration-150 flex items-center space-x-2 disabled:opacity-50 shadow-lg shadow-emerald-500/20"
+              class="bg-[#1D4ED8] hover:bg-blue-700 text-white font-bold px-6 py-2.5 rounded-lg transition duration-150 flex items-center space-x-2 disabled:opacity-50 shadow-lg shadow-[#1D4ED8]/25"
             >
               <span x-show="!aiLoading">Run AI Visibility Audit</span>
               <span x-show="aiLoading" class="flex items-center space-x-2">
-                <svg class="animate-spin h-4 w-4 text-slate-950" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
                 <span>Evaluating AI Engines...</span>
               </span>
             </button>
@@ -1118,20 +1164,20 @@ DASHBOARD_HTML = """<!DOCTYPE html>
         <div class="space-y-6">
           <!-- Score Metric Cards -->
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+            <div class="bg-[#0F1A36] border border-slate-800 p-5 rounded-xl">
               <span class="text-xs uppercase font-semibold text-slate-400">AI Visibility Score</span>
               <div class="flex items-baseline space-x-2 mt-1">
-                <span class="text-4xl font-extrabold" :class="aiResult.overall_score >= 70 ? 'text-emerald-400' : (aiResult.overall_score >= 40 ? 'text-amber-400' : 'text-red-400')" x-text="aiResult.overall_score"></span>
+                <span class="text-4xl font-extrabold font-heading" :class="aiResult.overall_score >= 70 ? 'text-emerald-400' : (aiResult.overall_score >= 40 ? 'text-amber-400' : 'text-[#FF6B4A]')" x-text="aiResult.overall_score"></span>
                 <span class="text-slate-500 text-sm font-medium">/ 100</span>
               </div>
             </div>
-            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+            <div class="bg-[#0F1A36] border border-slate-800 p-5 rounded-xl">
               <span class="text-xs uppercase font-semibold text-slate-400">Mention Rate</span>
-              <p class="text-3xl font-extrabold text-white mt-1"><span x-text="aiResult.mention_rate_pct"></span>%</p>
+              <p class="text-3xl font-extrabold font-heading text-white mt-1"><span x-text="aiResult.mention_rate_pct"></span>%</p>
             </div>
-            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+            <div class="bg-[#0F1A36] border border-slate-800 p-5 rounded-xl">
               <span class="text-xs uppercase font-semibold text-slate-400">Direct Citation Rate</span>
-              <p class="text-3xl font-extrabold text-cyan-400 mt-1"><span x-text="aiResult.citation_rate_pct"></span>%</p>
+              <p class="text-3xl font-extrabold font-heading text-cyan-400 mt-1"><span x-text="aiResult.citation_rate_pct"></span>%</p>
             </div>
             <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
               <span class="text-xs uppercase font-semibold text-slate-400">Top Recommendation Rate</span>
@@ -1221,14 +1267,14 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     <div x-show="activeTab === 'team'" class="space-y-8">
       <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
         <!-- Team Management -->
-        <div class="md:col-span-7 bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 shadow-xl space-y-6">
+        <div class="md:col-span-7 bg-[#0F1A36] border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
           <div class="flex items-center justify-between">
-            <h2 class="text-xl font-bold text-white">Team Members</h2>
-            <button @click="loadTeam()" class="text-xs text-emerald-400 hover:text-emerald-300">Refresh</button>
+            <h2 class="text-xl font-bold font-heading text-white">Team Members</h2>
+            <button @click="loadTeam()" class="text-xs text-[#1D4ED8] hover:text-blue-400 font-semibold">Refresh</button>
           </div>
           
           <!-- Invite Teammate Form -->
-          <form @submit.prevent="createInvite()" class="bg-slate-900/80 p-4 rounded-xl border border-slate-700/60 space-y-3">
+          <form @submit.prevent="createInvite()" class="bg-[#070C1B] p-4 rounded-xl border border-slate-800 space-y-3">
             <h3 class="text-xs uppercase font-bold text-slate-400 tracking-wider">Invite Teammate</h3>
             <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
               <div class="sm:col-span-8">
@@ -1237,22 +1283,22 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                   x-model="inviteEmail" 
                   placeholder="colleague@company.com" 
                   required
-                  class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500"
+                  class="w-full bg-[#0B1226] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-[#1D4ED8]"
                 />
               </div>
               <div class="sm:col-span-4">
                 <button 
                   type="submit" 
-                  class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-2 rounded-lg text-xs transition"
+                  class="w-full bg-[#1D4ED8] hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs shadow-md shadow-[#1D4ED8]/25 transition"
                 >
                   Generate Link
                 </button>
               </div>
             </div>
             <template x-if="inviteSuccess">
-              <div class="p-3 bg-emerald-950/80 border border-emerald-500/40 rounded-lg text-xs text-emerald-200">
-                <div class="font-bold mb-1">Invitation Link Created:</div>
-                <div class="font-mono break-all text-[11px] bg-slate-950 p-2 rounded" x-text="inviteSuccess.invite_url"></div>
+              <div class="p-3 bg-[#132145] border border-[#1D4ED8]/40 rounded-lg text-xs text-slate-200">
+                <div class="font-bold mb-1 text-white">Invitation Link Created:</div>
+                <div class="font-mono break-all text-[11px] bg-[#070C1B] p-2 rounded text-blue-300" x-text="inviteSuccess.invite_url"></div>
               </div>
             </template>
           </form>
@@ -1260,15 +1306,15 @@ DASHBOARD_HTML = """<!DOCTYPE html>
           <!-- Members Table -->
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
-              <thead class="border-b border-slate-700 text-slate-400 uppercase">
+              <thead class="border-b border-slate-800 text-slate-400 uppercase">
                 <tr><th class="py-2.5 px-3">Email</th><th class="py-2.5 px-3 text-center">Role</th><th class="py-2.5 px-3 text-center">Status</th></tr>
               </thead>
-              <tbody class="divide-y divide-slate-700/50">
+              <tbody class="divide-y divide-slate-800">
                 <template x-for="m in teamList" :key="m.id">
                   <tr>
                     <td class="py-2.5 px-3 text-white font-medium" x-text="m.email"></td>
-                    <td class="py-2.5 px-3 text-center"><span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold" :class="m.role === 'admin' ? 'bg-purple-950 text-purple-400' : 'bg-slate-700 text-slate-300'" x-text="m.role"></span></td>
-                    <td class="py-2.5 px-3 text-center"><span class="text-emerald-400" x-text="m.is_active ? 'Active' : 'Inactive'"></span></td>
+                    <td class="py-2.5 px-3 text-center"><span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold" :class="m.role === 'admin' ? 'bg-purple-950 text-purple-400' : 'bg-slate-800 text-slate-300'" x-text="m.role"></span></td>
+                    <td class="py-2.5 px-3 text-center"><span class="text-[#1D4ED8] font-semibold" x-text="m.is_active ? 'Active' : 'Inactive'"></span></td>
                   </tr>
                 </template>
               </tbody>
@@ -1277,15 +1323,15 @@ DASHBOARD_HTML = """<!DOCTYPE html>
         </div>
 
         <!-- MCP API Token & Agent Integration -->
-        <div class="md:col-span-5 bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 shadow-xl space-y-6">
-          <h2 class="text-xl font-bold text-white">AI Agent & MCP Keys</h2>
+        <div class="md:col-span-5 bg-[#0F1A36] border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+          <h2 class="text-xl font-bold font-heading text-white">AI Agent & MCP Keys</h2>
           <p class="text-xs text-slate-400 leading-relaxed">
             Connect AI coding agents (Claude Code, ChatGPT, Cursor, Codex) to neemSEO via the Model Context Protocol. MCP clients authenticate using your per-user API key.
           </p>
 
-          <div class="bg-slate-900/90 border border-slate-700 rounded-xl p-4 space-y-3">
+          <div class="bg-[#070C1B] border border-slate-800 rounded-xl p-4 space-y-3">
             <span class="text-xs uppercase font-bold text-slate-400">Claude Code / Cursor Configuration</span>
-            <pre class="bg-slate-950 p-3 rounded-lg text-[11px] font-mono text-emerald-300 overflow-x-auto"><code>{
+            <pre class="bg-[#0B1226] p-3 rounded-lg text-[11px] font-mono text-blue-300 overflow-x-auto border border-slate-800"><code>{
   "mcpServers": {
     "neemseo": {
       "command": "python",
@@ -1302,7 +1348,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                 type="text" 
                 readonly 
                 :value="userApiToken || 'neemseo_live_demo_unconfigured'"
-                class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-emerald-400"
+                class="w-full bg-[#070C1B] border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-[#1D4ED8]"
               />
             </div>
           </div>

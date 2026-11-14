@@ -11,6 +11,17 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        brand: {
+          blue: '#1D4ED8',
+          coral: '#FF6B4A',
+          navy: '#0B1226',
+          surface: '#0F1A36',
+          card: '#132145',
+        },
+      },
+      fontFamily: {
+        sans: ['Inter', '-apple-system', 'sans-serif'],
+        heading: ['"IBM Plex Sans"', 'sans-serif'],
       },
     },
   },

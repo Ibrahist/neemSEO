@@ -265,16 +265,28 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#0B1226] text-slate-100 flex flex-col font-sans">
       {/* Top Navbar: ONLY Logo and Brand Name */}
-      <header className="border-b border-slate-800 bg-slate-950/90 backdrop-blur sticky top-0 z-50">
+      <header className="border-b border-slate-800 bg-[#0B1226]/90 backdrop-blur sticky top-0 z-50">
         <div className="px-6 h-16 flex items-center">
           <div className="flex items-center space-x-3">
-            <div className="h-9 w-9 bg-emerald-500 rounded-lg flex items-center justify-center font-bold text-slate-950 text-xl shadow-lg shadow-emerald-500/20">
-              n
-            </div>
-            <span className="text-xl font-bold tracking-tight text-white">
-              neem<span className="text-emerald-400">SEO</span>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" className="w-9 h-9" role="img" aria-label="neemSEO">
+              <title>neemSEO</title>
+              <circle cx="27" cy="27" r="20" fill="none" stroke="#1D4ED8" strokeWidth="5"/>
+              <path d="M41.5 41.5 L56 56" fill="none" stroke="#FF6B4A" strokeWidth="7" strokeLinecap="round"/>
+              <g transform="translate(27 27) rotate(40) scale(0.9)" fill="#2FA05A">
+                <path d="M0 15 V-14" fill="none" stroke="#2FA05A" strokeWidth="1.8" strokeLinecap="round"/>
+                <ellipse cx="0" cy="-14" rx="2.7" ry="6"/>
+                <ellipse cx="5.5" cy="7" rx="2.7" ry="6" transform="rotate(50 5.5 7)"/>
+                <ellipse cx="-5.5" cy="7" rx="2.7" ry="6" transform="rotate(-50 -5.5 7)"/>
+                <ellipse cx="5.2" cy="-1.5" rx="2.5" ry="5.6" transform="rotate(50 5.2 -1.5)"/>
+                <ellipse cx="-5.2" cy="-1.5" rx="2.5" ry="5.6" transform="rotate(-50 -5.2 -1.5)"/>
+                <ellipse cx="4.6" cy="-9.5" rx="2.3" ry="5" transform="rotate(50 4.6 -9.5)"/>
+                <ellipse cx="-4.6" cy="-9.5" rx="2.3" ry="5" transform="rotate(-50 -4.6 -9.5)"/>
+              </g>
+            </svg>
+            <span className="text-xl font-heading font-bold tracking-tight text-white">
+              neem<span style={{ color: "#FF6B4A" }}>SEO</span>
             </span>
           </div>
         </div>
@@ -283,7 +295,7 @@ export default function Dashboard() {
       {/* Main Container with Left Sidebar */}
       <div className="flex min-h-[calc(100vh-4rem)]">
         {/* Left Sidebar */}
-        <aside className="w-64 shrink-0 bg-slate-950 border-r border-slate-800 flex flex-col justify-between p-4 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto">
+        <aside className="w-64 shrink-0 bg-[#0B1226] border-r border-slate-800 flex flex-col justify-between p-4 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto">
           <div className="space-y-6">
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3">SEO Tools</span>
@@ -306,8 +318,8 @@ export default function Dashboard() {
                       onClick={() => setActiveTab(tab.id)}
                       className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition text-left ${
                         isActive
-                          ? "bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20"
-                          : "text-slate-300 hover:text-white hover:bg-slate-900"
+                          ? "bg-[#1D4ED8] text-white font-bold shadow-md shadow-[#1D4ED8]/30"
+                          : "text-slate-300 hover:text-white hover:bg-slate-800/60"
                       }`}
                     >
                       <Icon className="w-4 h-4 shrink-0" />
@@ -325,7 +337,7 @@ export default function Dashboard() {
               <a
                 href="http://localhost:8000/docs"
                 target="_blank"
-                className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-900 transition"
+                className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-800/60 transition"
               >
                 <span>FastAPI Docs</span>
                 <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
@@ -333,14 +345,14 @@ export default function Dashboard() {
               <a
                 href="http://localhost:8000/bot"
                 target="_blank"
-                className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-900 transition"
+                className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-800/60 transition"
               >
                 <span>Bot Policy</span>
                 <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
               </a>
             </div>
-            <div className="p-2.5 bg-slate-900/90 border border-slate-800 rounded-lg flex items-center space-x-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <div className="p-2.5 bg-[#0F1A36] border border-slate-800 rounded-lg flex items-center space-x-2">
+              <span className="w-2 h-2 rounded-full bg-[#FF6B4A] animate-pulse"></span>
               <span className="text-[11px] text-slate-300 font-medium">BYOK: Pay-as-you-go</span>
             </div>
           </div>
@@ -368,7 +380,7 @@ export default function Dashboard() {
                       onChange={(e) => setAuditUrl(e.target.value)}
                       required
                       placeholder="https://example.com"
-                      className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="w-full bg-[#070C1B] border border-slate-700 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]"
                     />
                   </div>
                   <div className="md:col-span-5">
@@ -378,7 +390,7 @@ export default function Dashboard() {
                       value={auditKeyword}
                       onChange={(e) => setAuditKeyword(e.target.value)}
                       placeholder="e.g. open source seo tool"
-                      className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="w-full bg-[#070C1B] border border-slate-700 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]"
                     />
                   </div>
                 </div>
@@ -389,7 +401,7 @@ export default function Dashboard() {
                       type="checkbox"
                       checked={checkPagespeed}
                       onChange={(e) => setCheckPagespeed(e.target.checked)}
-                      className="rounded border-slate-700 text-emerald-500 bg-slate-900"
+                      className="rounded border-slate-700 text-[#1D4ED8] focus:ring-[#1D4ED8] bg-[#070C1B]"
                     />
                     <span>Include Google Core Web Vitals (LCP, FID/INP, CLS)</span>
                   </label>
@@ -397,7 +409,7 @@ export default function Dashboard() {
                   <button
                     type="submit"
                     disabled={auditLoading}
-                    className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-5 py-2 rounded-lg text-xs transition flex items-center space-x-2 shadow-lg shadow-emerald-500/20 disabled:opacity-50"
+                    className="bg-[#1D4ED8] hover:bg-blue-700 text-white font-bold px-5 py-2 rounded-lg text-xs transition flex items-center space-x-2 shadow-lg shadow-[#1D4ED8]/25 disabled:opacity-50"
                   >
                     {auditLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <FileSearch className="w-4 h-4" />}
                     <span>{auditLoading ? "Auditing Page..." : "Run On-Page Audit"}</span>
@@ -476,7 +488,7 @@ export default function Dashboard() {
                       value={crawlUrl}
                       onChange={(e) => setCrawlUrl(e.target.value)}
                       required
-                      className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="w-full bg-[#070C1B] border border-slate-700 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]"
                     />
                   </div>
                   <div className="md:col-span-4">
@@ -485,7 +497,7 @@ export default function Dashboard() {
                       type="number"
                       value={crawlMaxPages}
                       onChange={(e) => setCrawlMaxPages(Number(e.target.value))}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="w-full bg-[#070C1B] border border-slate-700 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]"
                     />
                   </div>
                 </div>
@@ -496,7 +508,7 @@ export default function Dashboard() {
                       type="checkbox"
                       checked={crawlRenderJs}
                       onChange={(e) => setCrawlRenderJs(e.target.checked)}
-                      className="rounded border-slate-700 text-emerald-500 bg-slate-900"
+                      className="rounded border-slate-700 text-[#1D4ED8] focus:ring-[#1D4ED8] bg-[#070C1B]"
                     />
                     <span>Opt-in Playwright JS Rendering (Headless Chromium)</span>
                   </label>
@@ -504,7 +516,7 @@ export default function Dashboard() {
                   <button
                     type="submit"
                     disabled={crawlLoading}
-                    className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-5 py-2 rounded-lg text-xs transition flex items-center space-x-2 shadow-lg shadow-emerald-500/20 disabled:opacity-50"
+                    className="bg-[#1D4ED8] hover:bg-blue-700 text-white font-bold px-5 py-2 rounded-lg text-xs transition flex items-center space-x-2 shadow-lg shadow-[#1D4ED8]/25 disabled:opacity-50"
                   >
                     {crawlLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Globe className="w-4 h-4" />}
                     <span>{crawlLoading ? "Crawling Site..." : "Start Site Crawl"}</span>
@@ -514,13 +526,13 @@ export default function Dashboard() {
             </div>
 
             {crawlProgress && crawlLoading && (
-              <div className="bg-slate-900/80 border border-slate-800 rounded-xl p-5 shadow-xl space-y-2">
+              <div className="bg-[#0F1A36] border border-slate-800 rounded-xl p-5 shadow-xl space-y-2">
                 <div className="flex justify-between text-xs text-slate-300 font-semibold">
                   <span>Crawling in progress...</span>
                   <span>{crawlProgress.pages_crawled} pages indexed</span>
                 </div>
                 <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-                  <div className="bg-emerald-500 h-2 rounded-full animate-pulse" style={{ width: "65%" }}></div>
+                  <div className="bg-[#1D4ED8] h-2 rounded-full animate-pulse" style={{ width: "65%" }}></div>
                 </div>
               </div>
             )}
@@ -566,12 +578,12 @@ export default function Dashboard() {
                   onChange={(e) => setKwSeed(e.target.value)}
                   placeholder="e.g. open source seo tool"
                   required
-                  className="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="flex-1 bg-[#070C1B] border border-slate-700 rounded-lg px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#1D4ED8]"
                 />
                 <button
                   type="submit"
                   disabled={kwLoading}
-                  className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-6 py-2 rounded-lg text-xs transition flex items-center space-x-2 disabled:opacity-50"
+                  className="bg-[#1D4ED8] hover:bg-blue-700 text-white font-bold px-6 py-2 rounded-lg text-xs transition flex items-center space-x-2 shadow-lg shadow-[#1D4ED8]/25 disabled:opacity-50"
                 >
                   {kwLoading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
                   <span>Research</span>
@@ -580,14 +592,14 @@ export default function Dashboard() {
             </div>
 
             {kwResult && (
-              <div className="bg-slate-900/80 border border-slate-800 rounded-xl overflow-hidden shadow-xl">
+              <div className="bg-[#0F1A36] border border-slate-800 rounded-xl overflow-hidden shadow-xl">
                 <div className="p-4 border-b border-slate-800 flex justify-between items-center">
                   <span className="text-xs font-bold text-white">Discovered Keywords ({kwResult.total_found})</span>
                   <span className="text-xs text-slate-400">Cost: $0.00 (Autocomplete Free)</span>
                 </div>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-950/60 text-slate-400 uppercase">
+                    <thead className="bg-[#070C1B] text-slate-400 uppercase">
                       <tr>
                         <th className="py-2.5 px-4">Keyword</th>
                         <th className="py-2.5 px-4 text-center">Intent</th>
@@ -600,12 +612,12 @@ export default function Dashboard() {
                         <tr key={idx} className="hover:bg-slate-800/30">
                           <td className="py-2.5 px-4 font-medium text-white">{k.keyword}</td>
                           <td className="py-2.5 px-4 text-center">
-                            <span className="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-slate-800 text-slate-300">
+                            <span className="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-[#070C1B] text-slate-300 border border-slate-800">
                               {k.intent}
                             </span>
                           </td>
                           <td className="py-2.5 px-4 text-center text-slate-400 font-mono text-[11px]">{k.cluster}</td>
-                          <td className="py-2.5 px-4 text-center font-bold text-emerald-400">{k.priority_score}</td>
+                          <td className="py-2.5 px-4 text-center font-bold text-[#1D4ED8]">{k.priority_score}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -619,13 +631,13 @@ export default function Dashboard() {
         {/* ================= TAB 4: RANK TRACKER ================= */}
         {activeTab === "ranker" && (
           <div className="space-y-6">
-            <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+            <div className="bg-[#0F1A36] border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
               <div className="flex justify-between items-center">
                 <h1 className="text-xl font-bold text-white">SERP Rank Tracker & Drop Alerts</h1>
                 <button
                   onClick={handleCheckRanks}
                   disabled={rankLoading}
-                  className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-4 py-2 rounded-lg text-xs transition flex items-center space-x-1.5"
+                  className="bg-[#1D4ED8] hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-lg text-xs transition flex items-center space-x-1.5 shadow-md shadow-[#1D4ED8]/25"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${rankLoading ? "animate-spin" : ""}`} />
                   <span>Check SERP Now</span>
@@ -641,7 +653,7 @@ export default function Dashboard() {
                     onChange={(e) => setNewKeyword(e.target.value)}
                     placeholder="Keyword to track"
                     required
-                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
+                    className="w-full bg-[#070C1B] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-[#1D4ED8]"
                   />
                 </div>
                 <div className="md:col-span-4">
@@ -651,11 +663,11 @@ export default function Dashboard() {
                     onChange={(e) => setNewUrl(e.target.value)}
                     placeholder="https://example.com/target-page"
                     required
-                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
+                    className="w-full bg-[#070C1B] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-[#1D4ED8]"
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <button type="submit" className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2 rounded-lg text-xs">
+                  <button type="submit" className="w-full bg-[#132145] hover:bg-blue-900 border border-[#1D4ED8]/40 text-white font-bold py-2 rounded-lg text-xs transition">
                     + Add Target
                   </button>
                 </div>
@@ -718,7 +730,7 @@ export default function Dashboard() {
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Backlink Profile Card */}
-              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+              <div className="bg-[#0F1A36] border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
                 <h2 className="text-base font-bold text-white">Backlink Profile Snapshot</h2>
                 <form onSubmit={handleBacklinks} className="flex gap-2">
                   <input
@@ -727,20 +739,20 @@ export default function Dashboard() {
                     onChange={(e) => setBlDomain(e.target.value)}
                     required
                     placeholder="example.com"
-                    className="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
+                    className="flex-1 bg-[#070C1B] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-[#1D4ED8]"
                   />
-                  <button type="submit" disabled={blLoading} className="bg-emerald-500 text-slate-950 font-bold px-4 py-2 rounded-lg text-xs">
+                  <button type="submit" disabled={blLoading} className="bg-[#1D4ED8] hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-lg text-xs shadow-md shadow-[#1D4ED8]/25 transition">
                     Inspect
                   </button>
                 </form>
 
                 {blResult && (
                   <div className="grid grid-cols-2 gap-3 pt-2">
-                    <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
+                    <div className="bg-[#070C1B] p-3 rounded-lg border border-slate-800">
                       <span className="text-[10px] text-slate-400 uppercase">Total Backlinks</span>
                       <p className="text-xl font-bold text-white">{blResult.total_backlinks}</p>
                     </div>
-                    <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
+                    <div className="bg-[#070C1B] p-3 rounded-lg border border-slate-800">
                       <span className="text-[10px] text-slate-400 uppercase">Referring Domains</span>
                       <p className="text-xl font-bold text-cyan-400">{blResult.total_referring_domains}</p>
                     </div>
@@ -749,7 +761,7 @@ export default function Dashboard() {
               </div>
 
               {/* Competitor Gap Card */}
-              <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+              <div className="bg-[#0F1A36] border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
                 <h2 className="text-base font-bold text-white">Competitor Gap Analysis</h2>
                 <form onSubmit={handleCompetitors} className="space-y-3">
                   <input
@@ -757,29 +769,29 @@ export default function Dashboard() {
                     value={compDomain}
                     onChange={(e) => setCompDomain(e.target.value)}
                     placeholder="Your domain (e.g. neemseo.com)"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
+                    className="w-full bg-[#070C1B] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-[#1D4ED8]"
                   />
                   <input
                     type="text"
                     value={compList}
                     onChange={(e) => setCompList(e.target.value)}
                     placeholder="competitor1.com, competitor2.com"
-                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
+                    className="w-full bg-[#070C1B] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-[#1D4ED8]"
                   />
-                  <button type="submit" className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2 rounded-lg text-xs">
+                  <button type="submit" className="w-full bg-[#132145] hover:bg-blue-900 border border-[#1D4ED8]/40 text-white font-bold py-2 rounded-lg text-xs transition">
                     Compare Competitors
                   </button>
                 </form>
 
                 {compResult && (
                   <div className="grid grid-cols-2 gap-3 pt-2">
-                    <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
+                    <div className="bg-[#070C1B] p-3 rounded-lg border border-slate-800">
                       <span className="text-[10px] text-slate-400 uppercase">Missing Keywords</span>
-                      <p className="text-xl font-bold text-amber-400">{compResult.total_missing_keywords}</p>
+                      <p className="text-xl font-bold text-[#FF6B4A]">{compResult.total_missing_keywords}</p>
                     </div>
-                    <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
+                    <div className="bg-[#070C1B] p-3 rounded-lg border border-slate-800">
                       <span className="text-[10px] text-slate-400 uppercase">Backlink Gaps</span>
-                      <p className="text-xl font-bold text-emerald-400">{compResult.total_backlink_gaps}</p>
+                      <p className="text-xl font-bold text-[#1D4ED8]">{compResult.total_backlink_gaps}</p>
                     </div>
                   </div>
                 )}
@@ -791,7 +803,7 @@ export default function Dashboard() {
         {/* ================= TAB 6: AI VISIBILITY (GEO) ================= */}
         {activeTab === "ai" && (
           <div className="space-y-6">
-            <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
+            <div className="bg-[#0F1A36] border border-slate-800 rounded-2xl p-6 shadow-xl">
               <h1 className="text-xl font-bold text-white mb-2">Generative Engine Optimization (GEO) & AI Visibility</h1>
               <p className="text-slate-400 text-xs mb-6">
                 Audit brand presence, citation rates, and recommendation sentiment across ChatGPT, Claude, Perplexity, Gemini, and Google AI Overviews.
@@ -805,7 +817,7 @@ export default function Dashboard() {
                     onChange={(e) => setAiDomain(e.target.value)}
                     placeholder="neemseo.com"
                     required
-                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
+                    className="w-full bg-[#070C1B] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-[#1D4ED8]"
                   />
                 </div>
                 <div className="md:col-span-5">
@@ -815,14 +827,14 @@ export default function Dashboard() {
                     onChange={(e) => setAiBrand(e.target.value)}
                     placeholder="neemSEO"
                     required
-                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
+                    className="w-full bg-[#070C1B] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-[#1D4ED8]"
                   />
                 </div>
                 <div className="md:col-span-2">
                   <button
                     type="submit"
                     disabled={aiLoading}
-                    className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-2 rounded-lg text-xs"
+                    className="w-full bg-[#1D4ED8] hover:bg-blue-700 text-white font-bold py-2 rounded-lg text-xs shadow-md shadow-[#1D4ED8]/25 transition"
                   >
                     {aiLoading ? "Auditing..." : "Run AI Audit"}
                   </button>
@@ -887,12 +899,12 @@ export default function Dashboard() {
                   onChange={(e) => setGscSite(e.target.value)}
                   placeholder="neemseo.com"
                   required
-                  className="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-4 py-2 text-xs text-white"
+                  className="flex-1 bg-[#070C1B] border border-slate-700 rounded-lg px-4 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-[#1D4ED8]"
                 />
                 <button
                   type="submit"
                   disabled={gscLoading}
-                  className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-6 py-2 rounded-lg text-xs"
+                  className="bg-[#1D4ED8] hover:bg-blue-700 text-white font-bold px-6 py-2 rounded-lg text-xs shadow-md shadow-[#1D4ED8]/25 transition"
                 >
                   {gscLoading ? "Loading..." : "Fetch Performance"}
                 </button>
@@ -902,27 +914,27 @@ export default function Dashboard() {
             {gscResult && (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <div className="bg-slate-900/80 border border-slate-800 p-5 rounded-xl">
+                  <div className="bg-[#0F1A36] border border-slate-800 p-5 rounded-xl">
                     <span className="text-[11px] uppercase font-semibold text-slate-400">Total Organic Clicks</span>
-                    <p className="text-3xl font-extrabold text-emerald-400 mt-1">{gscResult.total_clicks.toLocaleString()}</p>
+                    <p className="text-3xl font-extrabold text-[#1D4ED8] mt-1">{gscResult.total_clicks.toLocaleString()}</p>
                   </div>
-                  <div className="bg-slate-900/80 border border-slate-800 p-5 rounded-xl">
+                  <div className="bg-[#0F1A36] border border-slate-800 p-5 rounded-xl">
                     <span className="text-[11px] uppercase font-semibold text-slate-400">Total Impressions</span>
                     <p className="text-3xl font-extrabold text-white mt-1">{gscResult.total_impressions.toLocaleString()}</p>
                   </div>
-                  <div className="bg-slate-900/80 border border-slate-800 p-5 rounded-xl">
+                  <div className="bg-[#0F1A36] border border-slate-800 p-5 rounded-xl">
                     <span className="text-[11px] uppercase font-semibold text-slate-400">Average CTR</span>
                     <p className="text-3xl font-extrabold text-cyan-400 mt-1">{gscResult.average_ctr}%</p>
                   </div>
-                  <div className="bg-slate-900/80 border border-slate-800 p-5 rounded-xl">
+                  <div className="bg-[#0F1A36] border border-slate-800 p-5 rounded-xl">
                     <span className="text-[11px] uppercase font-semibold text-slate-400">Average Position</span>
-                    <p className="text-3xl font-extrabold text-amber-400 mt-1">#{gscResult.average_position}</p>
+                    <p className="text-3xl font-extrabold text-[#FF6B4A] mt-1">#{gscResult.average_position}</p>
                   </div>
                 </div>
 
-                <div className="bg-slate-900/80 border border-slate-800 rounded-xl overflow-hidden shadow-xl">
+                <div className="bg-[#0F1A36] border border-slate-800 rounded-xl overflow-hidden shadow-xl">
                   <table className="w-full text-left text-xs">
-                    <thead className="bg-slate-950/60 text-slate-400 uppercase">
+                    <thead className="bg-[#070C1B] text-slate-400 uppercase">
                       <tr>
                         <th className="py-2.5 px-4">Search Query</th>
                         <th className="py-2.5 px-4 text-right">Clicks</th>
@@ -935,10 +947,10 @@ export default function Dashboard() {
                       {gscResult.queries?.map((q: any, idx: number) => (
                         <tr key={idx} className="hover:bg-slate-800/30">
                           <td className="py-2.5 px-4 font-semibold text-white">{q.query}</td>
-                          <td className="py-2.5 px-4 text-right font-mono text-emerald-400">{q.clicks.toLocaleString()}</td>
+                          <td className="py-2.5 px-4 text-right font-mono text-[#1D4ED8]">{q.clicks.toLocaleString()}</td>
                           <td className="py-2.5 px-4 text-right font-mono text-slate-300">{q.impressions.toLocaleString()}</td>
                           <td className="py-2.5 px-4 text-center font-mono">{q.ctr}%</td>
-                          <td className="py-2.5 px-4 text-center font-bold text-amber-400">#{q.position}</td>
+                          <td className="py-2.5 px-4 text-center font-bold text-[#FF6B4A]">#{q.position}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -954,7 +966,7 @@ export default function Dashboard() {
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
               {/* Team Members */}
-              <div className="md:col-span-7 bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+              <div className="md:col-span-7 bg-[#0F1A36] border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
                 <h2 className="text-base font-bold text-white">Team Members & Access</h2>
                 <form onSubmit={handleInvite} className="flex gap-2">
                   <input
@@ -963,17 +975,17 @@ export default function Dashboard() {
                     onChange={(e) => setInviteEmail(e.target.value)}
                     placeholder="colleague@company.com"
                     required
-                    className="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
+                    className="flex-1 bg-[#070C1B] border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-[#1D4ED8]"
                   />
-                  <button type="submit" className="bg-emerald-500 text-slate-950 font-bold px-4 py-2 rounded-lg text-xs">
+                  <button type="submit" className="bg-[#1D4ED8] hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-lg text-xs shadow-md shadow-[#1D4ED8]/25 transition">
                     Invite Teammate
                   </button>
                 </form>
 
                 {inviteResult && (
-                  <div className="p-3 bg-emerald-950/80 border border-emerald-500/40 rounded-lg text-xs text-emerald-200">
+                  <div className="p-3 bg-[#132145] border border-[#1D4ED8]/40 rounded-lg text-xs text-slate-200">
                     <p className="font-bold mb-1">Invitation Link:</p>
-                    <code className="break-all font-mono text-[11px]">{inviteResult.invite_url}</code>
+                    <code className="break-all font-mono text-[11px] text-blue-300">{inviteResult.invite_url}</code>
                   </div>
                 )}
 
@@ -996,7 +1008,7 @@ export default function Dashboard() {
                             {m.role}
                           </span>
                         </td>
-                        <td className="py-2 px-3 text-center text-emerald-400 font-medium">Active</td>
+                        <td className="py-2 px-3 text-center text-blue-400 font-medium">Active</td>
                       </tr>
                     ))}
                   </tbody>
@@ -1004,7 +1016,7 @@ export default function Dashboard() {
               </div>
 
               {/* MCP Configuration */}
-              <div className="md:col-span-5 bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+              <div className="md:col-span-5 bg-[#0F1A36] border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
                 <h2 className="text-base font-bold text-white">AI Agent & MCP Keys</h2>
                 <p className="text-xs text-slate-400">
                   Configure Claude Code, ChatGPT, Cursor, and Codex to use your neemSEO MCP tools directly.

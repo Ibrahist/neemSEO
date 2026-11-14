@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="neemSEO">
+<title>neemSEO</title>
+<circle cx="27" cy="27" r="20" fill="none" stroke="#1D4ED8" stroke-width="5"/>
+<path d="M41.5 41.5 L56 56" fill="none" stroke="#FF6B4A" stroke-width="7" stroke-linecap="round"/>
+<g transform="translate(27 27) rotate(40) scale(0.9)" fill="#2FA05A">
+<path d="M0 15 V-14" fill="none" stroke="#2FA05A" stroke-width="1.8" stroke-linecap="round"/>
+<ellipse cx="0" cy="-14" rx="2.7" ry="6"/>
+<ellipse cx="5.5" cy="7" rx="2.7" ry="6" transform="rotate(50 5.5 7)"/>
+<ellipse cx="-5.5" cy="7" rx="2.7" ry="6" transform="rotate(-50 -5.5 7)"/>
+<ellipse cx="5.2" cy="-1.5" rx="2.5" ry="5.6" transform="rotate(50 5.2 -1.5)"/>
+<ellipse cx="-5.2" cy="-1.5" rx="2.5" ry="5.6" transform="rotate(-50 -5.2 -1.5)"/>
+<ellipse cx="4.6" cy="-9.5" rx="2.3" ry="5" transform="rotate(50 4.6 -9.5)"/>
+<ellipse cx="-4.6" cy="-9.5" rx="2.3" ry="5" transform="rotate(-50 -4.6 -9.5)"/>
+</g>
+</svg>

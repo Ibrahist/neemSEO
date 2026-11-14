@@ -2,8 +2,11 @@
 Main FastAPI Application Entrypoint for neemSEO.
 """
 
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 from neemseo import __version__
 from neemseo.core.config import settings
@@ -31,6 +34,18 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Static files
+static_dir = os.path.join(os.path.dirname(__file__), "..", "neemseo", "static")
+if os.path.isdir(static_dir):
+    app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    favicon_path = os.path.join(static_dir, "neemseo-mark-a.svg")
+    if os.path.exists(favicon_path):
+        return FileResponse(favicon_path, media_type="image/svg+xml")
+    return None
 
 # Register routes
 app.include_router(web_router)
