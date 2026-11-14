@@ -6,7 +6,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 
 from neemseo import __version__
 from neemseo.core.config import settings
@@ -46,6 +46,14 @@ def favicon():
     if os.path.exists(favicon_path):
         return FileResponse(favicon_path, media_type="image/svg+xml")
     return None
+
+root_index_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "index.html"))
+
+@app.get("/overview", include_in_schema=False)
+def overview_page():
+    if os.path.exists(root_index_path):
+        return FileResponse(root_index_path, media_type="text/html")
+    return HTMLResponse("<h1>Overview page not found</h1>", status_code=404)
 
 # Register routes
 app.include_router(web_router)

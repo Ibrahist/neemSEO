@@ -335,6 +335,14 @@ export default function Dashboard() {
           <div className="pt-4 border-t border-slate-800/80 space-y-3">
             <div className="space-y-1">
               <a
+                href="http://localhost:8000/overview"
+                target="_blank"
+                className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-blue-400 hover:text-white hover:bg-slate-800/60 transition"
+              >
+                <span>Feature Guide</span>
+                <ExternalLink className="w-3.5 h-3.5 text-blue-400" />
+              </a>
+              <a
                 href="http://localhost:8000/docs"
                 target="_blank"
                 className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-800/60 transition"

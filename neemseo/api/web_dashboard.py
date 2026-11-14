@@ -158,6 +158,10 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       <!-- Bottom sidebar items (formerly in navbar) -->
       <div class="pt-4 border-t border-slate-800/80 space-y-3">
         <div class="space-y-1">
+          <a href="/overview" target="_blank" class="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-blue-400 hover:text-white hover:bg-slate-800/60 transition">
+            <span>Feature Guide</span>
+            <svg class="w-3.5 h-3.5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          </a>
           <a href="/docs" target="_blank" class="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-800/60 transition">
             <span>FastAPI Docs</span>
             <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>

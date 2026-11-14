@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>neemSEO - Open-Source Autonomous SEO Suite & AI Agent Platform</title>
+  <meta name="description" content="Discover neemSEO: the simple, focused, pay-as-you-go open-source alternative to Semrush and Ahrefs with on-page auditing, site crawling, keyword research, rank tracking, backlink analysis, and GEO visibility.">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="neemseo/static/neemseo-mark-a.svg">
+
+  <!-- Google Fonts: IBM Plex Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              blue: '#1D4ED8',
+              blueHover: '#1E40AF',
+              coral: '#FF6B4A',
+              coralHover: '#E05335',
+              navy: '#0B1226',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', '-apple-system', 'sans-serif'],
+            heading: ['"IBM Plex Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background-color: #FFFFFF;
+      color: #0F172A;
+    }
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'IBM Plex Sans', sans-serif;
+    }
+    .hero-glow {
+      background: radial-gradient(circle at 50% 10%, rgba(29, 78, 216, 0.08) 0%, rgba(255, 107, 74, 0.05) 40%, rgba(255, 255, 255, 0) 70%);
+    }
+  </style>
+</head>
+<body class="bg-white text-slate-800 antialiased selection:bg-[#1D4ED8] selection:text-white">
+
+  <!-- Top Sticky Navbar -->
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 h-18 flex items-center justify-between">
+      <!-- Brand Logo & Name -->
+      <a href="#" class="flex items-center space-x-3 group">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="w-10 h-10 transition-transform group-hover:scale-105" role="img" aria-label="neemSEO">
+          <title>neemSEO</title>
+          <circle cx="27" cy="27" r="20" fill="none" stroke="#1D4ED8" stroke-width="5"/>
+          <path d="M41.5 41.5 L56 56" fill="none" stroke="#FF6B4A" stroke-width="7" stroke-linecap="round"/>
+          <g transform="translate(27 27) rotate(40) scale(0.9)" fill="#2FA05A">
+            <path d="M0 15 V-14" fill="none" stroke="#2FA05A" stroke-width="1.8" stroke-linecap="round"/>
+            <ellipse cx="0" cy="-14" rx="2.7" ry="6"/>
+            <ellipse cx="5.5" cy="7" rx="2.7" ry="6" transform="rotate(50 5.5 7)"/>
+            <ellipse cx="-5.5" cy="7" rx="2.7" ry="6" transform="rotate(-50 -5.5 7)"/>
+            <ellipse cx="5.2" cy="-1.5" rx="2.5" ry="5.6" transform="rotate(50 5.2 -1.5)"/>
+            <ellipse cx="-5.2" cy="-1.5" rx="2.5" ry="5.6" transform="rotate(-50 -5.2 -1.5)"/>
+            <ellipse cx="4.6" cy="-9.5" rx="2.3" ry="5" transform="rotate(50 4.6 -9.5)"/>
+            <ellipse cx="-4.6" cy="-9.5" rx="2.3" ry="5" transform="rotate(-50 -4.6 -9.5)"/>
+          </g>
+        </svg>
+        <div class="flex flex-col">
+          <span class="text-2xl font-heading font-bold tracking-tight text-slate-900">
+            neem<span style="color: #FF6B4A;">SEO</span>
+          </span>
+          <span class="text-[10px] uppercase font-bold tracking-widest text-slate-400 -mt-1">Open-Source SEO Suite</span>
+        </div>
+      </a>
+
+      <!-- Navigation Links -->
+      <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-slate-600">
+        <a href="#features" class="hover:text-[#1D4ED8] transition">Features</a>
+        <a href="#how-to-use" class="hover:text-[#1D4ED8] transition">How to Use</a>
+        <a href="#cli" class="hover:text-[#1D4ED8] transition">CLI Tools</a>
+        <a href="#mcp" class="hover:text-[#1D4ED8] transition">AI & MCP</a>
+        <a href="#byok" class="hover:text-[#1D4ED8] transition">BYOK Model</a>
+      </nav>
+
+      <!-- Primary Action: Redirect to Dashboard -->
+      <div class="flex items-center space-x-3">
+        <a 
+          href="http://127.0.0.1:8000/" 
+          target="_blank"
+          class="inline-flex items-center space-x-2 bg-[#1D4ED8] hover:bg-[#1E40AF] text-white font-semibold text-sm px-5 py-2.5 rounded-lg shadow-md shadow-blue-500/20 hover:shadow-lg transition-all transform hover:-translate-y-0.5"
+        >
+          <span>Open Dashboard</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section (Light & Crisp) -->
+  <section class="hero-glow pt-20 pb-24 border-b border-slate-100">
+    <div class="max-w-5xl mx-auto px-6 text-center space-y-8">
+      
+      <!-- Pill Badge -->
+      <div class="inline-flex items-center space-x-2 bg-blue-50 border border-blue-200/60 px-4 py-1.5 rounded-full text-xs font-semibold text-[#1D4ED8] shadow-sm">
+        <span class="w-2 h-2 rounded-full bg-[#FF6B4A] animate-pulse"></span>
+        <span>The Free & Open-Source Alternative to Semrush & Ahrefs</span>
+      </div>
+
+      <!-- Main Headline in IBM Plex Sans -->
+      <h1 class="text-4xl sm:text-6xl font-heading font-extrabold text-slate-900 tracking-tight leading-[1.15]">
+        All-in-One SEO Suite <br class="hidden sm:inline">
+        <span class="text-[#1D4ED8]">Built for Developers</span> & <span style="color: #FF6B4A;">AI Agents</span>
+      </h1>
+
+      <!-- Subheadline in Inter -->
+      <p class="text-lg sm:text-xl text-slate-600 max-w-3xl mx-auto font-normal leading-relaxed">
+        neemSEO gives you on-page audits, whole-site crawler link graphs, Google Autocomplete keyword expansion, SERP rank tracking, backlink gap analysis, and Generative Engine Optimization (GEO)—with zero monthly subscriptions.
+      </p>
+
+      <!-- Primary CTA Area -->
+      <div class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a 
+          href="http://127.0.0.1:8000/" 
+          target="_blank"
+          class="w-full sm:w-auto inline-flex items-center justify-center space-x-3 bg-[#1D4ED8] hover:bg-[#1E40AF] text-white font-bold text-base px-8 py-4 rounded-xl shadow-xl shadow-blue-600/25 hover:shadow-2xl transition transform hover:-translate-y-0.5"
+        >
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
+          <span>Launch neemSEO Dashboard →</span>
+        </a>
+
+        <a 
+          href="#how-to-use" 
+          class="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-base px-7 py-4 rounded-xl border border-slate-300 shadow-sm hover:border-slate-400 transition"
+        >
+          <span>Read User Guide</span>
+          <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- Quick Benefit Bullets -->
+      <div class="pt-6 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto text-left">
+        <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-sm flex items-start space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-blue-50 text-[#1D4ED8] flex items-center justify-center font-bold shrink-0">✓</div>
+          <div>
+            <p class="text-xs font-bold text-slate-900 uppercase">Zero SaaS Lock-in</p>
+            <p class="text-xs text-slate-500 mt-0.5">Self-hosted & open-source</p>
+          </div>
+        </div>
+        <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-sm flex items-start space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-orange-50 text-[#FF6B4A] flex items-center justify-center font-bold shrink-0">✓</div>
+          <div>
+            <p class="text-xs font-bold text-slate-900 uppercase">BYOK Architecture</p>
+            <p class="text-xs text-slate-500 mt-0.5">Pay only for raw API calls</p>
+          </div>
+        </div>
+        <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-sm flex items-start space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold shrink-0">✓</div>
+          <div>
+            <p class="text-xs font-bold text-slate-900 uppercase">Native MCP Server</p>
+            <p class="text-xs text-slate-500 mt-0.5">For Claude, Cursor & ChatGPT</p>
+          </div>
+        </div>
+        <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-sm flex items-start space-x-3">
+          <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center font-bold shrink-0">✓</div>
+          <div>
+            <p class="text-xs font-bold text-slate-900 uppercase">70+ Passing E2E Tests</p>
+            <p class="text-xs text-slate-500 mt-0.5">Production-ready test suite</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Complete Features Showcase Section -->
+  <section id="features" class="py-24 bg-slate-50/50 border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-6 space-y-16">
+      
+      <div class="text-center space-y-4 max-w-3xl mx-auto">
+        <span class="text-xs uppercase font-bold tracking-wider text-[#1D4ED8] bg-blue-50 px-3 py-1 rounded-full border border-blue-200">Full Capabilities</span>
+        <h2 class="text-3xl sm:text-4xl font-heading font-extrabold text-slate-900">
+          Everything You Need to Rank & Audit Websites
+        </h2>
+        <p class="text-slate-600 text-sm sm:text-base">
+          Every tool is accessible through the interactive Web Dashboard, the CLI terminal, the RESTful FastAPI backend, and Model Context Protocol (MCP) agents.
+        </p>
+      </div>
+
+      <!-- Feature Grid: 8 Core Modules -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+        <!-- Feature 1: On-Page Auditor -->
+        <div class="bg-white rounded-2xl p-7 border border-slate-200 shadow-sm hover:shadow-md transition space-y-4">
+          <div class="w-12 h-12 rounded-xl bg-blue-50 text-[#1D4ED8] flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </div>
+          <h3 class="text-xl font-heading font-bold text-slate-900">1. Instant On-Page Auditor</h3>
+          <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">
+            Evaluates title tags, meta descriptions, heading depth (H1–H6), canonical URLs, image alt attributes, OpenGraph tags, and mobile viewport responsiveness.
+          </p>
+          <ul class="text-xs text-slate-500 space-y-1.5 pt-2 border-t border-slate-100">
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>0–100 Health Score & Letter Grade</span></li>
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>Google Core Web Vitals (LCP, CLS, INP)</span></li>
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>Prioritized Action Items & CSV Export</span></li>
+          </ul>
+        </div>
+
+        <!-- Feature 2: Whole-Site Crawler -->
+        <div class="bg-white rounded-2xl p-7 border border-slate-200 shadow-sm hover:shadow-md transition space-y-4">
+          <div class="w-12 h-12 rounded-xl bg-orange-50 text-[#FF6B4A] flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+          </div>
+          <h3 class="text-xl font-heading font-bold text-slate-900">2. Whole-Site Link Graph Crawler</h3>
+          <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">
+            Breadth-first-search concurrency crawler that traverses your entire domain from homepage and sitemap.xml, mapping click depth and page architecture.
+          </p>
+          <ul class="text-xs text-slate-500 space-y-1.5 pt-2 border-t border-slate-100">
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>Broken Link Detection (4xx & 5xx)</span></li>
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>Orphan Page Discovery (0 incoming internal links)</span></li>
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>Optional Playwright Headless Chromium for SPAs</span></li>
+          </ul>
+        </div>
+
+        <!-- Feature 3: Keyword Research & Clustering -->
+        <div class="bg-white rounded-2xl p-7 border border-slate-200 shadow-sm hover:shadow-md transition space-y-4">
+          <div class="w-12 h-12 rounded-xl bg-blue-50 text-[#1D4ED8] flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </div>
+          <h3 class="text-xl font-heading font-bold text-slate-900">3. Keywords & Semantic Clustering</h3>
+          <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">
+            Discovers hundreds of high-opportunity keywords via Google Autocomplete A-Z alphabet modifiers and conversational question prepositions (how, why, vs).
+          </p>
+          <ul class="text-xs text-slate-500 space-y-1.5 pt-2 border-t border-slate-100">
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>Intent Tagging: Informational, Commercial, etc.</span></li>
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>Automated Semantic Topic Clustering</span></li>
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>Zero Cost (Google API) or DataForSEO BYOK</span></li>
+          </ul>
+        </div>
+
+        <!-- Feature 4: Rank Tracker -->
+        <div class="bg-white rounded-2xl p-7 border border-slate-200 shadow-sm hover:shadow-md transition space-y-4">
+          <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+          </div>
+          <h3 class="text-xl font-heading font-bold text-slate-900">4. SERP Rank Tracker & Alerts</h3>
+          <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">
+            Monitors real search engine positions across desktop and mobile devices per URL with historical trend charts and volatility drop alerts.
+          </p>
+          <ul class="text-xs text-slate-500 space-y-1.5 pt-2 border-t border-slate-100">
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>Automated Position Drop Alerts</span></li>
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>Visual Ranking History Charts (Recharts)</span></li>
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>Scheduled Background Checks via Celery</span></li>
+          </ul>
+        </div>
+
+        <!-- Feature 5: Backlink & Competitor Gaps -->
+        <div class="bg-white rounded-2xl p-7 border border-slate-200 shadow-sm hover:shadow-md transition space-y-4">
+          <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+          </div>
+          <h3 class="text-xl font-heading font-bold text-slate-900">5. Backlinks & Competitor Gaps</h3>
+          <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">
+            Inspects domain authority, referring domains, dofollow/nofollow ratio, and anchor text diversity. Compares domains to uncover competitor gaps.
+          </p>
+          <ul class="text-xs text-slate-500 space-y-1.5 pt-2 border-t border-slate-100">
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>Missing Keyword Gap Opportunities</span></li>
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>High-DR Backlink Outreach Targets</span></li>
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>Top Anchor Text Density Analysis</span></li>
+          </ul>
+        </div>
+
+        <!-- Feature 6: Generative Engine Optimization (GEO) -->
+        <div class="bg-white rounded-2xl p-7 border border-slate-200 shadow-sm hover:shadow-md transition space-y-4">
+          <div class="w-12 h-12 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          </div>
+          <h3 class="text-xl font-heading font-bold text-slate-900">6. AI Visibility & GEO Audit</h3>
+          <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">
+            Measure how your brand is cited, mentioned, and recommended in ChatGPT, Claude, Perplexity, Gemini, and Google AI Overviews.
+          </p>
+          <ul class="text-xs text-slate-500 space-y-1.5 pt-2 border-t border-slate-100">
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>0–100 AI Visibility Score</span></li>
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>Direct Citation & Recommendation Rates</span></li>
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>Actionable GEO Optimization Fixes</span></li>
+          </ul>
+        </div>
+
+        <!-- Feature 7: Search Console Direct Ingestion -->
+        <div class="bg-white rounded-2xl p-7 border border-slate-200 shadow-sm hover:shadow-md transition space-y-4">
+          <div class="w-12 h-12 rounded-xl bg-blue-50 text-[#1D4ED8] flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          </div>
+          <h3 class="text-xl font-heading font-bold text-slate-900">7. Google Search Console (GSC)</h3>
+          <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">
+            Zero-cost, 100% direct organic traffic data: impressions, real clicks, CTR, and actual SERP rankings fetched straight from your Google Search Console property.
+          </p>
+          <ul class="text-xs text-slate-500 space-y-1.5 pt-2 border-t border-slate-100">
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>Exact Organic Query Impressions & Clicks</span></li>
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>Real Google-Verified Average SERP Ranks</span></li>
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>Zero Third-Party Scraping Fees</span></li>
+          </ul>
+        </div>
+
+        <!-- Feature 8: Native Model Context Protocol (MCP) -->
+        <div class="bg-white rounded-2xl p-7 border border-slate-200 shadow-sm hover:shadow-md transition space-y-4">
+          <div class="w-12 h-12 rounded-xl bg-orange-50 text-[#FF6B4A] flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+          </div>
+          <h3 class="text-xl font-heading font-bold text-slate-900">8. AI Agent Skills & MCP Server</h3>
+          <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">
+            neemSEO functions as an autonomous tool server for AI agents. Run SEO audits and research directly from Claude Code, Cursor, ChatGPT, and Codex.
+          </p>
+          <ul class="text-xs text-slate-500 space-y-1.5 pt-2 border-t border-slate-100">
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>FastMCP Stdio Server Protocol</span></li>
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>Per-user API Token Authentication</span></li>
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>Pre-packaged Antigravity Skills</span></li>
+          </ul>
+        </div>
+
+        <!-- Feature 9: Multi-Tenant Team Management -->
+        <div class="bg-white rounded-2xl p-7 border border-slate-200 shadow-sm hover:shadow-md transition space-y-4">
+          <div class="w-12 h-12 rounded-xl bg-slate-100 text-slate-800 flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          </div>
+          <h3 class="text-xl font-heading font-bold text-slate-900">9. Team & Multi-Tenant Access</h3>
+          <p class="text-slate-600 text-xs sm:text-sm leading-relaxed">
+            Invite teammates and assign Admin or Member roles with cryptographically signed tokens. Share keyword clusters, audits, and crawl reports across your organization.
+          </p>
+          <ul class="text-xs text-slate-500 space-y-1.5 pt-2 border-t border-slate-100">
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>Role-Based Access Control (RBAC)</span></li>
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>Signed Invitation URL Generation</span></li>
+            <li class="flex items-center space-x-2"><span class="text-emerald-500 font-bold">✓</span> <span>Isolated Project Workspaces</span></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Mid-page Call to Action Button -->
+      <div class="p-8 bg-blue-50/80 rounded-2xl border border-blue-200/80 flex flex-col sm:flex-row items-center justify-between gap-6">
+        <div>
+          <h3 class="text-xl font-heading font-bold text-slate-900">Ready to audit your websites?</h3>
+          <p class="text-slate-600 text-sm mt-1">Access the live dashboard right now. No signup or credit card required.</p>
+        </div>
+        <a 
+          href="http://127.0.0.1:8000/" 
+          target="_blank"
+          class="shrink-0 inline-flex items-center space-x-2 bg-[#1D4ED8] hover:bg-[#1E40AF] text-white font-bold px-6 py-3.5 rounded-xl shadow-lg shadow-blue-500/20 hover:shadow-xl transition"
+        >
+          <span>Open Web Dashboard</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- How to Use neemSEO (Step-by-Step Guide) -->
+  <section id="how-to-use" class="py-24 bg-white border-b border-slate-200">
+    <div class="max-w-6xl mx-auto px-6 space-y-16">
+      
+      <div class="text-center space-y-4 max-w-2xl mx-auto">
+        <span class="text-xs uppercase font-bold tracking-wider text-[#FF6B4A] bg-orange-50 px-3 py-1 rounded-full border border-orange-200">User Manual</span>
+        <h2 class="text-3xl sm:text-4xl font-heading font-extrabold text-slate-900">
+          How to Use neemSEO
+        </h2>
+        <p class="text-slate-600 text-sm sm:text-base">
+          Follow these simple steps to start auditing pages, crawling sites, tracking ranks, and plugging in your AI coding agents.
+        </p>
+      </div>
+
+      <!-- Steps Flow -->
+      <div class="space-y-12">
+
+        <!-- Step 1: Launch Server & Open Dashboard -->
+        <div class="flex flex-col md:flex-row items-start gap-8 p-8 bg-slate-50 rounded-2xl border border-slate-200">
+          <div class="w-12 h-12 rounded-xl bg-[#1D4ED8] text-white font-heading font-bold text-xl flex items-center justify-center shrink-0 shadow-md shadow-blue-500/20">
+            1
+          </div>
+          <div class="flex-1 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <h3 class="text-xl font-heading font-bold text-slate-900">Start the neemSEO Backend Server</h3>
+              <span class="text-xs bg-emerald-100 text-emerald-800 font-semibold px-2.5 py-0.5 rounded-full">FastAPI & Uvicorn</span>
+            </div>
+            <p class="text-slate-600 text-sm leading-relaxed">
+              neemSEO runs locally on your machine or container. From your terminal in the project directory, run:
+            </p>
+            <div class="bg-slate-900 text-slate-100 p-4 rounded-xl font-mono text-xs overflow-x-auto shadow-inner flex justify-between items-center">
+              <code>python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload</code>
+              <button onclick="navigator.clipboard.writeText('python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload'); alert('Copied to clipboard!')" class="text-xs text-slate-400 hover:text-white ml-4">Copy</button>
+            </div>
+            <p class="text-slate-600 text-xs">
+              Once started, open <a href="http://127.0.0.1:8000/" target="_blank" class="text-[#1D4ED8] font-bold hover:underline">http://127.0.0.1:8000/</a> in your browser to access the interactive web dashboard.
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 2: Running Your First On-Page Audit -->
+        <div class="flex flex-col md:flex-row items-start gap-8 p-8 bg-slate-50 rounded-2xl border border-slate-200">
+          <div class="w-12 h-12 rounded-xl bg-[#FF6B4A] text-white font-heading font-bold text-xl flex items-center justify-center shrink-0 shadow-md shadow-orange-500/20">
+            2
+          </div>
+          <div class="flex-1 space-y-3">
+            <h3 class="text-xl font-heading font-bold text-slate-900">Run an Instant On-Page Audit</h3>
+            <p class="text-slate-600 text-sm leading-relaxed">
+              In the web dashboard under the <strong>Page Auditor</strong> tab:
+            </p>
+            <ol class="list-decimal list-inside text-sm text-slate-600 space-y-1.5 pl-2">
+              <li>Enter your target URL (e.g. <code class="bg-white px-2 py-0.5 rounded border border-slate-200 text-xs text-[#1D4ED8]">https://example.com</code>).</li>
+              <li>Optionally enter a focus target keyword to evaluate density and placement.</li>
+              <li>Check the <em>Include Google Core Web Vitals</em> box if you want LCP, CLS, and INP metrics.</li>
+              <li>Click <strong>Run On-Page Audit</strong>. Review your Health Score (0–100), letter grade, and prioritized recommendations.</li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- Step 3: Crawling Whole Sites -->
+        <div class="flex flex-col md:flex-row items-start gap-8 p-8 bg-slate-50 rounded-2xl border border-slate-200">
+          <div class="w-12 h-12 rounded-xl bg-slate-800 text-white font-heading font-bold text-xl flex items-center justify-center shrink-0 shadow-md">
+            3
+          </div>
+          <div class="flex-1 space-y-3">
+            <h3 class="text-xl font-heading font-bold text-slate-900">Audit Whole-Site Link Graph & Broken Links</h3>
+            <p class="text-slate-600 text-sm leading-relaxed">
+              Switch to the <strong>Site Crawler</strong> tab to audit multiple pages:
+            </p>
+            <ol class="list-decimal list-inside text-sm text-slate-600 space-y-1.5 pl-2">
+              <li>Provide your homepage or sitemap.xml URL.</li>
+              <li>Set maximum pages (e.g. 50 pages) and click depth (1–6).</li>
+              <li>Click <strong>Start Whole-Site Crawl</strong>. Watch live progress and inspect the final broken link table (4xx/5xx error codes), orphan pages, and duplicate metadata.</li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- Step 4: Keyword Research & Clusters -->
+        <div class="flex flex-col md:flex-row items-start gap-8 p-8 bg-slate-50 rounded-2xl border border-slate-200">
+          <div class="w-12 h-12 rounded-xl bg-[#1D4ED8] text-white font-heading font-bold text-xl flex items-center justify-center shrink-0 shadow-md shadow-blue-500/20">
+            4
+          </div>
+          <div class="flex-1 space-y-3">
+            <h3 class="text-xl font-heading font-bold text-slate-900">Discover & Cluster Keyword Opportunities</h3>
+            <p class="text-slate-600 text-sm leading-relaxed">
+              Navigate to the <strong>Keywords</strong> tab:
+            </p>
+            <ol class="list-decimal list-inside text-sm text-slate-600 space-y-1.5 pl-2">
+              <li>Enter a seed topic (e.g. <code class="bg-white px-2 py-0.5 rounded border border-slate-200 text-xs text-[#1D4ED8]">open source seo</code>) and select a country market.</li>
+              <li>Toggle A-Z expansion or Question modifiers to automatically generate long-tail variants.</li>
+              <li>Click <strong>Discover Keywords</strong>. Filter results by intent pills (Informational, Commercial, Transactional) or click semantic clusters to organize content silos.</li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- Step 5: AI Visibility (GEO) Audit -->
+        <div class="flex flex-col md:flex-row items-start gap-8 p-8 bg-slate-50 rounded-2xl border border-slate-200">
+          <div class="w-12 h-12 rounded-xl bg-[#FF6B4A] text-white font-heading font-bold text-xl flex items-center justify-center shrink-0 shadow-md shadow-orange-500/20">
+            5
+          </div>
+          <div class="flex-1 space-y-3">
+            <h3 class="text-xl font-heading font-bold text-slate-900">Measure Your AI Visibility (GEO)</h3>
+            <p class="text-slate-600 text-sm leading-relaxed">
+              Go to the <strong>AI Visibility (GEO)</strong> tab:
+            </p>
+            <ol class="list-decimal list-inside text-sm text-slate-600 space-y-1.5 pl-2">
+              <li>Enter your website domain and your official brand/product name.</li>
+              <li>Click <strong>Run AI Visibility Audit</strong>.</li>
+              <li>neemSEO queries and benchmarks ChatGPT, Claude, Perplexity, Gemini, and Google AI Overviews to calculate your brand's AI Visibility Score (0–100), citation percentage, and specific optimization tips.</li>
+            </ol>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CLI Quick Reference Section -->
+  <section id="cli" class="py-24 bg-slate-50/50 border-b border-slate-200">
+    <div class="max-w-6xl mx-auto px-6 space-y-12">
+      
+      <div class="text-center space-y-4 max-w-2xl mx-auto">
+        <span class="text-xs uppercase font-bold tracking-wider text-slate-500 bg-white px-3 py-1 rounded-full border border-slate-200">Terminal Power</span>
+        <h2 class="text-3xl sm:text-4xl font-heading font-extrabold text-slate-900">
+          The neemseo CLI Command Suite
+        </h2>
+        <p class="text-slate-600 text-sm sm:text-base">
+          Prefer the command line? neemSEO comes with a first-class CLI for CI/CD pipelines, cron jobs, and terminal power users.
+        </p>
+      </div>
+
+      <!-- Commands Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Command 1: Audit -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="font-heading font-bold text-slate-900">1. On-Page Audit</span>
+            <span class="text-[11px] font-mono bg-blue-50 text-[#1D4ED8] px-2 py-0.5 rounded font-semibold">neemseo audit</span>
+          </div>
+          <p class="text-xs text-slate-600">Audit any single URL and output JSON or table results:</p>
+          <div class="bg-slate-900 text-slate-100 p-3 rounded-lg font-mono text-xs">
+            <code>neemseo audit https://example.com --keyword "seo tools"</code>
+          </div>
+        </div>
+
+        <!-- Command 2: Crawl -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="font-heading font-bold text-slate-900">2. Whole-Site Crawl</span>
+            <span class="text-[11px] font-mono bg-blue-50 text-[#1D4ED8] px-2 py-0.5 rounded font-semibold">neemseo crawl</span>
+          </div>
+          <p class="text-xs text-slate-600">Crawl website links with depth limits and sitemap discovery:</p>
+          <div class="bg-slate-900 text-slate-100 p-3 rounded-lg font-mono text-xs">
+            <code>neemseo crawl https://example.com --max-pages 50 --max-depth 3</code>
+          </div>
+        </div>
+
+        <!-- Command 3: Keyword -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="font-heading font-bold text-slate-900">3. Keyword Expansion</span>
+            <span class="text-[11px] font-mono bg-blue-50 text-[#1D4ED8] px-2 py-0.5 rounded font-semibold">neemseo keyword</span>
+          </div>
+          <p class="text-xs text-slate-600">Discover Autocomplete long-tail keywords and topic clusters:</p>
+          <div class="bg-slate-900 text-slate-100 p-3 rounded-lg font-mono text-xs">
+            <code>neemseo keyword "open source seo" --country US --expand-az</code>
+          </div>
+        </div>
+
+        <!-- Command 4: MCP Server -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="font-heading font-bold text-slate-900">4. Run Stdio MCP Server</span>
+            <span class="text-[11px] font-mono bg-blue-50 text-[#1D4ED8] px-2 py-0.5 rounded font-semibold">neemseo mcp</span>
+          </div>
+          <p class="text-xs text-slate-600">Launch standard input/output MCP server for AI coding agents:</p>
+          <div class="bg-slate-900 text-slate-100 p-3 rounded-lg font-mono text-xs">
+            <code>python -m neemseo.mcp.server</code>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Model Context Protocol & AI Agents Section -->
+  <section id="mcp" class="py-24 bg-white border-b border-slate-200">
+    <div class="max-w-6xl mx-auto px-6 space-y-12">
+      
+      <div class="text-center space-y-4 max-w-2xl mx-auto">
+        <span class="text-xs uppercase font-bold tracking-wider text-purple-600 bg-purple-50 px-3 py-1 rounded-full border border-purple-200">AI Tooling</span>
+        <h2 class="text-3xl sm:text-4xl font-heading font-extrabold text-slate-900">
+          Native MCP Server for AI Agents
+        </h2>
+        <p class="text-slate-600 text-sm sm:text-base">
+          Equip Claude Code, Cursor, ChatGPT, Codex, and Antigravity with autonomous SEO capabilities.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        <!-- Configuration Card -->
+        <div class="bg-slate-900 text-slate-100 p-6 rounded-2xl shadow-xl space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <span class="text-xs font-mono font-bold text-slate-400">claude_desktop_config.json / Cursor MCP</span>
+            <button onclick="navigator.clipboard.writeText('{\n  \"mcpServers\": {\n    \"neemseo\": {\n      \"command\": \"python\",\n      \"args\": [\"-m\", \"neemseo.mcp.server\"]\n    }\n  }\n}'); alert('MCP config copied!')" class="text-xs text-[#FF6B4A] hover:underline font-semibold">Copy JSON</button>
+          </div>
+          <pre class="font-mono text-xs text-emerald-300 leading-relaxed overflow-x-auto"><code>{
+  "mcpServers": {
+    "neemseo": {
+      "command": "python",
+      "args": ["-m", "neemseo.mcp.server"]
+    }
+  }
+}</code></pre>
+        </div>
+
+        <!-- Available Tools in MCP -->
+        <div class="space-y-4">
+          <h3 class="text-xl font-heading font-bold text-slate-900">Tools Exposed to Your Agents</h3>
+          <p class="text-sm text-slate-600">When your agent has neemSEO connected, it can autonomously run:</p>
+          <div class="space-y-2 text-xs font-mono text-slate-700">
+            <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-between">
+              <span class="font-bold text-[#1D4ED8]">audit_page(url, keyword, pagespeed)</span>
+              <span class="text-slate-400 font-sans">Full on-page check</span>
+            </div>
+            <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-between">
+              <span class="font-bold text-[#1D4ED8]">crawl_website(seed_url, max_pages)</span>
+              <span class="text-slate-400 font-sans">Internal link graph</span>
+            </div>
+            <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-between">
+              <span class="font-bold text-[#1D4ED8]">research_keywords(seed, country)</span>
+              <span class="text-slate-400 font-sans">Autocomplete intent</span>
+            </div>
+            <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-between">
+              <span class="font-bold text-[#1D4ED8]">track_rankings(targets, device)</span>
+              <span class="text-slate-400 font-sans">SERP check & trends</span>
+            </div>
+            <div class="p-2.5 bg-slate-50 rounded-lg border border-slate-200 flex items-center justify-between">
+              <span class="font-bold text-[#1D4ED8]">check_ai_visibility(domain, brand)</span>
+              <span class="text-slate-400 font-sans">GEO score across engines</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- BYOK Architecture Section -->
+  <section id="byok" class="py-24 bg-slate-50/50 border-b border-slate-200">
+    <div class="max-w-5xl mx-auto px-6 text-center space-y-12">
+      <div class="space-y-4 max-w-2xl mx-auto">
+        <span class="text-xs uppercase font-bold tracking-wider text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">Pay As You Go</span>
+        <h2 class="text-3xl sm:text-4xl font-heading font-extrabold text-slate-900">
+          The BYOK (Bring-Your-Own-Key) Model
+        </h2>
+        <p class="text-slate-600 text-sm sm:text-base">
+          Legacy tools charge $130–$499 every single month regardless of usage. With neemSEO, everyday tasks (Google Autocomplete, On-Page Audits, Site Crawls, GSC) cost <strong>$0.00</strong>. When you need paid SERP scraping or backlink databases, plug in your DataForSEO or SerpApi keys and pay fractions of a penny per run.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-left">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-2">
+          <p class="text-xs uppercase font-bold text-slate-400">On-Page & Crawling</p>
+          <p class="text-3xl font-heading font-extrabold text-emerald-600">$0.00</p>
+          <p class="text-xs text-slate-500">100% free forever. Traversed directly from your machine.</p>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-2">
+          <p class="text-xs uppercase font-bold text-slate-400">Keyword Expansion</p>
+          <p class="text-3xl font-heading font-extrabold text-emerald-600">$0.00</p>
+          <p class="text-xs text-slate-500">Direct Google Autocomplete expansion at zero cost.</p>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-2">
+          <p class="text-xs uppercase font-bold text-slate-400">SERP & Backlink Checks</p>
+          <p class="text-3xl font-heading font-extrabold text-[#1D4ED8]">~$0.002</p>
+          <p class="text-xs text-slate-500">Pay DataForSEO directly. No markup, no subscription.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Big Final Call To Action Section (Prominent Clickable Button) -->
+  <section class="py-24 bg-white">
+    <div class="max-w-4xl mx-auto px-6 text-center space-y-8">
+      
+      <div class="w-16 h-16 mx-auto rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="w-10 h-10" role="img" aria-label="neemSEO">
+          <circle cx="27" cy="27" r="20" fill="none" stroke="#1D4ED8" stroke-width="5"/>
+          <path d="M41.5 41.5 L56 56" fill="none" stroke="#FF6B4A" stroke-width="7" stroke-linecap="round"/>
+          <g transform="translate(27 27) rotate(40) scale(0.9)" fill="#2FA05A">
+            <path d="M0 15 V-14" fill="none" stroke="#2FA05A" stroke-width="1.8" stroke-linecap="round"/>
+            <ellipse cx="0" cy="-14" rx="2.7" ry="6"/>
+            <ellipse cx="5.5" cy="7" rx="2.7" ry="6" transform="rotate(50 5.5 7)"/>
+            <ellipse cx="-5.5" cy="7" rx="2.7" ry="6" transform="rotate(-50 -5.5 7)"/>
+            <ellipse cx="5.2" cy="-1.5" rx="2.5" ry="5.6" transform="rotate(50 5.2 -1.5)"/>
+            <ellipse cx="-5.2" cy="-1.5" rx="2.5" ry="5.6" transform="rotate(-50 -5.2 -1.5)"/>
+            <ellipse cx="4.6" cy="-9.5" rx="2.3" ry="5" transform="rotate(50 4.6 -9.5)"/>
+            <ellipse cx="-4.6" cy="-9.5" rx="2.3" ry="5" transform="rotate(-50 -4.6 -9.5)"/>
+          </g>
+        </svg>
+      </div>
+
+      <h2 class="text-3xl sm:text-5xl font-heading font-extrabold text-slate-900 tracking-tight">
+        Experience neemSEO in Action
+      </h2>
+      <p class="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto font-normal">
+        Click below to immediately open the live dashboard. Start auditing pages, exploring keyword opportunities, and tracking ranks right away.
+      </p>
+
+      <!-- The Big Clickable Redirect Button -->
+      <div class="pt-2">
+        <a 
+          href="http://127.0.0.1:8000/" 
+          target="_blank"
+          id="dashboardRedirectBtn"
+          class="inline-flex items-center space-x-3 bg-[#1D4ED8] hover:bg-[#1E40AF] text-white font-heading font-bold text-lg sm:text-xl px-10 py-5 rounded-2xl shadow-2xl shadow-blue-600/30 hover:shadow-blue-600/50 transition-all transform hover:-translate-y-1"
+        >
+          <span>Go to neemSEO Dashboard</span>
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+          </svg>
+        </a>
+      </div>
+
+      <p class="text-xs text-slate-400">
+        Redirects to <code class="font-mono text-slate-600">http://127.0.0.1:8000/</code> (FastAPI Web UI).
+      </p>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-slate-50 border-t border-slate-200 py-12">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs text-slate-500">
+      <div class="flex items-center space-x-2">
+        <span class="font-heading font-bold text-slate-800">neem<span style="color: #FF6B4A;">SEO</span></span>
+        <span>— Simple, focused, pay-as-you-go SEO suite & AI agent interface.</span>
+      </div>
+      <div class="flex items-center space-x-6">
+        <a href="http://127.0.0.1:8000/" target="_blank" class="hover:text-[#1D4ED8] font-semibold transition">Web Dashboard</a>
+        <a href="http://127.0.0.1:8000/docs" target="_blank" class="hover:text-[#1D4ED8] transition">FastAPI Docs</a>
+        <a href="http://127.0.0.1:8000/bot" target="_blank" class="hover:text-[#1D4ED8] transition">Bot Policy</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
