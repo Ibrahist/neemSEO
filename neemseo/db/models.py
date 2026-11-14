@@ -31,6 +31,7 @@ class User(Base):
     email = Column(String(255), unique=True, index=True, nullable=False)
     hashed_password = Column(String(255), nullable=False)
     role = Column(String(50), default="member")  # admin, member
+    api_token = Column(String(128), unique=True, index=True, nullable=True)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -263,6 +264,38 @@ class BacklinkRecord(Base):
     is_lost = Column(Boolean, default=False)
 
     snapshot = relationship("BacklinkSnapshotRecord", back_populates="backlinks")
+
+
+# ─────────────────────────── Team Invitations ──────────────────────────────
+
+class Invitation(Base):
+    __tablename__ = "invitations"
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    email = Column(String(255), nullable=False, index=True)
+    token = Column(String(128), unique=True, index=True, nullable=False)
+    role = Column(String(50), default="member")
+    invited_by_id = Column(String(36), ForeignKey("users.id"), nullable=True)
+    is_accepted = Column(Boolean, default=False)
+    expires_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+
+
+# ─────────────────────────── AI Visibility ─────────────────────────────────
+
+class AIVisibilityRun(Base):
+    __tablename__ = "ai_visibility_runs"
+
+    id = Column(String(36), primary_key=True, default=generate_uuid)
+    user_id = Column(String(36), ForeignKey("users.id"), nullable=True)
+    domain = Column(String(512), nullable=False, index=True)
+    brand_name = Column(String(255), nullable=False)
+    overall_score = Column(Integer, default=0)  # 0-100
+    queries_count = Column(Integer, default=0)
+    citations_count = Column(Integer, default=0)
+    details = Column(JSON, default=dict)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
+
 
 
 

@@ -35,6 +35,10 @@ from neemseo.backlinks.schemas import BacklinkResearchRequest
 from neemseo.backlinks.service import BacklinkTrackerService
 from neemseo.competitors.schemas import CompetitorGapRequest
 from neemseo.competitors.service import CompetitorService
+from neemseo.aivisibility.schemas import AIVisibilityRequest
+from neemseo.aivisibility.service import AIVisibilityService
+from neemseo.auth.service import AuthService
+from neemseo.auth.schemas import SetupAdminRequest, CreateInviteRequest
 
 app = typer.Typer(
     name="neemseo",
@@ -930,6 +934,138 @@ def competitor_gap_cmd(
                 f"[{val_color}]{b.estimated_outreach_value.upper()}[/{val_color}]",
             )
         console.print(b_table)
+
+
+@app.command(name="ai-visibility")
+def ai_visibility(
+    domain: str = typer.Argument(..., help="Domain to evaluate for AI engine visibility"),
+    brand: Optional[str] = typer.Option(None, "--brand", "-b", help="Brand or product name (defaults to domain)"),
+    query: Optional[List[str]] = typer.Option(None, "--query", "-q", help="Specific prompt queries to evaluate"),
+    json_output: bool = typer.Option(False, "--json", help="Output raw JSON results"),
+):
+    """
+    Run an AI Visibility audit across AI search engines (ChatGPT, Claude, Perplexity, Gemini, Google AI Overview).
+    Tracks brand mentions, citation rates, and returns actionable GEO optimization tips.
+    """
+    init_db()
+    brand_name = brand or domain.split(".")[0].title()
+    svc = AIVisibilityService()
+    req = AIVisibilityRequest(domain=domain, brand_name=brand_name, queries=query)
+
+    console.print(f"[bold cyan]Auditing AI Visibility for {domain} ({brand_name})...[/bold cyan]")
+    result = svc.audit_visibility(req)
+
+    if json_output:
+        console.print(json.dumps(result.dict(), indent=2, default=str))
+        return
+
+    score_color = "green" if result.overall_score >= 70 else ("yellow" if result.overall_score >= 40 else "red")
+    summary = (
+        f"[bold]Domain:[/bold] {result.domain} | [bold]Brand:[/bold] {result.brand_name}\n"
+        f"[bold]AI Visibility Score:[/bold] [{score_color}]{result.overall_score} / 100[/{score_color}]\n"
+        f"[bold]Mention Rate:[/bold] {result.mention_rate_pct}% | [bold]Citation Rate:[/bold] {result.citation_rate_pct}% | [bold]Top Recommendation Rate:[/bold] {result.recommendation_rate_pct}%"
+    )
+    console.print(Panel(summary, title="neemSEO AI Visibility Engine (GEO)", border_style="cyan"))
+
+    # Engine Breakdown Table
+    e_table = Table(title="AI Engine Breakdown", header_style="bold blue")
+    e_table.add_column("Engine", style="bold white")
+    e_table.add_column("Visibility Score", justify="center")
+    e_table.add_column("Mentions", justify="center")
+    e_table.add_column("Citations", justify="center")
+    e_table.add_column("Total Queries", justify="center")
+
+    for eng in result.engine_breakdown:
+        sc_col = "green" if eng.visibility_score >= 70 else ("yellow" if eng.visibility_score >= 40 else "red")
+        e_table.add_row(
+            eng.display_name,
+            f"[{sc_col}]{eng.visibility_score} / 100[/{sc_col}]",
+            str(eng.mentions),
+            str(eng.citations),
+            str(eng.total_queries),
+        )
+    console.print(e_table)
+
+    # Optimization Tips
+    console.print("\n[bold yellow]GEO (Generative Engine Optimization) Tips:[/bold yellow]")
+    for tip in result.optimization_tips:
+        console.print(f" • {tip}")
+
+
+@app.command(name="setup-admin")
+def setup_admin(
+    email: str = typer.Option(..., "--email", "-e", prompt=True, help="Admin email address"),
+    password: str = typer.Option(..., "--password", "-p", prompt=True, hide_input=True, help="Admin password (min 8 chars)"),
+):
+    """
+    First visitor onboarding: create the primary admin account for neemSEO.
+    """
+    init_db()
+    svc = AuthService()
+    status = svc.get_system_status()
+    if not status.setup_required:
+        console.print("[red]Error: System already has registered users. Please use login or an invitation link.[/red]")
+        raise typer.Exit(code=1)
+
+    try:
+        res = svc.setup_admin(SetupAdminRequest(email=email, password=password))
+        console.print(f"[bold green]Admin account created successfully![/bold green]")
+        console.print(f"Email: {res.user.email}")
+        console.print(f"Role: {res.user.role}")
+        console.print(f"[bold cyan]MCP API Key (use in Claude/Cursor):[/bold cyan] {res.user.api_token}")
+    except ValueError as e:
+        console.print(f"[red]Error: {e}[/red]")
+        raise typer.Exit(code=1)
+
+
+@app.command(name="team")
+def list_team():
+    """
+    List all team members registered in neemSEO.
+    """
+    init_db()
+    svc = AuthService()
+    members = svc.list_team()
+    if not members:
+        console.print("[yellow]No team members found. Run 'neemseo setup-admin' to create the first admin.[/yellow]")
+        return
+
+    table = Table(title="neemSEO Team Members", header_style="bold green")
+    table.add_column("ID", style="dim")
+    table.add_column("Email", style="bold white")
+    table.add_column("Role", justify="center")
+    table.add_column("Active", justify="center")
+    table.add_column("Joined", justify="center")
+
+    for m in members:
+        role_style = "bold magenta" if m.role == "admin" else "cyan"
+        act_style = "[green]Yes[/green]" if m.is_active else "[red]No[/red]"
+        joined = m.created_at.strftime("%Y-%m-%d") if m.created_at else "-"
+        table.add_row(m.id[:8] + "...", m.email, f"[{role_style}]{m.role}[/{role_style}]", act_style, joined)
+
+    console.print(table)
+
+
+@app.command(name="invite-user")
+def invite_user(
+    email: str = typer.Argument(..., help="Teammate's email address to invite"),
+    role: str = typer.Option("member", "--role", "-r", help="Role: member or admin"),
+):
+    """
+    Generate an invitation link for a teammate to join neemSEO.
+    """
+    init_db()
+    svc = AuthService()
+    try:
+        inv = svc.create_invitation(CreateInviteRequest(email=email, role=role))
+        console.print(f"[bold green]Invitation created for {inv.email}![/bold green]")
+        console.print(f"Role: {inv.role}")
+        console.print(f"Expires: {inv.expires_at.strftime('%Y-%m-%d %H:%M:%S UTC')}")
+        console.print(f"[bold cyan]Invitation URL:[/bold cyan] {inv.invite_url}")
+        console.print(f"[bold yellow]Invite Token:[/bold yellow] {inv.token}")
+    except ValueError as e:
+        console.print(f"[red]Error: {e}[/red]")
+        raise typer.Exit(code=1)
 
 
 if __name__ == "__main__":

@@ -6,7 +6,10 @@ Exposes neemSEO audit, keyword research, and rank tracking tools directly to AI 
 
 import asyncio
 from typing import Optional, List, Dict, Any
-from mcp.server.fastmcp import FastMCP
+try:
+    from mcp.server.fastmcp import FastMCP
+except (ImportError, ModuleNotFoundError):
+    from mcp.server import MCPServer as FastMCP
 
 from neemseo.core.auditor import OnPageAuditor
 from neemseo.rules.registry import registry
@@ -27,6 +30,8 @@ from neemseo.backlinks.schemas import BacklinkResearchRequest
 from neemseo.backlinks.service import BacklinkTrackerService
 from neemseo.competitors.schemas import CompetitorGapRequest
 from neemseo.competitors.service import CompetitorService
+from neemseo.aivisibility.schemas import AIVisibilityRequest
+from neemseo.aivisibility.service import AIVisibilityService
 
 # Initialize FastMCP server with exact naming requirement
 mcp = FastMCP("neemseo")
@@ -486,6 +491,57 @@ async def compare_competitors(
                 "outreach_value": b.estimated_outreach_value,
             }
             for b in report.backlink_gaps[:15]
+        ],
+    }
+
+
+@mcp.tool()
+async def check_ai_visibility(
+    domain: str,
+    brand_name: str,
+    queries: Optional[List[str]] = None,
+) -> Dict[str, Any]:
+    """
+    Check brand/domain visibility inside AI answer engines and AI Overviews
+    (ChatGPT, Claude, Perplexity, Gemini, Google AI Overview).
+    Returns the AI Visibility Score (0-100), citation rates, engine breakdowns,
+    and actionable GEO (Generative Engine Optimization) tips.
+    Estimated Cost: $0.00 (Free)
+    """
+    svc = AIVisibilityService()
+    req = AIVisibilityRequest(domain=domain, brand_name=brand_name, queries=queries)
+    result = svc.audit_visibility(req)
+    return {
+        "run_id": result.id,
+        "domain": result.domain,
+        "brand_name": result.brand_name,
+        "overall_score": result.overall_score,
+        "queries_count": result.queries_count,
+        "citations_count": result.citations_count,
+        "mention_rate_pct": result.mention_rate_pct,
+        "citation_rate_pct": result.citation_rate_pct,
+        "recommendation_rate_pct": result.recommendation_rate_pct,
+        "engine_breakdown": [
+            {
+                "engine": b.engine,
+                "display_name": b.display_name,
+                "score": b.visibility_score,
+                "mentions": b.mentions,
+                "citations": b.citations,
+            }
+            for b in result.engine_breakdown
+        ],
+        "optimization_tips": result.optimization_tips,
+        "sample_query_results": [
+            {
+                "query": q.query,
+                "engine": q.engine,
+                "is_cited": q.is_cited,
+                "is_recommended": q.is_recommended,
+                "position": q.position,
+                "excerpt": q.excerpt,
+            }
+            for q in result.query_results[:6]
         ],
     }
 

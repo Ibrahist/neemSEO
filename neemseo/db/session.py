@@ -40,6 +40,15 @@ def get_db():
 
 
 def init_db():
-    """Create all tables in the database if they don't exist."""
+    """Create all tables in the database if they don't exist and ensure SQLite schema migrations."""
     Base.metadata.create_all(bind=engine)
+    if settings.DATABASE_URL.startswith("sqlite"):
+        with engine.begin() as conn:
+            try:
+                res = conn.exec_driver_sql("PRAGMA table_info(users)")
+                cols = [row[1] for row in res.fetchall()]
+                if cols and "api_token" not in cols:
+                    conn.exec_driver_sql("ALTER TABLE users ADD COLUMN api_token VARCHAR(128)")
+            except Exception:
+                pass
 

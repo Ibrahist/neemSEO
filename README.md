@@ -21,13 +21,15 @@
 
 ---
 
-## The Four Core Tools + AI Agent Interface
+## The Core Tools + AI Agent Interface
 
-1. **On-Page SEO Auditor** (Week 1): Fast, granular inspection of page titles, meta descriptions, single H1 & logical heading hierarchy, image alt attributes, canonical tags, indexability directives, link profiles, and body content depth. Integrates Google Core Web Vitals (LCP, INP, CLS).
-2. **Site Crawler** (Week 2): Whole-site auditing from root URL or sitemap, orphan page detection, broken link graphs, duplicate content flags, and crawl difference comparisons.
-3. **Keyword Research Tool** (Week 3): Google Autocomplete expansion, search volume metrics, topical clustering, and search intent classification.
-4. **Rank Tracker & Backlink Tracker** (Week 4): Scheduled position tracking by location and device, rank drop alerts, and backlink snapshots.
-5. **MCP Server (`neemseo`) & Skills**: Enables AI agents to audit URLs, list fixes, and optimize content directly from agent coding sessions.
+1. **On-Page SEO Auditor**: Fast, granular inspection of page titles, meta descriptions, single H1 & logical heading hierarchy, image alt attributes, canonical tags, indexability directives, link profiles, and body content depth. Integrates Google Core Web Vitals (LCP, INP, CLS).
+2. **Site Crawler**: Whole-site auditing from root URL or sitemap, orphan page detection, broken link graphs, duplicate content flags, and crawl difference comparisons.
+3. **Keyword Research Tool**: Google Autocomplete expansion, search volume metrics, topical clustering, and search intent classification.
+4. **Rank Tracker & Backlink Tracker**: Scheduled position tracking by location and device, rank drop alerts, backlink profile snapshots, and competitor gap analysis.
+5. **AI Visibility Engine (GEO)**: Tracks brand mentions, direct citations, and recommendation sentiment across AI answer engines (ChatGPT, Claude, Perplexity, Gemini, Google AI Overviews) with actionable Generative Engine Optimization fixes.
+6. **Auth & Team Management**: Simple email/password accounts where the first visitor creates the admin account, teammates join through secure invitation links, and MCP clients authenticate with per-user API tokens (`neemseo_live_...`).
+7. **MCP Server (`neemseo`) & Agent Skills**: Enables AI agents (Claude Code, ChatGPT, Codex, Cursor) to audit URLs, list fixes, track rankings, and optimize visibility autonomously.
 
 ---
 
@@ -66,6 +68,13 @@ neemseo rank-schedule-run
 neemseo backlinks example.com --limit 30 --confirm
 neemseo backlink-history
 neemseo competitor-gap "example.com" "competitor1.com" "competitor2.com"
+# 6. AI Visibility Audit (Generative Engine Optimization)
+neemseo ai-visibility example.com --brand "Example Brand"
+
+# 7. Team & MCP Access
+neemseo setup-admin --email admin@example.com
+neemseo invite-user colleague@example.com --role member
+neemseo team
 ```
 
 ### 2. Web Dashboard
@@ -73,7 +82,7 @@ neemseo competitor-gap "example.com" "competitor1.com" "competitor2.com"
 ```bash
 python backend/main.py
 ```
-Open **http://localhost:8000** to access the complete interactive dashboard featuring Page Auditor, Site Crawler, Keyword Research, Rank Tracker, Backlinks, and Competitor Gap Analysis.
+Open **http://localhost:8000** to access the complete interactive dashboard featuring Page Auditor, Site Crawler, Keyword Research, Rank Tracker, Backlinks, Competitor Gap Analysis, AI Visibility (GEO), and Team & API Keys.
 
 ### 3. Docker Compose
 
@@ -120,7 +129,23 @@ Add this to your MCP configuration (`claude_desktop_config.json` or Cursor MCP s
 - `get_rank_trend(target_id: str)`: Historical rank movement and drop alerts.
 - `fetch_backlinks(target_domain: str, confirm_cost: bool)`: Referring domains, anchor profiles, and new/lost links.
 - `compare_competitors(target_domain: str, competitors: List[str])`: Keyword gap & backlink gap opportunities.
+- `check_ai_visibility(domain: str, brand_name: str, queries: Optional[List[str]])`: Brand mentions, citations, and visibility inside AI Overviews and answer engines (ChatGPT, Claude, Perplexity, Gemini).
 - `estimate_action_cost(action: str, count: int)`: Pre-flight cost check for budget safety.
+
+---
+
+## Agent Skills (`skills/`)
+
+Reusable agent skills guide AI agents through complex SEO workflows using the `neemseo` MCP server:
+
+| Skill | Description | Path |
+|-------|-------------|------|
+| `neemseo-site-audit` | Guided on-page audit, Core Web Vitals review, and ranked fix plan | [`skills/neemseo-site-audit/SKILL.md`](skills/neemseo-site-audit/SKILL.md) |
+| `neemseo-site-crawl` | Whole-site crawling, broken link graphs, duplicate metadata, and crawl diffs | [`skills/neemseo-site-crawl/SKILL.md`](skills/neemseo-site-crawl/SKILL.md) |
+| `neemseo-keyword-plan` | Autocomplete A-Z expansion, intent categorization, clustering, and priority roadmap | [`skills/neemseo-keyword-plan/SKILL.md`](skills/neemseo-keyword-plan/SKILL.md) |
+| `neemseo-rank-tracker` | Rank setup, SERP checks, movement analysis, and drop alert triage | [`skills/neemseo-rank-tracker/SKILL.md`](skills/neemseo-rank-tracker/SKILL.md) |
+| `neemseo-backlink-audit` | Referring domain profiles, dofollow ratios, lost link detection, and competitor gaps | [`skills/neemseo-backlink-audit/SKILL.md`](skills/neemseo-backlink-audit/SKILL.md) |
+| `neemseo-ai-visibility` | Generative Engine Optimization (GEO), LLM brand citations, and AI Overviews | [`skills/neemseo-ai-visibility/SKILL.md`](skills/neemseo-ai-visibility/SKILL.md) |
 
 ---
 

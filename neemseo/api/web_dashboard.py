@@ -21,7 +21,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     [x-cloak] { display: none !important; }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased" x-data="seoApp()" x-init="loadRecentCrawls(); loadRecentKeywordRuns(); loadRankTargets(); loadRankAlerts()" x-cloak>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased" x-data="seoApp()" x-init="loadRecentCrawls(); loadRecentKeywordRuns(); loadRankTargets(); loadRankAlerts(); loadAIHistory(); loadTeam()" x-cloak>
 
   <!-- Top Navigation -->
   <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
@@ -29,7 +29,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       <div class="flex items-center space-x-3">
         <div class="h-9 w-9 bg-emerald-500 rounded-lg flex items-center justify-center font-bold text-slate-950 text-xl shadow-lg shadow-emerald-500/20">n</div>
         <span class="text-xl font-bold tracking-tight text-white">neem<span class="text-emerald-400">SEO</span></span>
-        <span class="text-xs bg-slate-800 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded font-mono">v0.1.0 (Week 4: Full Suite)</span>
+        <span class="text-xs bg-slate-800 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded font-mono">v0.1.0 (Full Suite & MCP)</span>
       </div>
 
       <!-- Main Navigation Tabs -->
@@ -75,6 +75,20 @@ DASHBOARD_HTML = """<!DOCTYPE html>
           class="px-3 py-1.5 rounded-lg text-xs font-medium transition"
         >
           Competitors
+        </button>
+        <button 
+          @click="activeTab = 'ai-visibility'"
+          :class="activeTab === 'ai-visibility' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-400 hover:text-white'"
+          class="px-3 py-1.5 rounded-lg text-xs font-medium transition"
+        >
+          AI Visibility (GEO)
+        </button>
+        <button 
+          @click="activeTab = 'team'"
+          :class="activeTab === 'team' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-400 hover:text-white'"
+          class="px-3 py-1.5 rounded-lg text-xs font-medium transition"
+        >
+          Team & Keys
         </button>
       </nav>
 
@@ -1023,6 +1037,252 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       </template>
     </div>
 
+    <!-- ================= TAB 7: AI VISIBILITY (GEO) ================= -->
+    <div x-show="activeTab === 'ai-visibility'" class="space-y-8">
+      <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 shadow-xl">
+        <div class="flex items-center justify-between mb-2">
+          <h1 class="text-2xl font-bold text-white">Generative Engine Optimization (GEO) & AI Visibility</h1>
+          <span class="text-xs bg-purple-500/10 text-purple-400 border border-purple-500/30 px-2.5 py-1 rounded-full font-mono">ChatGPT · Claude · Perplexity · Gemini · AI Overviews</span>
+        </div>
+        <p class="text-slate-400 text-sm mb-6">Track brand mentions, citations, and recommendation sentiment when users query AI answer engines. Measure your AI Visibility Score (0–100) and receive actionable GEO fixes.</p>
+
+        <form @submit.prevent="runAIVisibility()" class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+            <div class="md:col-span-6">
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Target Domain</label>
+              <input 
+                type="text" 
+                x-model="aiDomain" 
+                placeholder="neemseo.com" 
+                required
+                class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+            </div>
+            <div class="md:col-span-6">
+              <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Brand / Product Name</label>
+              <input 
+                type="text" 
+                x-model="aiBrand" 
+                placeholder="neemSEO" 
+                required
+                class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+            </div>
+          </div>
+
+          <div class="flex justify-end pt-2">
+            <button 
+              type="submit" 
+              :disabled="aiLoading"
+              class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition duration-150 flex items-center space-x-2 disabled:opacity-50 shadow-lg shadow-emerald-500/20"
+            >
+              <span x-show="!aiLoading">Run AI Visibility Audit</span>
+              <span x-show="aiLoading" class="flex items-center space-x-2">
+                <svg class="animate-spin h-4 w-4 text-slate-950" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                <span>Evaluating AI Engines...</span>
+              </span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- AI Visibility Results -->
+      <template x-if="aiResult">
+        <div class="space-y-6">
+          <!-- Score Metric Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+              <span class="text-xs uppercase font-semibold text-slate-400">AI Visibility Score</span>
+              <div class="flex items-baseline space-x-2 mt-1">
+                <span class="text-4xl font-extrabold" :class="aiResult.overall_score >= 70 ? 'text-emerald-400' : (aiResult.overall_score >= 40 ? 'text-amber-400' : 'text-red-400')" x-text="aiResult.overall_score"></span>
+                <span class="text-slate-500 text-sm font-medium">/ 100</span>
+              </div>
+            </div>
+            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+              <span class="text-xs uppercase font-semibold text-slate-400">Mention Rate</span>
+              <p class="text-3xl font-extrabold text-white mt-1"><span x-text="aiResult.mention_rate_pct"></span>%</p>
+            </div>
+            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+              <span class="text-xs uppercase font-semibold text-slate-400">Direct Citation Rate</span>
+              <p class="text-3xl font-extrabold text-cyan-400 mt-1"><span x-text="aiResult.citation_rate_pct"></span>%</p>
+            </div>
+            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+              <span class="text-xs uppercase font-semibold text-slate-400">Top Recommendation Rate</span>
+              <p class="text-3xl font-extrabold text-emerald-400 mt-1"><span x-text="aiResult.recommendation_rate_pct"></span>%</p>
+            </div>
+          </div>
+
+          <!-- Engine Breakdown Cards -->
+          <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-6 shadow-xl">
+            <h3 class="text-base font-bold text-white mb-4">AI Engine Performance Breakdown</h3>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <template x-for="eng in aiResult.engine_breakdown" :key="eng.engine">
+                <div class="bg-slate-900/80 border border-slate-700/60 rounded-lg p-4 flex flex-col justify-between">
+                  <div>
+                    <span class="text-xs font-semibold text-slate-300 block truncate" x-text="eng.display_name"></span>
+                    <div class="flex items-baseline space-x-1.5 mt-2">
+                      <span class="text-2xl font-bold" :class="eng.visibility_score >= 70 ? 'text-emerald-400' : (eng.visibility_score >= 40 ? 'text-amber-400' : 'text-red-400')" x-text="eng.visibility_score"></span>
+                      <span class="text-xs text-slate-500">/ 100</span>
+                    </div>
+                  </div>
+                  <div class="mt-4 pt-3 border-t border-slate-800 text-[11px] text-slate-400 space-y-1">
+                    <div class="flex justify-between"><span>Mentions:</span> <span class="font-mono text-white" x-text="eng.mentions"></span></div>
+                    <div class="flex justify-between"><span>Citations:</span> <span class="font-mono text-cyan-400" x-text="eng.citations"></span></div>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </div>
+
+          <!-- GEO Optimization Tips -->
+          <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-6 shadow-xl">
+            <h3 class="text-base font-bold text-amber-400 mb-3 flex items-center space-x-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              <span>Actionable Generative Engine Optimization (GEO) Fixes</span>
+            </h3>
+            <ul class="space-y-2 text-sm text-slate-300">
+              <template x-for="tip in aiResult.optimization_tips" :key="tip">
+                <li class="flex items-start space-x-2">
+                  <span class="text-emerald-400 font-bold">✓</span>
+                  <span x-text="tip"></span>
+                </li>
+              </template>
+            </ul>
+          </div>
+
+          <!-- Detailed Query Results Table -->
+          <div class="bg-slate-800/80 border border-slate-700 rounded-xl overflow-hidden shadow-xl">
+            <div class="p-4 border-b border-slate-700">
+              <h3 class="text-base font-bold text-white">Evaluated Conversational Queries & AI Overviews</h3>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-950/60 border-b border-slate-700 text-slate-400 uppercase">
+                  <tr>
+                    <th class="py-3 px-4">User Prompt Query</th>
+                    <th class="py-3 px-4">Engine</th>
+                    <th class="py-3 px-4 text-center">Cited</th>
+                    <th class="py-3 px-4 text-center">Rank</th>
+                    <th class="py-3 px-4 text-center">Sentiment</th>
+                    <th class="py-3 px-4">Extracted Snippet Context</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-700/50">
+                  <template x-for="(q, idx) in aiResult.query_results" :key="idx">
+                    <tr class="hover:bg-slate-700/30">
+                      <td class="py-3 px-4 font-medium text-white max-w-xs truncate" x-text="q.query"></td>
+                      <td class="py-3 px-4 text-slate-300 font-mono text-[11px]" x-text="q.engine"></td>
+                      <td class="py-3 px-4 text-center">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold" :class="q.is_cited ? 'bg-cyan-950 text-cyan-400' : 'bg-slate-800 text-slate-500'" x-text="q.is_cited ? 'YES' : 'NO'"></span>
+                      </td>
+                      <td class="py-3 px-4 text-center font-mono text-slate-200" x-text="q.position ? '#' + q.position : '-'"></td>
+                      <td class="py-3 px-4 text-center">
+                        <span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold" :class="q.sentiment === 'positive' ? 'bg-emerald-950 text-emerald-400' : (q.sentiment === 'neutral' ? 'bg-amber-950 text-amber-400' : 'bg-slate-800 text-slate-500')" x-text="q.sentiment"></span>
+                      </td>
+                      <td class="py-3 px-4 text-slate-400 max-w-md truncate" x-text="q.excerpt || 'Brand not referenced in response'"></td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <!-- ================= TAB 8: TEAM & MCP API KEYS ================= -->
+    <div x-show="activeTab === 'team'" class="space-y-8">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+        <!-- Team Management -->
+        <div class="md:col-span-7 bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 shadow-xl space-y-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-bold text-white">Team Members</h2>
+            <button @click="loadTeam()" class="text-xs text-emerald-400 hover:text-emerald-300">Refresh</button>
+          </div>
+          
+          <!-- Invite Teammate Form -->
+          <form @submit.prevent="createInvite()" class="bg-slate-900/80 p-4 rounded-xl border border-slate-700/60 space-y-3">
+            <h3 class="text-xs uppercase font-bold text-slate-400 tracking-wider">Invite Teammate</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+              <div class="sm:col-span-8">
+                <input 
+                  type="email" 
+                  x-model="inviteEmail" 
+                  placeholder="colleague@company.com" 
+                  required
+                  class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500"
+                />
+              </div>
+              <div class="sm:col-span-4">
+                <button 
+                  type="submit" 
+                  class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-2 rounded-lg text-xs transition"
+                >
+                  Generate Link
+                </button>
+              </div>
+            </div>
+            <template x-if="inviteSuccess">
+              <div class="p-3 bg-emerald-950/80 border border-emerald-500/40 rounded-lg text-xs text-emerald-200">
+                <div class="font-bold mb-1">Invitation Link Created:</div>
+                <div class="font-mono break-all text-[11px] bg-slate-950 p-2 rounded" x-text="inviteSuccess.invite_url"></div>
+              </div>
+            </template>
+          </form>
+
+          <!-- Members Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="border-b border-slate-700 text-slate-400 uppercase">
+                <tr><th class="py-2.5 px-3">Email</th><th class="py-2.5 px-3 text-center">Role</th><th class="py-2.5 px-3 text-center">Status</th></tr>
+              </thead>
+              <tbody class="divide-y divide-slate-700/50">
+                <template x-for="m in teamList" :key="m.id">
+                  <tr>
+                    <td class="py-2.5 px-3 text-white font-medium" x-text="m.email"></td>
+                    <td class="py-2.5 px-3 text-center"><span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold" :class="m.role === 'admin' ? 'bg-purple-950 text-purple-400' : 'bg-slate-700 text-slate-300'" x-text="m.role"></span></td>
+                    <td class="py-2.5 px-3 text-center"><span class="text-emerald-400" x-text="m.is_active ? 'Active' : 'Inactive'"></span></td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- MCP API Token & Agent Integration -->
+        <div class="md:col-span-5 bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 shadow-xl space-y-6">
+          <h2 class="text-xl font-bold text-white">AI Agent & MCP Keys</h2>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Connect AI coding agents (Claude Code, ChatGPT, Cursor, Codex) to neemSEO via the Model Context Protocol. MCP clients authenticate using your per-user API key.
+          </p>
+
+          <div class="bg-slate-900/90 border border-slate-700 rounded-xl p-4 space-y-3">
+            <span class="text-xs uppercase font-bold text-slate-400">Claude Code / Cursor Configuration</span>
+            <pre class="bg-slate-950 p-3 rounded-lg text-[11px] font-mono text-emerald-300 overflow-x-auto"><code>{
+  "mcpServers": {
+    "neemseo": {
+      "command": "python",
+      "args": ["-m", "neemseo.mcp.server"]
+    }
+  }
+}</code></pre>
+          </div>
+
+          <div class="space-y-2">
+            <div class="text-xs uppercase font-bold text-slate-400">Your MCP API Token</div>
+            <div class="flex items-center space-x-2">
+              <input 
+                type="text" 
+                readonly 
+                :value="userApiToken || 'neemseo_live_demo_unconfigured'"
+                class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-emerald-400"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <script>
@@ -1079,6 +1339,20 @@ DASHBOARD_HTML = """<!DOCTYPE html>
         compDomainsInput: '',
         compLoading: false,
         compReport: null,
+
+        // AI Visibility state
+        aiDomain: '',
+        aiBrand: '',
+        aiLoading: false,
+        aiResult: null,
+        aiHistory: [],
+
+        // Team & MCP Key state
+        teamList: [],
+        inviteEmail: '',
+        inviteRole: 'member',
+        inviteSuccess: null,
+        userApiToken: '',
 
         async runAudit() {
           this.loading = true;
@@ -1337,6 +1611,73 @@ DASHBOARD_HTML = """<!DOCTYPE html>
             alert('Competitor analysis failed: ' + e.message);
           } finally {
             this.compLoading = false;
+          }
+        },
+
+        // AI Visibility Methods
+        async runAIVisibility() {
+          this.aiLoading = true;
+          this.aiResult = null;
+          try {
+            const res = await fetch('/api/v1/ai-visibility/audit', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                domain: this.aiDomain,
+                brand_name: this.aiBrand
+              })
+            });
+            this.aiResult = await res.json();
+            this.loadAIHistory();
+          } catch(e) {
+            alert('AI Visibility audit failed: ' + e.message);
+          } finally {
+            this.aiLoading = false;
+          }
+        },
+
+        async loadAIHistory() {
+          try {
+            const res = await fetch('/api/v1/ai-visibility/history?limit=10');
+            this.aiHistory = await res.json();
+          } catch(e) {}
+        },
+
+        // Team & Auth Methods
+        async loadTeam() {
+          try {
+            const res = await fetch('/api/v1/auth/team');
+            if (res.ok) {
+              this.teamList = await res.json();
+            }
+            const meRes = await fetch('/api/v1/auth/me');
+            if (meRes.ok) {
+              const me = await meRes.json();
+              this.userApiToken = me.api_token;
+            }
+          } catch(e) {}
+        },
+
+        async createInvite() {
+          try {
+            const res = await fetch('/api/v1/auth/invite', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: this.inviteEmail,
+                role: this.inviteRole
+              })
+            });
+            if (res.ok) {
+              this.inviteSuccess = await res.json();
+              this.inviteEmail = '';
+              this.loadTeam();
+            } else {
+              const err = await res.json();
+              alert('Invite failed: ' + (err.detail || 'Error'));
+            }
+          } catch(e) {
+            alert('Invite error: ' + e.message);
           }
         },
 
