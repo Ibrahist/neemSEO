@@ -40,20 +40,32 @@
 git clone https://github.com/your-org/neemseo.git
 cd neemseo
 
-# Install dependencies
+# Install dependencies in editable mode
 pip install -e .
 
-# Run an instant on-page audit
-neemseo audit https://example.com --keyword "example"
+# 1. On-Page SEO Audit
+neemseo audit https://example.com --keyword "example" --pagespeed --csv report.csv
 
-# Run with Core Web Vitals and export to CSV
-neemseo audit https://example.com --pagespeed --csv report.csv
+# 2. Whole-Site Crawler & Link Graph
+neemseo crawl https://example.com --max-pages 50 --max-depth 3
+neemseo crawls
+neemseo crawl-compare <base-id> <target-id>
 
-# View audit history
-neemseo history
+# 3. Keyword Research & Intent Clustering
+neemseo keywords "seo tools" --country US --expand-az --limit 50 --csv keywords.csv
+neemseo keyword-lists
 
-# Inspect available SEO checking rules
-neemseo rules
+# 4. Rank Tracker & SERP Checks
+neemseo rank-add "open source seo tool" "https://example.com/features" --device desktop
+neemseo rank-targets
+neemseo rank-check --confirm
+neemseo rank-trend <target-id>
+neemseo rank-schedule-run
+
+# 5. Backlink Profile & Competitor Gaps
+neemseo backlinks example.com --limit 30 --confirm
+neemseo backlink-history
+neemseo competitor-gap "example.com" "competitor1.com" "competitor2.com"
 ```
 
 ### 2. Web Dashboard
@@ -61,7 +73,7 @@ neemseo rules
 ```bash
 python backend/main.py
 ```
-Open **http://localhost:8000** to access the interactive web interface.
+Open **http://localhost:8000** to access the complete interactive dashboard featuring Page Auditor, Site Crawler, Keyword Research, Rank Tracker, Backlinks, and Competitor Gap Analysis.
 
 ### 3. Docker Compose
 
@@ -96,9 +108,19 @@ Add this to your MCP configuration (`claude_desktop_config.json` or Cursor MCP s
 ### Available MCP Tools
 
 - `audit_url(url: str, keyword: Optional[str])`: Complete on-page SEO health check.
-- `list_available_rules()`: Detailed index of all SEO rules.
+- `list_available_rules()`: Detailed index of all SEO rules and weights.
+- `start_site_crawl(seed_url: str, max_pages: int, max_depth: int)`: Background whole-site audit.
+- `get_crawl_progress(crawl_id: str)`: Live crawl progress polling.
+- `get_site_crawl_report(crawl_id: str)`: Full link graph, broken links, duplicate titles report.
+- `compare_site_crawls(base_crawl_id: str, target_crawl_id: str)`: Crawl diff regression analysis.
+- `research_keywords(seed_keyword: str, country: str, expand_alphabet: bool)`: Keyword expansion & intent clustering.
+- `cluster_keywords(keywords: List[str])`: Group arbitrary keywords into topical themes.
+- `add_rank_target(keyword: str, target_url: str, device: str)`: Register keyword/URL/device tracking.
+- `check_serp_positions(confirm_cost: bool)`: SERP position check with pre-flight cost confirmation.
+- `get_rank_trend(target_id: str)`: Historical rank movement and drop alerts.
+- `fetch_backlinks(target_domain: str, confirm_cost: bool)`: Referring domains, anchor profiles, and new/lost links.
+- `compare_competitors(target_domain: str, competitors: List[str])`: Keyword gap & backlink gap opportunities.
 - `estimate_action_cost(action: str, count: int)`: Pre-flight cost check for budget safety.
-- `keyword_ideas(seed: str, confirm_cost: bool)`: Keyword metrics (requires user confirmation).
 
 ---
 
