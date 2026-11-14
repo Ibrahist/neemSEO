@@ -62,6 +62,10 @@ def list_snapshots(
     limit: int = Query(default=20, ge=1, le=100),
 ):
     """List all backlink snapshots, optionally filtered by domain."""
+    if not isinstance(domain, str):
+        domain = None
+    if not isinstance(limit, int):
+        limit = 20
     rows = _service.list_snapshots(domain=domain, limit=limit)
     return [
         {

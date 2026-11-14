@@ -40,6 +40,9 @@ class Settings(BaseSettings):
     DATAFORSEO_PASSWORD: Optional[str] = None
     SERPAPI_API_KEY: Optional[str] = None
 
+    # Alerts & Notifications
+    ALERT_WEBHOOK_URL: Optional[str] = None
+
 
 settings = Settings()
 

@@ -52,7 +52,12 @@ class BacklinkTrackerService:
         """
         snapshot_id = str(uuid.uuid4())
         now = datetime.now(timezone.utc)
-        target = req.target_domain.strip().lower().lstrip("https://").lstrip("http://").rstrip("/")
+        target = req.target_domain.strip().lower()
+        if target.startswith("https://"):
+            target = target[len("https://"):]
+        elif target.startswith("http://"):
+            target = target[len("http://"):]
+        target = target.rstrip("/")
 
         if self.dataforseo.is_configured():
             backlinks, cost = await self._fetch_from_dataforseo(
@@ -174,15 +179,17 @@ class BacklinkTrackerService:
 
         link_types = [BacklinkType.DOFOLLOW] * 7 + [BacklinkType.NOFOLLOW] * 3
 
-        backlinks = []
-        seen = set()
-        for i in range(min(count, len(demo_domains) * 3)):
-            d_idx = i % len(demo_domains)
-            ref_domain, dr = demo_domains[d_idx]
-            if ref_domain in seen and i < len(demo_domains):
-                continue
-            seen.add(ref_domain)
+        # Shuffle domains deterministically per target domain so each has distinct referring domains
+        shuffled_domains = list(demo_domains)
+        random.seed(h)
+        random.shuffle(shuffled_domains)
+        # Select roughly 8 to 14 domains for this target
+        domain_sample_size = min(len(shuffled_domains), max(6, (h % 9) + 6))
+        chosen_domains = shuffled_domains[:domain_sample_size]
 
+        backlinks = []
+        for i in range(min(count, len(chosen_domains) * 2)):
+            ref_domain, dr = chosen_domains[i % len(chosen_domains)]
             path = f"/blog/{random.randint(1000, 9999)}"
             backlinks.append(BacklinkItem(
                 id=str(uuid.uuid4()),
@@ -192,7 +199,7 @@ class BacklinkTrackerService:
                 target_url=f"https://{domain}/",
                 anchor_text=random.choice(anchors),
                 link_type=random.choice(link_types),
-                domain_rank=dr + random.randint(-5, 5),
+                domain_rank=max(10, min(100, dr + random.randint(-5, 5))),
                 page_rank=random.randint(10, 70),
                 first_seen=datetime.now(timezone.utc),
                 last_seen=datetime.now(timezone.utc),

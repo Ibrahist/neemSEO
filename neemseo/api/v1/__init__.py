@@ -9,6 +9,7 @@ from neemseo.api.v1.crawls import router as crawls_router
 from neemseo.api.v1.keywords import router as keywords_router
 from neemseo.api.v1.rank_tracker import router as rank_tracker_router
 from neemseo.api.v1.backlinks import router as backlinks_router
+from neemseo.api.v1.competitors import router as competitors_router
 
 api_v1_router = APIRouter(prefix="/api/v1")
 api_v1_router.include_router(health_router)
@@ -17,5 +18,6 @@ api_v1_router.include_router(crawls_router)
 api_v1_router.include_router(keywords_router)
 api_v1_router.include_router(rank_tracker_router)
 api_v1_router.include_router(backlinks_router)
+api_v1_router.include_router(competitors_router)
 
 __all__ = ["api_v1_router"]

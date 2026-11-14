@@ -32,6 +32,8 @@ def add_target(req: AddTargetRequest):
 @router.get("/targets", response_model=List[RankTarget])
 def list_targets(active_only: bool = Query(default=True)):
     """List all rank tracking targets."""
+    if not isinstance(active_only, bool):
+        active_only = True
     return _service.list_targets(active_only=active_only)
 
 
@@ -76,6 +78,8 @@ async def run_rank_checks(req: CheckRankRequest):
 @router.get("/trends/{target_id}", response_model=RankTrend)
 def get_rank_trend(target_id: str, limit: int = Query(default=30, ge=1, le=100)):
     """Get full position history and trend data for a rank target."""
+    if not isinstance(limit, int):
+        limit = 30
     trend = _service.get_trend(target_id, limit=limit)
     if not trend:
         raise HTTPException(status_code=404, detail="Target not found or no data yet.")

@@ -6,7 +6,7 @@ Allows running on-page audits, listing rules, and exporting reports from the ter
 import asyncio
 import csv
 import json
-from typing import Optional
+from typing import Optional, List, Dict, Any
 import typer
 from rich.console import Console
 from rich.table import Table
@@ -30,8 +30,11 @@ from neemseo.keywords.intent import IntentClassifier
 from neemseo.keywords.scoring import PriorityScorer
 from neemseo.ranker.schemas import AddTargetRequest, CheckRankRequest, DeviceType
 from neemseo.ranker.service import RankTrackerService
+from neemseo.ranker.scheduler import RankScheduler
 from neemseo.backlinks.schemas import BacklinkResearchRequest
 from neemseo.backlinks.service import BacklinkTrackerService
+from neemseo.competitors.schemas import CompetitorGapRequest
+from neemseo.competitors.service import CompetitorService
 
 app = typer.Typer(
     name="neemseo",
@@ -697,6 +700,27 @@ def rank_trend_cmd(
     console.print(table)
 
 
+@app.command(name="rank-schedule-run")
+def rank_schedule_run_cmd(
+    webhook: Optional[str] = typer.Option(None, "--webhook", "-w", help="Custom webhook URL for drop alerts"),
+):
+    """Execute scheduled SERP checks across all active targets and dispatch drop alerts."""
+    init_db()
+    scheduler = RankScheduler(webhook_url=webhook)
+
+    with console.status("[bold cyan]Running scheduled rank checks...[/bold cyan]"):
+        summary = asyncio.run(scheduler.execute_scheduled_run())
+
+    console.print(Panel(
+        f"[bold]Checks Executed:[/bold] {summary['checks_run']}\n"
+        f"[bold]Alerts Triggered:[/bold] {summary['alerts_count']}\n"
+        f"[bold]Webhook Dispatched:[/bold] {'Yes' if summary['webhook_dispatched'] else 'No'}\n"
+        f"[bold]Total Cost:[/bold] ${summary['cost_usd']:.4f}",
+        title="[bold green]Scheduled Rank Check Run Completed[/bold green]",
+        border_style="green",
+    ))
+
+
 # ═══════════════════════════════════════════════════════
 #  BACKLINK TRACKER CLI COMMANDS
 # ═══════════════════════════════════════════════════════
@@ -820,6 +844,92 @@ def backlink_history_cmd(
             r.created_at.strftime("%Y-%m-%d %H:%M") if r.created_at else "",
         )
     console.print(table)
+
+
+# ═══════════════════════════════════════════════════════
+#  COMPETITOR INSIGHTS CLI COMMANDS
+# ═══════════════════════════════════════════════════════
+
+@app.command(name="competitor-gap")
+def competitor_gap_cmd(
+    target: str = typer.Argument(..., help="Your target domain (e.g. example.com)"),
+    competitors: List[str] = typer.Argument(..., help="One or more competitor domains separated by spaces"),
+    limit: int = typer.Option(15, "--limit", "-n", help="Max gaps to display"),
+):
+    """Analyze keyword gaps and backlink gap opportunities against competitors."""
+    init_db()
+    svc = CompetitorService()
+
+    with console.status(f"[bold cyan]Analyzing competitive gaps for [white]{target}[/white]...[/bold cyan]"):
+        req = CompetitorGapRequest(target_domain=target, competitors=competitors)
+        report = asyncio.run(svc.analyze_gaps(req))
+
+    # Summary Panel
+    console.print(Panel(
+        f"[bold]Target Domain:[/bold] {report.target_domain}\n"
+        f"[bold]Competitors:[/bold] {', '.join(report.competitors)}\n"
+        f"[bold]Shared Keywords:[/bold] [green]{report.total_shared_keywords}[/green]  "
+        f"[bold]Missing / Opportunity Keywords:[/bold] [yellow]{report.total_missing_keywords}[/yellow]\n"
+        f"[bold]Backlink Gap Opportunities:[/bold] [cyan]{report.total_backlink_gaps}[/cyan]",
+        title="[bold green]Competitor Gap Intelligence Summary[/bold green]",
+        border_style="green",
+    ))
+
+    # Keyword Gaps Table
+    if report.keyword_gaps:
+        k_table = Table(title="Keyword Gap Opportunities", header_style="bold magenta")
+        k_table.add_column("Keyword", style="bold white")
+        k_table.add_column("Volume", justify="right")
+        k_table.add_column("KD", justify="center")
+        k_table.add_column("Gap Type", justify="center")
+        k_table.add_column(f"{report.target_domain} Rank", justify="center")
+        for c in report.competitors[:2]:
+            k_table.add_column(f"{c} Rank", justify="center")
+        k_table.add_column("Priority", justify="center", style="bold")
+
+        for k in report.keyword_gaps[:limit]:
+            gap_badge = (
+                "[red]Missing[/red]" if k.gap_type == "missing"
+                else ("[yellow]Weak[/yellow]" if k.gap_type == "weak"
+                else ("[green]Shared[/green]" if k.gap_type == "shared" else "[cyan]Advantage[/cyan]"))
+            )
+            t_rank = f"#{k.domain_ranks.get(report.target_domain)}" if k.domain_ranks.get(report.target_domain) else "[dim]-[/dim]"
+
+            row = [
+                k.keyword,
+                f"{k.search_volume:,}",
+                str(k.difficulty),
+                gap_badge,
+                t_rank,
+            ]
+            for c in report.competitors[:2]:
+                c_rank = f"#{k.domain_ranks.get(c)}" if k.domain_ranks.get(c) else "[dim]-[/dim]"
+                row.append(c_rank)
+
+            p_color = "green" if k.priority_score >= 70 else ("yellow" if k.priority_score >= 50 else "dim")
+            row.append(f"[{p_color}]{k.priority_score}[/{p_color}]")
+            k_table.add_row(*row)
+
+        console.print(k_table)
+
+    # Backlink Gaps Table
+    if report.backlink_gaps:
+        b_table = Table(title="Backlink Gap Opportunities (Competitor Referring Domains)", header_style="bold cyan")
+        b_table.add_column("Referring Domain", style="bold white")
+        b_table.add_column("DR", justify="center")
+        b_table.add_column("Links to Competitors", style="dim")
+        b_table.add_column("Outreach Value", justify="center", style="bold")
+
+        for b in report.backlink_gaps[:limit]:
+            dr_color = "green" if b.domain_rank >= 75 else ("yellow" if b.domain_rank >= 50 else "dim")
+            val_color = "green" if b.estimated_outreach_value == "high" else ("yellow" if b.estimated_outreach_value == "medium" else "dim")
+            b_table.add_row(
+                b.referring_domain,
+                f"[{dr_color}]{b.domain_rank}[/{dr_color}]",
+                ", ".join(b.links_to_competitors),
+                f"[{val_color}]{b.estimated_outreach_value.upper()}[/{val_color}]",
+            )
+        console.print(b_table)
 
 
 if __name__ == "__main__":

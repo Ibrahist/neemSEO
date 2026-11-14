@@ -25,6 +25,8 @@ from neemseo.ranker.schemas import AddTargetRequest, CheckRankRequest, DeviceTyp
 from neemseo.ranker.service import RankTrackerService
 from neemseo.backlinks.schemas import BacklinkResearchRequest
 from neemseo.backlinks.service import BacklinkTrackerService
+from neemseo.competitors.schemas import CompetitorGapRequest
+from neemseo.competitors.service import CompetitorService
 
 # Initialize FastMCP server with exact naming requirement
 mcp = FastMCP("neemseo")
@@ -443,6 +445,47 @@ async def fetch_backlinks(
         "top_referring_domains": [
             {"domain": d.domain, "links": d.total_links, "dr": d.domain_rank}
             for d in snapshot.referring_domains[:10]
+        ],
+    }
+
+
+@mcp.tool()
+async def compare_competitors(
+    target_domain: str,
+    competitors: List[str],
+) -> Dict[str, Any]:
+    """
+    Compare target domain against competitors to find missing keywords and backlink gap opportunities.
+    Estimated Cost: $0.00 (Free in demo/simulated mode; BYOK when configured)
+    """
+    svc = CompetitorService()
+    req = CompetitorGapRequest(target_domain=target_domain, competitors=competitors)
+    report = await svc.analyze_gaps(req)
+    return {
+        "target_domain": report.target_domain,
+        "competitors": report.competitors,
+        "total_shared_keywords": report.total_shared_keywords,
+        "total_missing_keywords": report.total_missing_keywords,
+        "total_backlink_gaps": report.total_backlink_gaps,
+        "top_missing_keywords": [
+            {
+                "keyword": k.keyword,
+                "search_volume": k.search_volume,
+                "difficulty": k.difficulty,
+                "gap_type": k.gap_type,
+                "priority_score": k.priority_score,
+                "ranks": k.domain_ranks,
+            }
+            for k in report.keyword_gaps[:15]
+        ],
+        "top_backlink_gaps": [
+            {
+                "referring_domain": b.referring_domain,
+                "domain_rank": b.domain_rank,
+                "links_to": b.links_to_competitors,
+                "outreach_value": b.estimated_outreach_value,
+            }
+            for b in report.backlink_gaps[:15]
         ],
     }
 

@@ -21,7 +21,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     [x-cloak] { display: none !important; }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased" x-data="seoApp()" x-init="loadRecentCrawls(); loadRecentKeywordRuns()" x-cloak>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased" x-data="seoApp()" x-init="loadRecentCrawls(); loadRecentKeywordRuns(); loadRankTargets(); loadRankAlerts()" x-cloak>
 
   <!-- Top Navigation -->
   <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
@@ -29,31 +29,52 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       <div class="flex items-center space-x-3">
         <div class="h-9 w-9 bg-emerald-500 rounded-lg flex items-center justify-center font-bold text-slate-950 text-xl shadow-lg shadow-emerald-500/20">n</div>
         <span class="text-xl font-bold tracking-tight text-white">neem<span class="text-emerald-400">SEO</span></span>
-        <span class="text-xs bg-slate-800 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded font-mono">v0.1.0 (Week 3: Keywords)</span>
+        <span class="text-xs bg-slate-800 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded font-mono">v0.1.0 (Week 4: Full Suite)</span>
       </div>
 
       <!-- Main Navigation Tabs -->
-      <nav class="flex space-x-2 bg-slate-900 p-1 rounded-xl border border-slate-800">
+      <nav class="flex space-x-1.5 bg-slate-900 p-1 rounded-xl border border-slate-800">
         <button 
           @click="activeTab = 'audit'"
           :class="activeTab === 'audit' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-400 hover:text-white'"
-          class="px-4 py-1.5 rounded-lg text-sm transition"
+          class="px-3 py-1.5 rounded-lg text-xs font-medium transition"
         >
           Page Auditor
         </button>
         <button 
           @click="activeTab = 'crawler'"
           :class="activeTab === 'crawler' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-400 hover:text-white'"
-          class="px-4 py-1.5 rounded-lg text-sm transition"
+          class="px-3 py-1.5 rounded-lg text-xs font-medium transition"
         >
           Site Crawler
         </button>
         <button 
           @click="activeTab = 'keywords'"
           :class="activeTab === 'keywords' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-400 hover:text-white'"
-          class="px-4 py-1.5 rounded-lg text-sm transition"
+          class="px-3 py-1.5 rounded-lg text-xs font-medium transition"
         >
-          Keyword Research
+          Keywords
+        </button>
+        <button 
+          @click="activeTab = 'ranker'"
+          :class="activeTab === 'ranker' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-400 hover:text-white'"
+          class="px-3 py-1.5 rounded-lg text-xs font-medium transition"
+        >
+          Rank Tracker
+        </button>
+        <button 
+          @click="activeTab = 'backlinks'"
+          :class="activeTab === 'backlinks' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-400 hover:text-white'"
+          class="px-3 py-1.5 rounded-lg text-xs font-medium transition"
+        >
+          Backlinks
+        </button>
+        <button 
+          @click="activeTab = 'competitors'"
+          :class="activeTab === 'competitors' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-400 hover:text-white'"
+          class="px-3 py-1.5 rounded-lg text-xs font-medium transition"
+        >
+          Competitors
         </button>
       </nav>
 
@@ -678,6 +699,330 @@ DASHBOARD_HTML = """<!DOCTYPE html>
       </div>
     </div>
 
+    <!-- ================= TAB 4: RANK TRACKER ================= -->
+    <div x-show="activeTab === 'ranker'" class="space-y-8">
+      <!-- Alerts Banner -->
+      <template x-if="rankAlerts && rankAlerts.length > 0">
+        <div class="bg-amber-950/60 border border-amber-600/50 rounded-xl p-4 text-amber-200">
+          <div class="flex items-center space-x-2 font-bold mb-2">
+            <svg class="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            <span>SERP Volatility & Position Drop Alerts (<span x-text="rankAlerts.length"></span>)</span>
+          </div>
+          <div class="space-y-1 text-xs">
+            <template x-for="a in rankAlerts" :key="a.target_id">
+              <div class="flex items-center space-x-2">
+                <span class="font-bold text-white" x-text="a.keyword"></span>
+                <span>dropped from #<span x-text="a.old_position"></span> to #<span x-text="a.new_position"></span></span>
+                <span class="text-red-400 font-bold" x-text="'(' + a.change + ' spots)'"></span>
+              </div>
+            </template>
+          </div>
+        </div>
+      </template>
+
+      <!-- Add Target & SERP Check Card -->
+      <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 shadow-xl">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h1 class="text-2xl font-bold text-white">Keyword Rank Tracker</h1>
+            <p class="text-slate-400 text-sm">Monitor SERP positions across desktop & mobile per target URL and location.</p>
+          </div>
+          <button 
+            @click="checkRankPositions()" 
+            :disabled="rankLoading || rankTargets.length === 0"
+            class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold px-5 py-2 rounded-lg text-sm transition flex items-center space-x-2 shadow-lg shadow-emerald-500/20 disabled:opacity-50"
+          >
+            <span x-show="!rankLoading">Run SERP Check</span>
+            <span x-show="rankLoading">Checking SERPs...</span>
+          </button>
+        </div>
+
+        <form @submit.prevent="addRankTarget()" class="grid grid-cols-1 md:grid-cols-12 gap-3 pt-2 border-t border-slate-700/50">
+          <div class="md:col-span-4">
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Target Keyword</label>
+            <input type="text" x-model="newRankKeyword" placeholder="e.g. open source seo tool" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500" />
+          </div>
+          <div class="md:col-span-4">
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Page URL</label>
+            <input type="url" x-model="newRankUrl" placeholder="https://example.com/page" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500" />
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Device</label>
+            <select x-model="newRankDevice" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-1 focus:ring-emerald-500">
+              <option value="desktop">Desktop</option>
+              <option value="mobile">Mobile</option>
+            </select>
+          </div>
+          <div class="md:col-span-2 flex items-end">
+            <button type="submit" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2 px-3 rounded-lg text-sm transition">
+              + Add Target
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Tracked Targets Table -->
+      <div class="bg-slate-800/80 border border-slate-700 rounded-xl overflow-hidden shadow-xl">
+        <div class="p-4 border-b border-slate-700/60 flex items-center justify-between">
+          <h2 class="text-base font-bold text-white">Tracked Keywords (<span x-text="rankTargets.length"></span>)</h2>
+          <span class="text-xs text-slate-400">Pre-flight cost: $0.002 per check (DataForSEO BYOK)</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-950/60 border-b border-slate-700 text-xs uppercase text-slate-400 font-semibold tracking-wider">
+              <tr>
+                <th class="py-3 px-4">Keyword</th>
+                <th class="py-3 px-4">Target URL</th>
+                <th class="py-3 px-4 text-center">Device</th>
+                <th class="py-3 px-4 text-center">Latest Position</th>
+                <th class="py-3 px-4 text-center">Change</th>
+                <th class="py-3 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-700/50">
+              <template x-if="rankTargets.length === 0">
+                <tr><td colspan="6" class="text-center py-6 text-slate-500 text-sm">No keywords tracked yet. Add your first keyword above.</td></tr>
+              </template>
+              <template x-for="t in rankTargets" :key="t.id">
+                <tr class="hover:bg-slate-700/30 transition">
+                  <td class="py-3 px-4 font-semibold text-white" x-text="t.keyword"></td>
+                  <td class="py-3 px-4 text-xs font-mono text-slate-400 max-w-xs truncate" x-text="t.target_url"></td>
+                  <td class="py-3 px-4 text-center">
+                    <span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold" :class="t.device === 'mobile' ? 'bg-purple-950 text-purple-300 border border-purple-800' : 'bg-slate-800 text-slate-300'" x-text="t.device"></span>
+                  </td>
+                  <td class="py-3 px-4 text-center font-bold">
+                    <span :class="t.last_position && t.last_position <= 10 ? 'text-emerald-400' : (t.last_position <= 30 ? 'text-amber-400' : 'text-slate-300')" x-text="t.last_position ? '#' + t.last_position : '-'"></span>
+                  </td>
+                  <td class="py-3 px-4 text-center font-semibold text-xs">
+                    <span x-show="t.last_change > 0" class="text-emerald-400" x-text="'+' + t.last_change"></span>
+                    <span x-show="t.last_change < 0" class="text-red-400" x-text="t.last_change"></span>
+                    <span x-show="!t.last_change || t.last_change === 0" class="text-slate-500">-</span>
+                  </td>
+                  <td class="py-3 px-4 text-right space-x-2">
+                    <button @click="loadRankTrend(t.id)" class="text-xs bg-slate-700 hover:bg-slate-600 text-white px-2.5 py-1 rounded transition">Trend</button>
+                    <button @click="deleteRankTarget(t.id)" class="text-xs text-red-400 hover:text-red-300 px-2 py-1 transition">Delete</button>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Trend Modal / Drawer -->
+      <template x-if="selectedTrend">
+        <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 shadow-2xl space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+            <div>
+              <h3 class="text-lg font-bold text-white" x-text="selectedTrend.keyword"></h3>
+              <p class="text-xs text-slate-400" x-text="selectedTrend.target_url"></p>
+            </div>
+            <button @click="selectedTrend = null" class="text-slate-400 hover:text-white text-sm">Close ✕</button>
+          </div>
+          <div class="grid grid-cols-3 gap-3 text-center">
+            <div class="bg-slate-900 p-3 rounded-lg border border-slate-700/60">
+              <span class="text-xs text-slate-400 uppercase">Current</span>
+              <p class="text-2xl font-bold text-white mt-1" x-text="selectedTrend.current_position ? '#' + selectedTrend.current_position : 'N/A'"></p>
+            </div>
+            <div class="bg-slate-900 p-3 rounded-lg border border-slate-700/60">
+              <span class="text-xs text-slate-400 uppercase">Best</span>
+              <p class="text-2xl font-bold text-emerald-400 mt-1" x-text="selectedTrend.best_position ? '#' + selectedTrend.best_position : 'N/A'"></p>
+            </div>
+            <div class="bg-slate-900 p-3 rounded-lg border border-slate-700/60">
+              <span class="text-xs text-slate-400 uppercase">Worst</span>
+              <p class="text-2xl font-bold text-red-400 mt-1" x-text="selectedTrend.worst_position ? '#' + selectedTrend.worst_position : 'N/A'"></p>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left">
+              <thead class="text-slate-400 uppercase border-b border-slate-700">
+                <tr><th class="py-2">Date</th><th class="py-2 text-center">Position</th><th class="py-2 text-center">Change</th><th class="py-2">Source</th></tr>
+              </thead>
+              <tbody class="divide-y divide-slate-700/50">
+                <template x-for="c in selectedTrend.checks" :key="c.id">
+                  <tr>
+                    <td class="py-2 text-slate-400" x-text="new Date(c.checked_at).toLocaleDateString()"></td>
+                    <td class="py-2 text-center font-bold text-white" x-text="c.position ? '#' + c.position : 'Not Found'"></td>
+                    <td class="py-2 text-center font-bold" :class="c.position_change > 0 ? 'text-emerald-400' : (c.position_change < 0 ? 'text-red-400' : 'text-slate-500')" x-text="c.position_change || '-'"></td>
+                    <td class="py-2 text-slate-400" x-text="c.source"></td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <!-- ================= TAB 5: BACKLINK TRACKER ================= -->
+    <div x-show="activeTab === 'backlinks'" class="space-y-8">
+      <!-- Input Card -->
+      <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 shadow-xl">
+        <h1 class="text-2xl font-bold text-white mb-2">Backlink & Referring Domain Tracker</h1>
+        <p class="text-slate-400 text-sm mb-6">Inspect backlink profile snapshots, referring domains, domain authority (DR proxy), anchor texts, and new/lost links.</p>
+
+        <form @submit.prevent="fetchBacklinkSnapshot()" class="flex flex-wrap items-center gap-3">
+          <input 
+            type="text" 
+            x-model="blDomain" 
+            placeholder="e.g. example.com or mydomain.io" 
+            required
+            class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+          />
+          <button 
+            type="submit" 
+            :disabled="blLoading"
+            class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold px-6 py-2.5 rounded-lg transition duration-150 flex items-center space-x-2 disabled:opacity-50 shadow-lg shadow-emerald-500/20"
+          >
+            <span x-show="!blLoading">Snapshot Backlinks</span>
+            <span x-show="blLoading">Analyzing...</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- Snapshot Results Section -->
+      <template x-if="blSnapshot">
+        <div class="space-y-6">
+          <!-- Overview Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+              <span class="text-xs uppercase font-semibold text-slate-400">Total Backlinks</span>
+              <p class="text-3xl font-extrabold text-white mt-1" x-text="blSnapshot.total_backlinks"></p>
+            </div>
+            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+              <span class="text-xs uppercase font-semibold text-slate-400">Referring Domains</span>
+              <p class="text-3xl font-extrabold text-emerald-400 mt-1" x-text="blSnapshot.total_referring_domains"></p>
+            </div>
+            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+              <span class="text-xs uppercase font-semibold text-slate-400">Dofollow / Nofollow</span>
+              <p class="text-xl font-bold text-cyan-400 mt-2">
+                <span x-text="blSnapshot.dofollow_count"></span> <span class="text-xs text-slate-400">/</span> <span class="text-slate-300" x-text="blSnapshot.nofollow_count"></span>
+              </p>
+            </div>
+            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl flex items-center justify-between">
+              <div>
+                <span class="text-xs uppercase font-semibold text-slate-400">Export Report</span>
+                <p class="text-xs text-slate-500 mt-1">Full referring link data</p>
+              </div>
+              <button @click="downloadBacklinkCSV()" class="bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold px-4 py-2 rounded-lg transition">
+                CSV Export
+              </button>
+            </div>
+          </div>
+
+          <!-- Referring Domains & Top Anchors Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+            <!-- Referring Domains -->
+            <div class="md:col-span-8 bg-slate-800/80 border border-slate-700 rounded-xl p-5 shadow-xl">
+              <h3 class="text-base font-bold text-white mb-3">Top Referring Domains</h3>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead class="text-slate-400 uppercase border-b border-slate-700">
+                    <tr><th class="py-2">Domain</th><th class="py-2 text-center">DR</th><th class="py-2 text-center">Links</th><th class="py-2 text-center">Type</th></tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-700/50">
+                    <template x-for="d in blSnapshot.referring_domains" :key="d.domain">
+                      <tr>
+                        <td class="py-2.5 font-semibold text-white" x-text="d.domain"></td>
+                        <td class="py-2.5 text-center">
+                          <span class="px-2 py-0.5 rounded font-bold" :class="d.domain_rank >= 70 ? 'bg-emerald-950 text-emerald-400' : 'bg-slate-900 text-slate-300'" x-text="d.domain_rank"></span>
+                        </td>
+                        <td class="py-2.5 text-center font-mono" x-text="d.total_links"></td>
+                        <td class="py-2.5 text-center text-slate-400" x-text="d.dofollow_count + ' dofollow'"></td>
+                      </tr>
+                    </template>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Anchor Text Profile -->
+            <div class="md:col-span-4 bg-slate-800/80 border border-slate-700 rounded-xl p-5 shadow-xl space-y-3">
+              <h3 class="text-base font-bold text-white mb-2">Anchor Text Profile</h3>
+              <div class="space-y-2">
+                <template x-for="a in blSnapshot.top_anchor_texts" :key="a.text">
+                  <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-700/60 flex items-center justify-between text-xs">
+                    <span class="text-slate-200 truncate max-w-[150px]" x-text="a.text"></span>
+                    <span class="text-emerald-400 font-bold" x-text="a.percentage + '% (' + a.count + ')'"></span>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <!-- ================= TAB 6: COMPETITOR INSIGHTS ================= -->
+    <div x-show="activeTab === 'competitors'" class="space-y-8">
+      <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 shadow-xl">
+        <h1 class="text-2xl font-bold text-white mb-2">Competitor Keyword & Backlink Gap Analysis</h1>
+        <p class="text-slate-400 text-sm mb-6">Compare your domain against competitors to find keywords they rank for that you are missing, and high-DR backlink opportunities.</p>
+
+        <form @submit.prevent="runCompetitorAnalysis()" class="grid grid-cols-1 md:grid-cols-12 gap-3">
+          <div class="md:col-span-5">
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Your Target Domain</label>
+            <input type="text" x-model="compTargetDomain" placeholder="e.g. neemseo.com" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500" />
+          </div>
+          <div class="md:col-span-5">
+            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">Competitors (Comma-separated)</label>
+            <input type="text" x-model="compDomainsInput" placeholder="e.g. semrush.com, ahrefs.com" required class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-emerald-500" />
+          </div>
+          <div class="md:col-span-2 flex items-end">
+            <button type="submit" :disabled="compLoading" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold py-2 px-3 rounded-lg text-sm transition disabled:opacity-50">
+              <span x-show="!compLoading">Compare Gaps</span>
+              <span x-show="compLoading">Analyzing...</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Competitor Results -->
+      <template x-if="compReport">
+        <div class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+              <span class="text-xs uppercase font-semibold text-slate-400">Shared Keywords</span>
+              <p class="text-3xl font-extrabold text-emerald-400 mt-1" x-text="compReport.total_shared_keywords"></p>
+            </div>
+            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+              <span class="text-xs uppercase font-semibold text-slate-400">Missing Keyword Opportunities</span>
+              <p class="text-3xl font-extrabold text-amber-400 mt-1" x-text="compReport.total_missing_keywords"></p>
+            </div>
+            <div class="bg-slate-800/80 border border-slate-700 p-5 rounded-xl">
+              <span class="text-xs uppercase font-semibold text-slate-400">Backlink Gap Leads</span>
+              <p class="text-3xl font-extrabold text-cyan-400 mt-1" x-text="compReport.total_backlink_gaps"></p>
+            </div>
+          </div>
+
+          <!-- Keyword Gaps Table -->
+          <div class="bg-slate-800/80 border border-slate-700 rounded-xl overflow-hidden shadow-xl">
+            <div class="p-4 border-b border-slate-700"><h3 class="text-base font-bold text-white">Keyword Gaps (Competitors Rank, You Don't)</h3></div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-950/60 border-b border-slate-700 text-slate-400 uppercase">
+                  <tr><th class="py-3 px-4">Keyword</th><th class="py-3 px-4 text-right">Volume</th><th class="py-3 px-4 text-center">KD</th><th class="py-3 px-4 text-center">Gap Status</th><th class="py-3 px-4 text-center">Priority</th></tr>
+                </thead>
+                <tbody class="divide-y divide-slate-700/50">
+                  <template x-for="k in compReport.keyword_gaps" :key="k.keyword">
+                    <tr class="hover:bg-slate-700/30">
+                      <td class="py-2.5 px-4 font-semibold text-white" x-text="k.keyword"></td>
+                      <td class="py-2.5 px-4 text-right font-mono" x-text="k.search_volume.toLocaleString()"></td>
+                      <td class="py-2.5 px-4 text-center" x-text="k.difficulty"></td>
+                      <td class="py-2.5 px-4 text-center">
+                        <span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold" :class="k.gap_type === 'missing' ? 'bg-red-950 text-red-400' : 'bg-emerald-950 text-emerald-400'" x-text="k.gap_type"></span>
+                      </td>
+                      <td class="py-2.5 px-4 text-center font-bold text-emerald-400" x-text="k.priority_score"></td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+
   </main>
 
   <script>
@@ -714,6 +1059,26 @@ DASHBOARD_HTML = """<!DOCTYPE html>
         kwFilterCluster: 'all',
         kwSearchQuery: '',
         recentKeywordRuns: [],
+
+        // Rank Tracker state
+        rankTargets: [],
+        rankLoading: false,
+        newRankKeyword: '',
+        newRankUrl: '',
+        newRankDevice: 'desktop',
+        rankAlerts: [],
+        selectedTrend: null,
+
+        // Backlinks state
+        blDomain: '',
+        blLoading: false,
+        blSnapshot: null,
+
+        // Competitor state
+        compTargetDomain: '',
+        compDomainsInput: '',
+        compLoading: false,
+        compReport: null,
 
         async runAudit() {
           this.loading = true;
@@ -846,6 +1211,133 @@ DASHBOARD_HTML = """<!DOCTYPE html>
         downloadAuditCSV() {
           if (!this.report) return;
           window.location.href = `/api/v1/audit/${this.report.id || ''}/csv`;
+        },
+
+        // Rank Tracker Methods
+        async loadRankTargets() {
+          try {
+            const res = await fetch('/api/v1/rank-tracker/targets');
+            const targets = await res.json();
+            const histRes = await fetch('/api/v1/rank-tracker/history?limit=100');
+            const history = await histRes.json();
+            const lastMap = {};
+            history.forEach(h => {
+              if (!lastMap[h.target_id]) {
+                lastMap[h.target_id] = { position: h.position, change: h.position_change };
+              }
+            });
+            this.rankTargets = targets.map(t => ({
+              ...t,
+              last_position: lastMap[t.id]?.position || null,
+              last_change: lastMap[t.id]?.change || null
+            }));
+          } catch(e) {}
+        },
+
+        async addRankTarget() {
+          try {
+            const res = await fetch('/api/v1/rank-tracker/targets', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                keyword: this.newRankKeyword,
+                target_url: this.newRankUrl,
+                device: this.newRankDevice
+              })
+            });
+            if (res.ok) {
+              this.newRankKeyword = '';
+              this.newRankUrl = '';
+              this.loadRankTargets();
+            }
+          } catch(e) {
+            alert('Failed to add target: ' + e.message);
+          }
+        },
+
+        async deleteRankTarget(id) {
+          if (!confirm('Stop tracking this keyword?')) return;
+          try {
+            await fetch(`/api/v1/rank-tracker/targets/${id}`, { method: 'DELETE' });
+            this.loadRankTargets();
+          } catch(e) {}
+        },
+
+        async checkRankPositions() {
+          this.rankLoading = true;
+          try {
+            const res = await fetch('/api/v1/rank-tracker/check', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ confirm_cost: true })
+            });
+            await res.json();
+            await this.loadRankTargets();
+            await this.loadRankAlerts();
+          } catch(e) {
+            alert('SERP check failed: ' + e.message);
+          } finally {
+            this.rankLoading = false;
+          }
+        },
+
+        async loadRankTrend(targetId) {
+          try {
+            const res = await fetch(`/api/v1/rank-tracker/trends/${targetId}`);
+            this.selectedTrend = await res.json();
+          } catch(e) {}
+        },
+
+        async loadRankAlerts() {
+          try {
+            const res = await fetch('/api/v1/rank-tracker/alerts');
+            this.rankAlerts = await res.json();
+          } catch(e) {}
+        },
+
+        // Backlinks Methods
+        async fetchBacklinkSnapshot() {
+          this.blLoading = true;
+          this.blSnapshot = null;
+          try {
+            const res = await fetch('/api/v1/backlinks/snapshot', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ target_domain: this.blDomain, confirm_cost: true })
+            });
+            this.blSnapshot = await res.json();
+          } catch(e) {
+            alert('Backlink analysis failed: ' + e.message);
+          } finally {
+            this.blLoading = false;
+          }
+        },
+
+        downloadBacklinkCSV() {
+          if (!this.blSnapshot || !this.blSnapshot.id) return;
+          window.location.href = `/api/v1/backlinks/snapshots/${this.blSnapshot.id}/export.csv`;
+        },
+
+        // Competitor Methods
+        async runCompetitorAnalysis() {
+          this.compLoading = true;
+          this.compReport = null;
+          const comps = this.compDomainsInput.split(',').map(s => s.trim()).filter(Boolean);
+          try {
+            const res = await fetch('/api/v1/competitors/gap-analysis', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                target_domain: this.compTargetDomain,
+                competitors: comps
+              })
+            });
+            this.compReport = await res.json();
+          } catch(e) {
+            alert('Competitor analysis failed: ' + e.message);
+          } finally {
+            this.compLoading = false;
+          }
         },
 
         getScoreColor(score) {
