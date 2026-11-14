@@ -77,7 +77,18 @@ class CrawlerJobManager:
                 if crawl_id in self._active_crawlers:
                     del self._active_crawlers[crawl_id]
 
-        asyncio.create_task(run_task())
+        try:
+            loop = asyncio.get_running_loop()
+            loop.create_task(run_task())
+        except RuntimeError:
+            import threading
+
+            def runner():
+                asyncio.run(run_task())
+
+            t = threading.Thread(target=runner, daemon=True)
+            t.start()
+
         return crawl_id
 
     def cancel_crawl(self, crawl_id: str) -> bool:

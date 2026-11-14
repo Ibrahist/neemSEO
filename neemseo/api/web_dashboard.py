@@ -1462,12 +1462,17 @@ DASHBOARD_HTML = """<!DOCTYPE html>
                 check_sitemap: this.crawlSitemap
               })
             });
+            if (!res.ok) {
+              const errData = await res.json().catch(() => null);
+              throw new Error(errData?.detail || `Server returned ${res.status}`);
+            }
             const data = await res.json();
             const crawlId = data.crawl_id;
             
             // Poll for progress until finished
             const interval = setInterval(async () => {
               const statusRes = await fetch(`/api/v1/crawls/${crawlId}`);
+              if (!statusRes.ok) return;
               const statusData = await statusRes.json();
               this.crawlProgress = statusData;
 
