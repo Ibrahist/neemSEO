@@ -23,86 +23,113 @@ DASHBOARD_HTML = """<!DOCTYPE html>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans antialiased" x-data="seoApp()" x-init="loadRecentCrawls(); loadRecentKeywordRuns(); loadRankTargets(); loadRankAlerts(); loadAIHistory(); loadTeam()" x-cloak>
 
-  <!-- Top Navigation -->
-  <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+  <!-- Top Navigation: Logo and Brand Name Only -->
+  <header class="border-b border-slate-800 bg-slate-950/90 backdrop-blur sticky top-0 z-50">
+    <div class="px-6 h-16 flex items-center">
       <div class="flex items-center space-x-3">
         <div class="h-9 w-9 bg-emerald-500 rounded-lg flex items-center justify-center font-bold text-slate-950 text-xl shadow-lg shadow-emerald-500/20">n</div>
         <span class="text-xl font-bold tracking-tight text-white">neem<span class="text-emerald-400">SEO</span></span>
-        <span class="text-xs bg-slate-800 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded font-mono">v0.1.0 (Full Suite & MCP)</span>
-      </div>
-
-      <!-- Main Navigation Tabs -->
-      <nav class="flex space-x-1.5 bg-slate-900 p-1 rounded-xl border border-slate-800">
-        <button 
-          @click="activeTab = 'audit'"
-          :class="activeTab === 'audit' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-400 hover:text-white'"
-          class="px-3 py-1.5 rounded-lg text-xs font-medium transition"
-        >
-          Page Auditor
-        </button>
-        <button 
-          @click="activeTab = 'crawler'"
-          :class="activeTab === 'crawler' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-400 hover:text-white'"
-          class="px-3 py-1.5 rounded-lg text-xs font-medium transition"
-        >
-          Site Crawler
-        </button>
-        <button 
-          @click="activeTab = 'keywords'"
-          :class="activeTab === 'keywords' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-400 hover:text-white'"
-          class="px-3 py-1.5 rounded-lg text-xs font-medium transition"
-        >
-          Keywords
-        </button>
-        <button 
-          @click="activeTab = 'ranker'"
-          :class="activeTab === 'ranker' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-400 hover:text-white'"
-          class="px-3 py-1.5 rounded-lg text-xs font-medium transition"
-        >
-          Rank Tracker
-        </button>
-        <button 
-          @click="activeTab = 'backlinks'"
-          :class="activeTab === 'backlinks' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-400 hover:text-white'"
-          class="px-3 py-1.5 rounded-lg text-xs font-medium transition"
-        >
-          Backlinks
-        </button>
-        <button 
-          @click="activeTab = 'competitors'"
-          :class="activeTab === 'competitors' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-400 hover:text-white'"
-          class="px-3 py-1.5 rounded-lg text-xs font-medium transition"
-        >
-          Competitors
-        </button>
-        <button 
-          @click="activeTab = 'ai-visibility'"
-          :class="activeTab === 'ai-visibility' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-400 hover:text-white'"
-          class="px-3 py-1.5 rounded-lg text-xs font-medium transition"
-        >
-          AI Visibility (GEO)
-        </button>
-        <button 
-          @click="activeTab = 'team'"
-          :class="activeTab === 'team' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-400 hover:text-white'"
-          class="px-3 py-1.5 rounded-lg text-xs font-medium transition"
-        >
-          Team & Keys
-        </button>
-      </nav>
-
-      <div class="flex items-center space-x-4 text-sm">
-        <a href="/docs" target="_blank" class="text-slate-400 hover:text-white transition">API Docs</a>
-        <a href="/bot" target="_blank" class="text-slate-400 hover:text-white transition">Bot Policy</a>
-        <span class="text-slate-600">|</span>
-        <span class="text-xs text-slate-400">BYOK: Pay-as-you-go</span>
       </div>
     </div>
   </header>
 
-  <!-- Main Content Area -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Dashboard Container with Left Sidebar and Main Content -->
+  <div class="flex min-h-[calc(100vh-4rem)]">
+    <!-- Left Sidebar: All navigation items and secondary links -->
+    <aside class="w-64 shrink-0 bg-slate-950 border-r border-slate-800 flex flex-col justify-between p-4 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto">
+      <div class="space-y-6">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3">SEO Tools</span>
+          <nav class="mt-2 space-y-1">
+            <button 
+              @click="activeTab = 'audit'"
+              :class="activeTab === 'audit' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-300 hover:text-white hover:bg-slate-900'"
+              class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition text-left"
+            >
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              <span>Page Auditor</span>
+            </button>
+            <button 
+              @click="activeTab = 'crawler'"
+              :class="activeTab === 'crawler' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-300 hover:text-white hover:bg-slate-900'"
+              class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition text-left"
+            >
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg>
+              <span>Site Crawler</span>
+            </button>
+            <button 
+              @click="activeTab = 'keywords'"
+              :class="activeTab === 'keywords' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-300 hover:text-white hover:bg-slate-900'"
+              class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition text-left"
+            >
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+              <span>Keywords</span>
+            </button>
+            <button 
+              @click="activeTab = 'ranker'"
+              :class="activeTab === 'ranker' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-300 hover:text-white hover:bg-slate-900'"
+              class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition text-left"
+            >
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+              <span>Rank Tracker</span>
+            </button>
+            <button 
+              @click="activeTab = 'backlinks'"
+              :class="activeTab === 'backlinks' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-300 hover:text-white hover:bg-slate-900'"
+              class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition text-left"
+            >
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+              <span>Backlinks</span>
+            </button>
+            <button 
+              @click="activeTab = 'competitors'"
+              :class="activeTab === 'competitors' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-300 hover:text-white hover:bg-slate-900'"
+              class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition text-left"
+            >
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+              <span>Competitors</span>
+            </button>
+            <button 
+              @click="activeTab = 'ai-visibility'"
+              :class="activeTab === 'ai-visibility' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-300 hover:text-white hover:bg-slate-900'"
+              class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition text-left"
+            >
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              <span>AI Visibility (GEO)</span>
+            </button>
+            <button 
+              @click="activeTab = 'team'"
+              :class="activeTab === 'team' ? 'bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20' : 'text-slate-300 hover:text-white hover:bg-slate-900'"
+              class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition text-left"
+            >
+              <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+              <span>Team & Keys</span>
+            </button>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Bottom sidebar items (formerly in navbar) -->
+      <div class="pt-4 border-t border-slate-800/80 space-y-3">
+        <div class="space-y-1">
+          <a href="/docs" target="_blank" class="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-900 transition">
+            <span>FastAPI Docs</span>
+            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          </a>
+          <a href="/bot" target="_blank" class="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-900 transition">
+            <span>Bot Policy</span>
+            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          </a>
+        </div>
+        <div class="p-2.5 bg-slate-900/90 border border-slate-800 rounded-lg flex items-center space-x-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-[11px] text-slate-300 font-medium">BYOK: Pay-as-you-go</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 p-6 md:p-8 overflow-x-hidden max-w-7xl">
     
     <!-- ================= TAB 1: ON-PAGE AUDITOR ================= -->
     <div x-show="activeTab === 'audit'" class="space-y-8">
@@ -1284,6 +1311,7 @@ DASHBOARD_HTML = """<!DOCTYPE html>
     </div>
 
   </main>
+  </div>
 
   <script>
     function seoApp() {

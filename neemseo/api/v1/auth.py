@@ -17,7 +17,7 @@ from neemseo.auth.schemas import (
     TeamMemberResponse,
     SystemStatusResponse,
 )
-from neemseo.api.deps import get_current_user, get_current_admin
+from neemseo.api.deps import get_current_user, get_current_admin, get_optional_user
 from neemseo.db.models import User
 
 router = APIRouter(prefix="/auth", tags=["Authentication & Team"])
@@ -96,6 +96,6 @@ def accept_invite(req: AcceptInviteRequest):
 
 
 @router.get("/team", response_model=List[TeamMemberResponse])
-def list_team_members(_user: User = Depends(get_current_user)):
+def list_team_members(_user: Optional[User] = Depends(get_optional_user)):
     """List all registered team members."""
     return auth_service.list_team()

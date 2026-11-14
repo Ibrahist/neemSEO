@@ -266,9 +266,9 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
-      {/* Top Navbar */}
-      <header className="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      {/* Top Navbar: ONLY Logo and Brand Name */}
+      <header className="border-b border-slate-800 bg-slate-950/90 backdrop-blur sticky top-0 z-50">
+        <div className="px-6 h-16 flex items-center">
           <div className="flex items-center space-x-3">
             <div className="h-9 w-9 bg-emerald-500 rounded-lg flex items-center justify-center font-bold text-slate-950 text-xl shadow-lg shadow-emerald-500/20">
               n
@@ -276,56 +276,78 @@ export default function Dashboard() {
             <span className="text-xl font-bold tracking-tight text-white">
               neem<span className="text-emerald-400">SEO</span>
             </span>
-            <span className="text-xs bg-slate-800 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-mono">
-              v0.1.0 (Full Suite)
-            </span>
-          </div>
-
-          {/* Navigation Tabs */}
-          <nav className="hidden lg:flex items-center space-x-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
-            {[
-              { id: "audit", label: "Page Auditor", icon: FileSearch },
-              { id: "crawler", label: "Site Crawler", icon: Globe },
-              { id: "keywords", label: "Keywords", icon: Search },
-              { id: "ranker", label: "Rank Tracker", icon: TrendingUp },
-              { id: "backlinks", label: "Backlinks & Gaps", icon: Link2 },
-              { id: "ai", label: "AI Visibility (GEO)", icon: Bot },
-              { id: "gsc", label: "Search Console", icon: BarChart3 },
-              { id: "team", label: "Team & MCP", icon: Users },
-            ].map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition ${
-                    isActive
-                      ? "bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20"
-                      : "text-slate-400 hover:text-white"
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
-          </nav>
-
-          <div className="flex items-center space-x-3 text-xs text-slate-400">
-            <a href="http://localhost:8000/docs" target="_blank" className="hover:text-white transition">
-              FastAPI Docs
-            </a>
-            <span className="text-slate-700">|</span>
-            <a href="http://localhost:8000/bot" target="_blank" className="hover:text-white transition">
-              Bot Policy
-            </a>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-6">
+      {/* Main Container with Left Sidebar */}
+      <div className="flex min-h-[calc(100vh-4rem)]">
+        {/* Left Sidebar */}
+        <aside className="w-64 shrink-0 bg-slate-950 border-r border-slate-800 flex flex-col justify-between p-4 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto">
+          <div className="space-y-6">
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3">SEO Tools</span>
+              <nav className="mt-2 space-y-1">
+                {[
+                  { id: "audit", label: "Page Auditor", icon: FileSearch },
+                  { id: "crawler", label: "Site Crawler", icon: Globe },
+                  { id: "keywords", label: "Keywords", icon: Search },
+                  { id: "ranker", label: "Rank Tracker", icon: TrendingUp },
+                  { id: "backlinks", label: "Backlinks & Gaps", icon: Link2 },
+                  { id: "ai", label: "AI Visibility (GEO)", icon: Bot },
+                  { id: "gsc", label: "Search Console", icon: BarChart3 },
+                  { id: "team", label: "Team & MCP", icon: Users },
+                ].map((tab) => {
+                  const Icon = tab.icon;
+                  const isActive = activeTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-xs font-medium transition text-left ${
+                        isActive
+                          ? "bg-emerald-500 text-slate-950 font-bold shadow-md shadow-emerald-500/20"
+                          : "text-slate-300 hover:text-white hover:bg-slate-900"
+                      }`}
+                    >
+                      <Icon className="w-4 h-4 shrink-0" />
+                      <span>{tab.label}</span>
+                    </button>
+                  );
+                })}
+              </nav>
+            </div>
+          </div>
+
+          {/* Bottom Sidebar Elements */}
+          <div className="pt-4 border-t border-slate-800/80 space-y-3">
+            <div className="space-y-1">
+              <a
+                href="http://localhost:8000/docs"
+                target="_blank"
+                className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-900 transition"
+              >
+                <span>FastAPI Docs</span>
+                <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
+              </a>
+              <a
+                href="http://localhost:8000/bot"
+                target="_blank"
+                className="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-900 transition"
+              >
+                <span>Bot Policy</span>
+                <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
+              </a>
+            </div>
+            <div className="p-2.5 bg-slate-900/90 border border-slate-800 rounded-lg flex items-center space-x-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="text-[11px] text-slate-300 font-medium">BYOK: Pay-as-you-go</span>
+            </div>
+          </div>
+        </aside>
+
+        {/* Main Content Area */}
+        <main className="flex-1 p-6 md:p-8 overflow-x-hidden max-w-7xl space-y-6">
 
         {/* ================= TAB 1: ON-PAGE AUDITOR ================= */}
         {activeTab === "audit" && (
@@ -1007,6 +1029,7 @@ export default function Dashboard() {
         )}
 
       </main>
+      </div>
     </div>
   );
 }
