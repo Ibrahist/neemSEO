@@ -108,10 +108,14 @@ class PageFetcher:
         url: str,
         max_retries: int = 2,
         backoff_factor: float = 0.5,
+        render_js: bool = False,
     ) -> FetchResult:
         """
         Fetch a page, record timing, redirect chain, headers, and handle retries.
         """
+        if render_js:
+            return await self.fetch_with_js(url)
+
         normalized_url = self._normalize_url(url)
         result = FetchResult(
             url=normalized_url,
@@ -185,4 +189,40 @@ class PageFetcher:
                 return result
 
         return result
+
+    async def fetch_with_js(self, url: str) -> FetchResult:
+        """
+        Render JavaScript-heavy pages using Playwright headless browser.
+        Opt-in setting per crawl (slower and heavier than httpx).
+        Falls back to standard HTTP if Playwright is not installed.
+        """
+        normalized_url = self._normalize_url(url)
+        start_time = time.perf_counter()
+        try:
+            from playwright.async_api import async_playwright
+            async with async_playwright() as p:
+                browser = await p.chromium.launch(headless=True)
+                page = await browser.new_page(user_agent=self.user_agent)
+                response = await page.goto(
+                    normalized_url,
+                    timeout=int(self.timeout * 1000),
+                    wait_until="networkidle",
+                )
+                content = await page.content()
+                elapsed = (time.perf_counter() - start_time) * 1000
+                status_code = response.status if response else 200
+                await browser.close()
+                return FetchResult(
+                    url=page.url,
+                    initial_url=normalized_url,
+                    status_code=status_code,
+                    html=content,
+                    response_time_ms=round(elapsed, 2),
+                )
+        except ImportError:
+            return await self.fetch(url, render_js=False)
+        except Exception as e:
+            res = await self.fetch(url, render_js=False)
+            res.error = f"JS render fallback: {str(e)[:100]}"
+            return res
 

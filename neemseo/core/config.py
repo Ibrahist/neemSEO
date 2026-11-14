@@ -25,6 +25,17 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = "sqlite:///./neemseo.db"
 
+    # Redis Cache & Queue
+    REDIS_URL: str = "redis://localhost:6379/0"
+    CACHE_DEFAULT_TTL: int = 86400  # 24 hours
+
+    # Celery Background Workers
+    CELERY_BROKER_URL: Optional[str] = None
+    CELERY_RESULT_BACKEND: Optional[str] = None
+
+    # Opt-in Playwright JS Rendering
+    ENABLE_PLAYWRIGHT: bool = False
+
     # Fetcher settings
     REQUEST_TIMEOUT: float = 12.0
     MAX_REDIRECTS: int = 5

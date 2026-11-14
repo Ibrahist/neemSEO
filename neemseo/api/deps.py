@@ -92,3 +92,15 @@ def get_current_admin(
             detail="Admin access required for this operation.",
         )
     return current_user
+
+
+def get_optional_user(
+    auth_header: Optional[HTTPAuthorizationCredentials] = Security(security_bearer),
+    api_key: Optional[str] = Security(api_key_header),
+    db: Session = Depends(get_db),
+) -> Optional[User]:
+    """Retrieve user if token provided, otherwise returns None without 401."""
+    try:
+        return get_current_user(auth_header=auth_header, api_key=api_key, db=db)
+    except HTTPException:
+        return None

@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # 1. FastAPI Backend API
   api:
     build:
       context: .
@@ -8,10 +9,13 @@ services:
     container_name: neemseo-api
     ports:
       - "8000:8000"
+    command: uvicorn backend.main:app --host 0.0.0.0 --port 8000
     environment:
       - NEEMSEO_ENV=production
       - NEEMSEO_DATABASE_URL=postgresql://neemseo:neemseo_secret@postgres:5432/neemseo
       - NEEMSEO_REDIS_URL=redis://redis:6379/0
+      - NEEMSEO_CELERY_BROKER_URL=redis://redis:6379/0
+      - NEEMSEO_CELERY_RESULT_BACKEND=redis://redis:6379/1
       - NEEMSEO_SECRET_KEY=${NEEMSEO_SECRET_KEY:-default_secret_key_change_me}
       - NEEMSEO_BASE_URL=${NEEMSEO_BASE_URL:-http://localhost:8000}
       - NEEMSEO_DATAFORSEO_LOGIN=${NEEMSEO_DATAFORSEO_LOGIN}
@@ -22,6 +26,61 @@ services:
       - redis
     restart: unless-stopped
 
+  # 2. Celery Distributed Background Worker (Long Crawls & Audits)
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: neemseo-worker
+    command: celery -A neemseo.tasks.celery_app worker --loglevel=info -c 4
+    environment:
+      - NEEMSEO_ENV=production
+      - NEEMSEO_DATABASE_URL=postgresql://neemseo:neemseo_secret@postgres:5432/neemseo
+      - NEEMSEO_REDIS_URL=redis://redis:6379/0
+      - NEEMSEO_CELERY_BROKER_URL=redis://redis:6379/0
+      - NEEMSEO_CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - NEEMSEO_SECRET_KEY=${NEEMSEO_SECRET_KEY:-default_secret_key_change_me}
+      - NEEMSEO_DATAFORSEO_LOGIN=${NEEMSEO_DATAFORSEO_LOGIN}
+      - NEEMSEO_DATAFORSEO_PASSWORD=${NEEMSEO_DATAFORSEO_PASSWORD}
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+
+  # 3. Celery Beat Periodic Scheduler (Daily SERP Checks & Drop Alerts)
+  beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: neemseo-beat
+    command: celery -A neemseo.tasks.celery_app beat --loglevel=info
+    environment:
+      - NEEMSEO_ENV=production
+      - NEEMSEO_DATABASE_URL=postgresql://neemseo:neemseo_secret@postgres:5432/neemseo
+      - NEEMSEO_REDIS_URL=redis://redis:6379/0
+      - NEEMSEO_CELERY_BROKER_URL=redis://redis:6379/0
+      - NEEMSEO_CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - NEEMSEO_SECRET_KEY=${NEEMSEO_SECRET_KEY:-default_secret_key_change_me}
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+
+  # 4. Next.js React Dashboard
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: neemseo-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://api:8000/api/v1
+    depends_on:
+      - api
+    restart: unless-stopped
+
+  # 5. PostgreSQL Database
   postgres:
     image: postgres:16-alpine
     container_name: neemseo-postgres
@@ -33,6 +92,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
 
+  # 6. Redis Cache & Message Broker
   redis:
     image: redis:7-alpine
     container_name: neemseo-redis
@@ -43,4 +103,3 @@ services:
 volumes:
   postgres_data:
   redis_data:
-

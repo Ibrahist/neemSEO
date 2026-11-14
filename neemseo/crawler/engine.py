@@ -137,7 +137,10 @@ class SiteCrawler:
                 if self.config.delay_seconds > 0:
                     await asyncio.sleep(self.config.delay_seconds)
 
-                fetch_res: FetchResult = await self.fetcher.fetch(current_url)
+                fetch_res: FetchResult = await self.fetcher.fetch(
+                    current_url,
+                    render_js=self.config.js_rendering,
+                )
 
                 page_record = {
                     "url": fetch_res.url,

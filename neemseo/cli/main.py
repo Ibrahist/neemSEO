@@ -39,6 +39,7 @@ from neemseo.aivisibility.schemas import AIVisibilityRequest
 from neemseo.aivisibility.service import AIVisibilityService
 from neemseo.auth.service import AuthService
 from neemseo.auth.schemas import SetupAdminRequest, CreateInviteRequest
+from neemseo.adapters.search_console import GoogleSearchConsoleAdapter
 
 app = typer.Typer(
     name="neemseo",
@@ -1066,6 +1067,47 @@ def invite_user(
     except ValueError as e:
         console.print(f"[red]Error: {e}[/red]")
         raise typer.Exit(code=1)
+
+
+@app.command(name="gsc")
+def search_console(
+    site_url: str = typer.Argument(..., help="Target website URL or domain"),
+    days: int = typer.Option(30, "--days", "-d", help="Days of history to analyze"),
+    limit: int = typer.Option(20, "--limit", "-l", help="Number of queries to display"),
+):
+    """
+    Pull organic search queries, clicks, impressions, CTR, and ranking positions from Google Search Console.
+    Free API with zero third-party provider costs.
+    """
+    adapter = GoogleSearchConsoleAdapter()
+    report = asyncio.run(adapter.get_performance(site_url=site_url, days=days, limit=limit))
+
+    source_tag = "[green]Live GSC API[/green]" if "live" in report.source else "[cyan]Simulated GSC Engine[/cyan]"
+    summary = (
+        f"[bold]Site:[/bold] {report.site_url} | [bold]Period:[/bold] {report.start_date} to {report.end_date}\n"
+        f"[bold]Total Clicks:[/bold] {report.total_clicks:,} | [bold]Total Impressions:[/bold] {report.total_impressions:,}\n"
+        f"[bold]Average CTR:[/bold] {report.average_ctr}% | [bold]Average Position:[/bold] #{report.average_position} | [bold]Source:[/bold] {source_tag}"
+    )
+    console.print(Panel(summary, title="Google Search Console (GSC) Performance", border_style="green"))
+
+    table = Table(title="Top Organic Search Queries", header_style="bold green")
+    table.add_column("Query", style="bold white")
+    table.add_column("Clicks", justify="right")
+    table.add_column("Impressions", justify="right")
+    table.add_column("CTR", justify="center")
+    table.add_column("Avg Position", justify="center", style="bold")
+
+    for q in report.queries[:limit]:
+        pos_color = "green" if q.position <= 3.0 else ("yellow" if q.position <= 10.0 else "dim")
+        table.add_row(
+            q.query,
+            f"{q.clicks:,}",
+            f"{q.impressions:,}",
+            f"{q.ctr}%",
+            f"[{pos_color}]#{q.position}[/{pos_color}]",
+        )
+
+    console.print(table)
 
 
 if __name__ == "__main__":

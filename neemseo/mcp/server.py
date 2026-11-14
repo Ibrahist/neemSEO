@@ -546,6 +546,41 @@ async def check_ai_visibility(
     }
 
 
+@mcp.tool()
+async def get_search_console_performance(
+    site_url: str,
+    days: int = 30,
+    limit: int = 25,
+) -> Dict[str, Any]:
+    """
+    Retrieve real search queries, impressions, clicks, CTR, and average ranking positions from Google Search Console.
+    Free API data from Google with zero third-party provider costs.
+    """
+    from neemseo.adapters.search_console import GoogleSearchConsoleAdapter
+    adapter = GoogleSearchConsoleAdapter()
+    report = await adapter.get_performance(site_url=site_url, days=days, limit=limit)
+    return {
+        "site_url": report.site_url,
+        "start_date": report.start_date,
+        "end_date": report.end_date,
+        "total_clicks": report.total_clicks,
+        "total_impressions": report.total_impressions,
+        "average_ctr": report.average_ctr,
+        "average_position": report.average_position,
+        "source": report.source,
+        "queries": [
+            {
+                "query": q.query,
+                "clicks": q.clicks,
+                "impressions": q.impressions,
+                "ctr": q.ctr,
+                "position": q.position,
+            }
+            for q in report.queries[:limit]
+        ],
+    }
+
+
 def main():
     mcp.run()
 
