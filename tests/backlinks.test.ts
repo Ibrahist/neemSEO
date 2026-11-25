@@ -3,7 +3,7 @@ import * as backlinkService from "@/features/backlinks/service";
 import * as backlinkRepo from "@/features/backlinks/repository";
 
 describe("Backlinks Service", () => {
-  it("should retrieve and snapshot backlinks overview", async () => {
+  it("should retrieve and snapshot backlinks overview with anchors and trend", async () => {
     const mockSnapshot = {
       id: "blsnap_1",
       projectId: "proj_1",
@@ -42,6 +42,9 @@ describe("Backlinks Service", () => {
 
     expect(result.snapshot.domain).toBe("neemseo.com");
     expect(result.referringDomains[0].referringDomain).toBe("github.com");
+    expect(result.anchors.length).toBeGreaterThan(0);
+    expect(result.anchors[0].anchor).toBe("neemseo.com");
+    expect(result.newLostTrend.length).toBe(14);
 
     spyGetLatest.mockRestore();
     spyGetRef.mockRestore();

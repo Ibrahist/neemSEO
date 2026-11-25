@@ -19,6 +19,10 @@ export interface AuditSummary {
 export class AuditsService {
   constructor(private repo = new AuditsRepository()) {}
 
+  async listAudits(projectId: string) {
+    return this.repo.listAudits(projectId);
+  }
+
   async runAudit(projectId: string, startUrl: string, maxPages = 15): Promise<AuditSummary> {
     const auditId = `audit_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     const parsedStart = new URL(startUrl);

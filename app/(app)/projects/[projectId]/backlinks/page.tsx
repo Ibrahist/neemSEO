@@ -3,7 +3,10 @@ import { requireAuth } from "@/lib/auth/session";
 import { getProject } from "@/features/projects/service";
 import { getBacklinksOverview } from "@/features/backlinks/service";
 import { ReferringDomainsTable } from "@/components/backlinks/referring-domains-table";
+import { AnchorTextTable } from "@/components/backlinks/anchor-text-table";
+import { NewLostLinksChart } from "@/components/backlinks/new-lost-links-chart";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { formatNumber } from "@/lib/utils";
 import { Link2, Globe, Shield, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,7 +20,7 @@ export default async function BacklinksPage({ params }: BacklinksPageProps) {
   const user = await requireAuth();
   const project = await getProject(projectId, user.organizationId);
 
-  const { snapshot, referringDomains } = await getBacklinksOverview({
+  const { snapshot, referringDomains, anchors, newLostTrend } = await getBacklinksOverview({
     projectId,
     userId: user.id,
     domain: project.domain,
@@ -32,7 +35,8 @@ export default async function BacklinksPage({ params }: BacklinksPageProps) {
             Backlink Profile
           </h1>
           <p className="text-sm text-neutral-500">
-            Referring domains, total backlinks, and authority metrics for {project.domain}
+            Referring domains, total backlinks, anchor text, and authority metrics for{" "}
+            {project.domain}
           </p>
         </div>
 
@@ -87,14 +91,32 @@ export default async function BacklinksPage({ params }: BacklinksPageProps) {
         </Card>
       </div>
 
-      {/* Referring Domains Table */}
-      <Suspense
-        fallback={
-          <div className="h-64 bg-neutral-100 dark:bg-neutral-900 rounded-xl animate-pulse" />
-        }
-      >
-        <ReferringDomainsTable targetDomain={project.domain} domains={referringDomains} />
-      </Suspense>
+      {/* Navigation Tabs */}
+      <Tabs defaultValue="domains" className="w-full">
+        <TabsList>
+          <TabsTrigger value="domains">Referring Domains ({referringDomains.length})</TabsTrigger>
+          <TabsTrigger value="anchors">Anchor Text ({anchors.length})</TabsTrigger>
+          <TabsTrigger value="velocity">Link Velocity</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="domains" className="mt-4">
+          <Suspense
+            fallback={
+              <div className="h-64 bg-neutral-100 dark:bg-neutral-900 rounded-xl animate-pulse" />
+            }
+          >
+            <ReferringDomainsTable targetDomain={project.domain} domains={referringDomains} />
+          </Suspense>
+        </TabsContent>
+
+        <TabsContent value="anchors" className="mt-4">
+          <AnchorTextTable targetDomain={project.domain} anchors={anchors} />
+        </TabsContent>
+
+        <TabsContent value="velocity" className="mt-4">
+          <NewLostLinksChart data={newLostTrend} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

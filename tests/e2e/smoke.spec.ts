@@ -16,4 +16,24 @@ test.describe("neemSEO E2E Smoke Tests", () => {
     await expect(page).toHaveTitle(/neemSEO/i);
     await expect(page.locator("h1")).toContainText(/Stop paying \$130\+\/mo/i);
   });
+
+  test("mcp endpoint is accessible and responds to json-rpc", async ({ request }) => {
+    const response = await request.post("/api/mcp", {
+      data: {
+        jsonrpc: "2.0",
+        id: 1,
+        method: "tools/list",
+        params: {},
+      },
+    });
+
+    // The endpoint should respond with either 200 (in local_noauth) or 401
+    expect([200, 401]).toContain(response.status());
+  });
+
+  test("projects dashboard is accessible in local_noauth mode", async ({ page }) => {
+    await page.goto("/projects");
+    // Verify projects dashboard heading is rendered
+    await expect(page.locator("h1, h2, h3").first()).toBeVisible();
+  });
 });

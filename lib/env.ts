@@ -2,6 +2,8 @@ import { z } from "zod";
 
 const envSchema = z.object({
   DATAFORSEO_API_KEY: z.string().optional(),
+  DATAFORSEO_LOGIN: z.string().optional(),
+  DATAFORSEO_PASSWORD: z.string().optional(),
   AUTH_MODE: z.enum(["local_noauth", "cloudflare_access", "hosted"]).default("local_noauth"),
   TEAM_DOMAIN: z.string().optional(),
   POLICY_AUD: z.string().optional(),
@@ -26,8 +28,18 @@ export function getEnv(): Env {
     return parsedEnv;
   }
 
+  const dataForSeoApiKey =
+    process.env.DATAFORSEO_API_KEY ||
+    (process.env.DATAFORSEO_LOGIN && process.env.DATAFORSEO_PASSWORD
+      ? Buffer.from(`${process.env.DATAFORSEO_LOGIN}:${process.env.DATAFORSEO_PASSWORD}`).toString(
+          "base64"
+        )
+      : undefined);
+
   const rawEnv = {
-    DATAFORSEO_API_KEY: process.env.DATAFORSEO_API_KEY,
+    DATAFORSEO_API_KEY: dataForSeoApiKey,
+    DATAFORSEO_LOGIN: process.env.DATAFORSEO_LOGIN,
+    DATAFORSEO_PASSWORD: process.env.DATAFORSEO_PASSWORD,
     AUTH_MODE: process.env.AUTH_MODE || "local_noauth",
     TEAM_DOMAIN: process.env.TEAM_DOMAIN,
     POLICY_AUD: process.env.POLICY_AUD,

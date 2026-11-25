@@ -31,12 +31,12 @@ export async function insertBacklinkSnapshot(data: {
   referringDomainsCount: number;
   rank: number;
   snapshotDate: string;
-}): Promise<void> {
+}): Promise<BacklinkSnapshotRecord> {
   const { db, schema } = await getDb();
   const id = `blsnap_${crypto.randomUUID()}`;
   const now = new Date();
 
-  await (db as any).insert((schema as any).backlinkSnapshots).values({
+  const record: BacklinkSnapshotRecord = {
     id,
     projectId: data.projectId,
     domain: data.domain.toLowerCase().trim(),
@@ -45,7 +45,10 @@ export async function insertBacklinkSnapshot(data: {
     rank: data.rank,
     snapshotDate: data.snapshotDate,
     createdAt: now,
-  });
+  };
+
+  await (db as any).insert((schema as any).backlinkSnapshots).values(record);
+  return record;
 }
 
 export async function getLatestBacklinkSnapshot(

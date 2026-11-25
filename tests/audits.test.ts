@@ -51,4 +51,24 @@ describe("AuditsService", () => {
     expect(issues.length).toBe(1);
     expect(issues[0].severity).toBe("critical");
   });
+
+  it("retrieves latest audit summary for a project", async () => {
+    vi.spyOn(mockRepo, "getLatestAudit").mockResolvedValue({
+      id: "audit_latest",
+      projectId: "proj_1",
+      startUrl: "https://example.com",
+      status: "completed",
+      pagesCrawled: 4,
+      healthScore: 92,
+      startedAt: new Date(),
+      completedAt: new Date(),
+    });
+    vi.spyOn(mockRepo, "listCrawledPages").mockResolvedValue([]);
+    vi.spyOn(mockRepo, "listAuditIssues").mockResolvedValue([]);
+
+    const summary = await service.getLatestAuditSummary("proj_1");
+    expect(summary).not.toBeNull();
+    expect(summary?.audit.id).toBe("audit_latest");
+    expect(summary?.audit.healthScore).toBe(92);
+  });
 });

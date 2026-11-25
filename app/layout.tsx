@@ -3,6 +3,7 @@ import { Providers } from "@/components/layout/providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://neemseo.com"),
   title: "neemSEO | Pay-as-you-go open-source SEO platform",
   description:
     "A simple, focused, self-hostable alternative to Semrush and Ahrefs. Bring your own DataForSEO key and pay only for what you use.",
