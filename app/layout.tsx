@@ -7,6 +7,11 @@ export const metadata: Metadata = {
   title: "neemSEO | Pay-as-you-go open-source SEO platform",
   description:
     "A simple, focused, self-hostable alternative to Semrush and Ahrefs. Bring your own DataForSEO key and pay only for what you use.",
+  icons: {
+    icon: "/neemseo-mark.svg",
+    shortcut: "/neemseo-mark.svg",
+    apple: "/neemseo-mark.svg",
+  },
 };
 
 export default function RootLayout({
