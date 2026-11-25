@@ -1,0 +1,64 @@
+services:
+  # Standalone neemSEO Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ghcr.io/neemseo/neemseo:latest
+    container_name: neemseo-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - AUTH_MODE=${AUTH_MODE:-local_noauth} # local_noauth, cloudflare_access, hosted
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET:-replace_with_a_secure_32_character_secret_key!}
+      - BETTER_AUTH_URL=${BETTER_AUTH_URL:-http://localhost:3000}
+      - DATAFORSEO_LOGIN=${DATAFORSEO_LOGIN:-}
+      - DATAFORSEO_PASSWORD=${DATAFORSEO_PASSWORD:-}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - OPENROUTER_MODEL=${OPENROUTER_MODEL:-anthropic/claude-3.5-haiku}
+      # Database: Use local SQLite mount by default, or Postgres if postgres service is running
+      - DATABASE_URL=${DATABASE_URL:-file:/app/data/neemseo.sqlite}
+    volumes:
+      - neemseo_data:/app/data
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:3000/api/healthz",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # Optional PostgreSQL database (enabled with --profile postgres)
+  postgres:
+    image: postgres:16-alpine
+    container_name: neemseo-postgres
+    restart: unless-stopped
+    profiles: ["postgres"]
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-neemseo}
+      POSTGRES_USER: ${POSTGRES_USER:-neemseo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-neemseo_secure_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-neemseo} -d ${POSTGRES_DB:-neemseo}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  neemseo_data:
+    driver: local
+  pgdata:
+    driver: local

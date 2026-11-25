@@ -1,0 +1,43 @@
+{
+  "$schema": "https://unpkg.com/knip@5/resources/knip-json-schema.json",
+  "entry": [
+    "app/**/{page,layout,loading,error,not-found,global-error,route,template,default}.{ts,tsx}",
+    "components/**/*.{ts,tsx}",
+    "scripts/**/*.{js,mjs,ts}",
+    "tests/**/*.{ts,tsx}"
+  ],
+  "project": [
+    "app/**/*.{ts,tsx}",
+    "components/**/*.{ts,tsx}",
+    "features/**/*.{ts,tsx}",
+    "lib/**/*.{ts,tsx}",
+    "db/**/*.{ts,tsx}",
+    "scripts/**/*.{js,mjs,ts}",
+    "tests/**/*.{ts,tsx}"
+  ],
+  "rules": {
+    "exports": "off",
+    "types": "off",
+    "unresolved": "warn"
+  },
+  "ignoreDependencies": [
+    "@ai-sdk/react",
+    "@modelcontextprotocol/sdk",
+    "ai",
+    "cheerio",
+    "dataforseo-client",
+    "fast-xml-parser",
+    "htmlparser2",
+    "react-markdown",
+    "remeda",
+    "remark-gfm",
+    "robots-parser",
+    "tldts",
+    "eslint",
+    "eslint-config-next",
+    "prettier-plugin-tailwindcss",
+    "tailwindcss",
+    "postcss-load-config"
+  ],
+  "ignoreExportsUsedInFile": true
+}

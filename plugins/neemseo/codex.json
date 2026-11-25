@@ -1,0 +1,31 @@
+{
+  "name": "neemseo",
+  "version": "0.1.0",
+  "description": "neemSEO MCP skills for Codex",
+  "skills": [
+    {
+      "id": "ai-visibility",
+      "file": "skills/ai-visibility.md"
+    },
+    {
+      "id": "backlink-profile",
+      "file": "skills/backlink-profile.md"
+    },
+    {
+      "id": "keyword-gap",
+      "file": "skills/keyword-gap.md"
+    },
+    {
+      "id": "keyword-research",
+      "file": "skills/keyword-research.md"
+    },
+    {
+      "id": "rank-tracking",
+      "file": "skills/rank-tracking.md"
+    },
+    {
+      "id": "technical-audit",
+      "file": "skills/technical-audit.md"
+    }
+  ]
+}
