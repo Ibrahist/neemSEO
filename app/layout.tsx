@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
+import { Comfortaa } from "next/font/google";
 import { Providers } from "@/components/layout/providers";
 import "./globals.css";
+
+const comfortaa = Comfortaa({
+  subsets: ["latin"],
+  variable: "--font-comfortaa",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://neemseo.com"),
@@ -20,8 +27,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="bg-neutral-50 text-neutral-900 antialiased">
+    <html lang="en" className={comfortaa.variable} suppressHydrationWarning>
+      <body className={`${comfortaa.className} bg-neutral-50 text-neutral-900 antialiased`}>
         <Providers>{children}</Providers>
       </body>
     </html>
