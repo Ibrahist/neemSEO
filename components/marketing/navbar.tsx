@@ -307,23 +307,11 @@ export function Navbar() {
                   </div>
                 )}
               </div>
-
-              <Link
-                href="/projects"
-                className="text-sm font-medium text-neutral-700 transition-colors hover:text-neutral-950"
-              >
-                Pricing & Wholesale Rates
-              </Link>
             </div>
           </div>
 
           {/* Right Action Buttons */}
           <div className="hidden sm:flex items-center gap-3">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#8CC63F]/20 border border-[#8CC63F]/40 text-[#0F3D2E] text-xs font-semibold">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#8CC63F]" />
-              <span>100% Free · No Login</span>
-            </div>
-
             <a
               href="https://github.com/Ibrahist/neemSEO"
               target="_blank"
@@ -371,10 +359,6 @@ export function Navbar() {
             >
               MCP Server
             </Link>
-            <div className="px-3 py-2 text-xs font-semibold text-[#0F3D2E] bg-[#8CC63F]/20 rounded-lg inline-flex items-center gap-1.5 w-full">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#8CC63F]" />
-              <span>100% Free · No Login Required</span>
-            </div>
             <Link
               href="/projects"
               onClick={() => setMobileMenuOpen(false)}
