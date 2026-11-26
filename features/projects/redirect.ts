@@ -6,9 +6,6 @@ import type { ProjectRecord } from "./repository";
 
 export async function redirectToProjectWorkflow(workflowSlug: string) {
   const user = await getCurrentUser();
-  if (!user) {
-    redirect("/login");
-  }
 
   let projects: ProjectRecord[] = [];
   try {

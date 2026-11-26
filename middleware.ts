@@ -2,27 +2,11 @@ import { NextResponse, type NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const authMode = process.env.AUTH_MODE || "local_noauth";
 
-  // Public paths that do not require auth checks
-  if (
-    pathname === "/" ||
-    pathname.startsWith("/login") ||
-    pathname.startsWith("/register") ||
-    pathname.startsWith("/api/healthz") ||
-    pathname.startsWith("/api/auth") ||
-    pathname.startsWith("/_next") ||
-    pathname.includes(".")
-  ) {
-    return NextResponse.next();
-  }
-
-  // If in cloudflare_access mode, ensure assertion header is present
-  if (authMode === "cloudflare_access") {
-    const assertion = request.headers.get("cf-access-jwt-assertion");
-    if (!assertion) {
-      return NextResponse.redirect(new URL("/login?error=cf_access_required", request.url));
-    }
+  // Platform is 100% free with no login required.
+  // Redirect any visits to /login or /register straight to the platform dashboard.
+  if (pathname === "/login" || pathname === "/register") {
+    return NextResponse.redirect(new URL("/projects", request.url));
   }
 
   return NextResponse.next();

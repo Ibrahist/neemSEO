@@ -318,27 +318,25 @@ export function Navbar() {
           </div>
 
           {/* Right Action Buttons */}
-          <div className="hidden sm:flex items-center gap-4">
+          <div className="hidden sm:flex items-center gap-3">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#8CC63F]/20 border border-[#8CC63F]/40 text-[#0F3D2E] text-xs font-semibold">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#8CC63F]" />
+              <span>100% Free · No Login</span>
+            </div>
+
             <a
               href="https://github.com"
               target="_blank"
               rel="noreferrer"
-              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-[#ded9d2] bg-white px-3 text-xs font-semibold text-neutral-700 hover:text-neutral-950 hover:bg-neutral-50 transition-colors shadow-xs"
+              className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[#ded9d2] bg-white px-3 text-xs font-semibold text-neutral-700 hover:text-neutral-950 hover:bg-neutral-50 transition-colors shadow-2xs"
             >
               <Github className="h-4 w-4" />
               <span>★ Star on GitHub</span>
             </a>
 
             <Link
-              href="/login"
-              className="text-xs font-medium text-neutral-600 hover:text-neutral-950 transition-colors"
-            >
-              Sign In ↗
-            </Link>
-
-            <Link
               href="/projects"
-              className="inline-flex h-9 items-center justify-center rounded-lg bg-[#0F3D2E] px-4 text-xs font-semibold text-white shadow-sm hover:bg-[#0A291F] transition-all"
+              className="inline-flex h-9 items-center justify-center rounded-xl bg-[#0F3D2E] px-4 text-xs font-semibold text-white shadow-xs hover:bg-[#0A291F] transition-all"
             >
               Launch Platform
             </Link>
@@ -373,13 +371,10 @@ export function Navbar() {
             >
               MCP Server
             </Link>
-            <Link
-              href="/login"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2 text-sm font-medium text-neutral-800 hover:bg-white rounded-lg"
-            >
-              Sign In
-            </Link>
+            <div className="px-3 py-2 text-xs font-semibold text-[#0F3D2E] bg-[#8CC63F]/20 rounded-lg inline-flex items-center gap-1.5 w-full">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#8CC63F]" />
+              <span>100% Free · No Login Required</span>
+            </div>
             <Link
               href="/projects"
               onClick={() => setMobileMenuOpen(false)}

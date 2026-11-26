@@ -26,17 +26,20 @@ export async function Header() {
       </div>
 
       <div className="flex items-center gap-3">
-        {user ? (
-          <div className="flex items-center gap-2.5 pl-3 border-l border-[#ded9d2]">
-            <div className="h-8 w-8 rounded-full bg-[#0F3D2E] text-white flex items-center justify-center text-xs font-bold shadow-xs">
-              {user.name.charAt(0).toUpperCase()}
-            </div>
-            <div className="text-left hidden md:block">
-              <div className="text-xs font-bold text-[#0F3D2E]">{user.name}</div>
-              <div className="text-[10px] text-neutral-500">{user.email}</div>
-            </div>
+        <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#8CC63F]/20 border border-[#8CC63F]/40 text-[#0F3D2E] text-xs font-semibold">
+          <span className="h-2 w-2 rounded-full bg-[#8CC63F]" />
+          <span>100% Free Access</span>
+        </div>
+
+        <div className="flex items-center gap-2.5 pl-3 border-l border-[#ded9d2]">
+          <div className="h-8 w-8 rounded-full bg-[#0F3D2E] text-white flex items-center justify-center text-xs font-bold shadow-xs">
+            F
           </div>
-        ) : null}
+          <div className="text-left hidden md:block">
+            <div className="text-xs font-bold text-[#0F3D2E]">Free Workspace</div>
+            <div className="text-[10px] text-neutral-500">No Login Required</div>
+          </div>
+        </div>
       </div>
     </header>
   );

@@ -5,9 +5,6 @@ import type { ProjectRecord } from "@/features/projects/repository";
 
 export default async function ProjectsIndexPage() {
   const user = await getCurrentUser();
-  if (!user) {
-    redirect("/login");
-  }
 
   let projects: ProjectRecord[] = [];
   try {
