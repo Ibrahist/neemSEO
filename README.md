@@ -14,7 +14,7 @@ No subscriptions. No credit card required. No login barriers.
 [![Next.js 15](https://img.shields.io/badge/Next.js-15.5-black.svg)](https://nextjs.org/)
 [![React 19](https://img.shields.io/badge/React-19-blue.svg)](https://react.dev/)
 
-[Features](#-key-features--core-workflows) • [Quick Start](#-quick-start) • [Connect AI Agents via MCP](#-connect-ai-agents-via-mcp) • [Architecture](#-architecture--security) • [Documentation](#-documentation)
+[Features](#-key-features--core-workflows) • [Quick Start](#-quick-start) • [Connect AI Agents via MCP](#-connect-ai-agents-via-mcp) • [Project Structure](#-project-structure) • [Architecture](#-architecture--security) • [Documentation](#-documentation)
 
 </div>
 
@@ -140,6 +140,82 @@ In Cursor Settings &rarr; Features &rarr; MCP:
 | `neemseo_check_ai_visibility`       | Test brand citation across 4 AI engines        |
 | `neemseo_get_ai_visibility_summary` | Summary of brand mention rates                 |
 | `neemseo_get_gsc_performance`       | Organic impressions, clicks, and CTR           |
+
+---
+
+## 📂 Project Structure
+
+```text
+neemSEO/
+├── app/                                # Next.js 15 App Router
+│   ├── (app)/                          # Authenticated / Platform Workspace
+│   │   ├── layout.tsx                  # Platform shell (minimal header + sidebar)
+│   │   ├── projects/                   # Multi-project index & creation
+│   │   │   ├── new/                    # Project workspace creation card
+│   │   │   └── [projectId]/            # Project-scoped workspace
+│   │   │       ├── overview/           # Dynamic KPI dashboard
+│   │   │       ├── keywords/           # Keyword research & exploration
+│   │   │       ├── rank-tracking/      # SERP monitoring & historical charts
+│   │   │       ├── competitors/        # Organic overlap & keyword gaps
+│   │   │       ├── backlinks/          # Inbound link & referring domain profiles
+│   │   │       ├── audits/             # SSRF-safe technical site crawler
+│   │   │       ├── ai-visibility/      # ChatGPT, Claude, Perplexity & Gemini citations
+│   │   │       ├── agent/              # In-app streaming AI SEO assistant
+│   │   │       └── settings/           # Domain configuration & BYOK keys
+│   │   └── (workflows)/                # Direct workflow shortcuts
+│   ├── (marketing)/                    # Public marketing & informational pages
+│   │   ├── page.tsx                    # Homepage with exclusive Hero CTA
+│   │   ├── docs/                       # Comprehensive documentation viewer
+│   │   └── health/                     # System diagnostics & health check UI
+│   └── api/                            # Serverless Route Handlers & Protocol APIs
+│       ├── mcp/                        # Model Context Protocol (MCP) JSON-RPC 2.0 endpoint
+│       ├── agent/chat/                 # Streaming LLM endpoint (Vercel AI SDK + OpenRouter)
+│       ├── healthz/                    # JSON liveness & database probe
+│       └── oauth/                      # MCP OAuth 2.0 token & authorization endpoints
+├── components/                         # React 19 UI Component Hierarchy
+│   ├── layout/                         # Sidebar, ProjectSwitcher, Header, Providers
+│   ├── marketing/                      # Hero, Navbar, MCP showcase, Features, Footer
+│   ├── keywords/                       # Keyword search forms & metrics tables
+│   ├── rank-tracking/                  # Position tracking forms & Recharts trends
+│   ├── competitors/                    # Competitor benchmarking & gap tables
+│   ├── backlinks/                      # Anchor distributions & referring domain lists
+│   ├── audits/                         # Health score cards, crawl forms & issues tables
+│   ├── ai-visibility/                  # Prompt testers & AI engine citation charts
+│   ├── agent/                          # Streaming chat interface & tool execution cards
+│   ├── integrations/                   # Google Search Console card & OAuth flow
+│   └── ui/                             # Radix & Tailwind UI primitives (Button, Card, Input)
+├── features/                           # Layered Domain Business Logic & Services
+│   ├── projects/                       # Actions, service, and DB repository
+│   ├── keywords/                       # DataForSEO search volume & difficulty engine
+│   ├── rank-tracking/                  # Position tracking logic & SERP history
+│   ├── competitors/                    # Organic overlap & keyword gap analytics
+│   ├── backlinks/                      # Backlink profile & domain-specific baselines
+│   ├── audits/                         # Site crawler orchestration & issue grading
+│   ├── ai-visibility/                  # AI engine evaluation logic & citation parser
+│   ├── integrations/gsc/               # Google Search Console service & token encryption
+│   └── usage/                          # Cost calculator & wholesale credit logging
+├── db/                                 # Dual-Dialect Database Layer
+│   ├── client.ts                       # Universal Drizzle ORM client (SQLite / PG)
+│   └── schema/
+│       ├── sqlite/                     # Cloudflare D1 & local file schema
+│       └── pg/                         # PostgreSQL production schema
+├── lib/                                # Core Utilities & Platform Infrastructure
+│   ├── auth/                           # BetterAuth integration & session resolution
+│   ├── crawler/                        # SSRF protection (safeFetch), robots.txt & HTML parser
+│   ├── dataforseo/                     # Wholesale API client & SHA-256 caching
+│   ├── mcp/                            # MCP protocol tools & authentication helpers
+│   ├── crypto.ts                       # AES-256-GCM token encryption at rest
+│   ├── env.ts                          # Type-safe Zod environment validation
+│   └── runtime.ts                      # Cloudflare Workers vs. Node runtime detection
+├── plugins/neemseo/                    # Agent Tool Manifests & Shared Skills
+│   ├── claude.json                     # Claude Desktop MCP manifest
+│   ├── cursor.json                     # Cursor IDE MCP configuration
+│   ├── codex.json                      # OpenAI Codex configuration
+│   └── skills/                         # Agent markdown instructions & guidance
+├── docs/                               # Architecture, deployment, and API guides
+├── scripts/                            # CI check, page verification, and migrations
+└── tests/                              # 18 Vitest suites (51 unit tests)
+```
 
 ---
 
