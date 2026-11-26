@@ -61,7 +61,7 @@ export function Navbar() {
                       <div className="grid grid-cols-2 gap-x-6 gap-y-4">
                         {/* Keyword Research */}
                         <Link
-                          href="/projects"
+                          href="/keywords"
                           className="group flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-[#f5f1ec]"
                         >
                           <div className="h-8 w-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-emerald-100 transition-colors">
@@ -79,7 +79,7 @@ export function Navbar() {
 
                         {/* Rank Tracking */}
                         <Link
-                          href="/projects"
+                          href="/rank-tracking"
                           className="group flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-[#f5f1ec]"
                         >
                           <div className="h-8 w-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-emerald-100 transition-colors">
@@ -97,7 +97,7 @@ export function Navbar() {
 
                         {/* Competitor Insights */}
                         <Link
-                          href="/projects"
+                          href="/competitors"
                           className="group flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-[#f5f1ec]"
                         >
                           <div className="h-8 w-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-emerald-100 transition-colors">
@@ -115,7 +115,7 @@ export function Navbar() {
 
                         {/* Backlink Profile */}
                         <Link
-                          href="/projects"
+                          href="/backlinks"
                           className="group flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-[#f5f1ec]"
                         >
                           <div className="h-8 w-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-emerald-100 transition-colors">
@@ -133,7 +133,7 @@ export function Navbar() {
 
                         {/* Site Audits */}
                         <Link
-                          href="/projects"
+                          href="/audits"
                           className="group flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-[#f5f1ec]"
                         >
                           <div className="h-8 w-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-emerald-100 transition-colors">
@@ -151,7 +151,7 @@ export function Navbar() {
 
                         {/* AI Visibility */}
                         <Link
-                          href="/projects"
+                          href="/ai-visibility"
                           className="group flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-[#f5f1ec]"
                         >
                           <div className="h-8 w-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-emerald-100 transition-colors">
@@ -169,7 +169,7 @@ export function Navbar() {
 
                         {/* In-App AI Agent */}
                         <Link
-                          href="/projects"
+                          href="/agent"
                           className="group flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-[#f5f1ec]"
                         >
                           <div className="h-8 w-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-emerald-100 transition-colors">

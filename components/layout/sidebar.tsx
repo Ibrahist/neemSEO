@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useParams } from "next/navigation";
 import {
   Search,
   TrendingUp,
@@ -14,110 +14,121 @@ import {
   LayoutDashboard,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Logo } from "@/components/ui/logo";
 
 interface SidebarProps {
   projectId?: string;
+  initialProjectId?: string;
 }
 
-export function Sidebar({ projectId }: SidebarProps) {
+export function Sidebar({ projectId, initialProjectId }: SidebarProps) {
   const pathname = usePathname();
+  const params = useParams();
+
+  // Resolve active project ID from props, URL path params, or initial project fallback
+  const activeProjectId = projectId || (params?.projectId as string) || initialProjectId;
 
   const navItems = [
     {
       label: "Overview",
-      href: projectId ? `/projects/${projectId}/overview` : "/projects",
+      href: activeProjectId ? `/projects/${activeProjectId}/overview` : "/projects",
       icon: LayoutDashboard,
     },
     {
       label: "Keyword Research",
-      href: projectId ? `/projects/${projectId}/keywords` : "/keywords",
+      href: activeProjectId ? `/projects/${activeProjectId}/keywords` : "/keywords",
       icon: Search,
     },
     {
       label: "Rank Tracking",
-      href: projectId ? `/projects/${projectId}/rank-tracking` : "/rank-tracking",
+      href: activeProjectId ? `/projects/${activeProjectId}/rank-tracking` : "/rank-tracking",
       icon: TrendingUp,
     },
     {
       label: "Competitors",
-      href: projectId ? `/projects/${projectId}/competitors` : "/competitors",
+      href: activeProjectId ? `/projects/${activeProjectId}/competitors` : "/competitors",
       icon: Users,
     },
     {
       label: "Backlinks",
-      href: projectId ? `/projects/${projectId}/backlinks` : "/backlinks",
+      href: activeProjectId ? `/projects/${activeProjectId}/backlinks` : "/backlinks",
       icon: Link2,
     },
     {
       label: "Site Audits",
-      href: projectId ? `/projects/${projectId}/audits` : "/audits",
+      href: activeProjectId ? `/projects/${activeProjectId}/audits` : "/audits",
       icon: FileCheck2,
     },
     {
       label: "AI Visibility",
-      href: projectId ? `/projects/${projectId}/ai-visibility` : "/ai-visibility",
+      href: activeProjectId ? `/projects/${activeProjectId}/ai-visibility` : "/ai-visibility",
       icon: Bot,
     },
     {
       label: "AI SEO Agent",
-      href: projectId ? `/projects/${projectId}/agent` : "/agent",
+      href: activeProjectId ? `/projects/${activeProjectId}/agent` : "/agent",
       icon: Sparkles,
     },
     {
       label: "Settings",
-      href: projectId ? `/projects/${projectId}/settings` : "/settings",
+      href: activeProjectId ? `/projects/${activeProjectId}/settings` : "/settings",
       icon: Settings,
     },
   ];
 
   return (
-    <aside className="w-64 border-r border-neutral-200 bg-white flex flex-col h-screen select-none dark:border-neutral-800 dark:bg-neutral-950">
-      <div className="h-16 flex items-center px-6 border-b border-neutral-200 dark:border-neutral-800">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">
-            N
-          </div>
-          <span className="font-bold text-lg tracking-tight text-neutral-900 dark:text-neutral-50">
-            neem<span className="text-emerald-600">SEO</span>
-          </span>
+    <aside className="w-64 border-r border-[#ded9d2] bg-[#f5f1ec] flex flex-col select-none shrink-0 min-h-full">
+      {/* Brand Header with Official Logo */}
+      <div className="h-16 flex items-center px-5 border-b border-[#ded9d2] bg-[#f5f1ec]">
+        <Link href="/" className="hover:opacity-90 transition-opacity flex items-center">
+          <Logo size={28} showText={true} />
         </Link>
       </div>
 
-      <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
-        <div className="text-xs font-semibold uppercase tracking-wider text-neutral-400 px-3 py-2">
+      {/* Navigation Links */}
+      <nav className="flex-1 px-3 py-4 space-y-1.5 overflow-y-auto">
+        <div className="text-[11px] font-bold uppercase tracking-wider text-[#0F3D2E] px-3 py-1.5 opacity-80">
           Workflows
         </div>
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href || pathname?.startsWith(item.href + "/");
+          const isActive =
+            pathname === item.href ||
+            (item.href !== "/projects" && pathname?.startsWith(item.href));
           return (
             <Link
               key={item.label}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                "flex items-center gap-3 px-3 py-2 text-sm font-semibold rounded-xl transition-all",
                 isActive
-                  ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400"
-                  : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800/60 dark:hover:text-neutral-100"
+                  ? "bg-[#0F3D2E] text-white shadow-xs"
+                  : "text-neutral-700 hover:text-neutral-950 hover:bg-[#ebe7e1]/90"
               )}
             >
-              <Icon className="h-4 w-4 shrink-0" />
+              <Icon
+                className={cn(
+                  "h-4 w-4 shrink-0 transition-colors",
+                  isActive ? "text-[#8CC63F]" : "text-neutral-500"
+                )}
+              />
               <span>{item.label}</span>
             </Link>
           );
         })}
       </nav>
 
-      <div className="p-4 border-t border-neutral-200 dark:border-neutral-800">
-        <div className="rounded-md bg-neutral-50 p-3 text-xs text-neutral-500 dark:bg-neutral-900 dark:text-neutral-400">
+      {/* BYOK Pricing Transparency Badge */}
+      <div className="p-4 border-t border-[#ded9d2] bg-[#f5f1ec]">
+        <div className="rounded-xl bg-white border border-[#ded9d2] p-3 text-xs text-neutral-600 shadow-2xs">
           <div className="flex items-center justify-between mb-1">
-            <span className="font-semibold text-neutral-700 dark:text-neutral-300">DataForSEO</span>
-            <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded dark:bg-emerald-950 dark:text-emerald-400">
+            <span className="font-bold text-[#0F3D2E]">DataForSEO</span>
+            <span className="text-[10px] font-bold bg-[#8CC63F]/20 text-[#0F3D2E] px-2 py-0.5 rounded-full border border-[#8CC63F]/30">
               BYOK
             </span>
           </div>
-          <p className="text-[11px] leading-tight">
-            Pay only for what you query. Zero subscription markup.
+          <p className="text-[11px] text-neutral-500 leading-tight">
+            Wholesale DataForSEO rates with 0% software markup.
           </p>
         </div>
       </div>

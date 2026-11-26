@@ -109,31 +109,29 @@ export default async function ProjectOverviewPage({ params }: OverviewProps) {
   return (
     <div className="space-y-6">
       {/* Project Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-2xl border border-[#ded9d2] bg-white shadow-xs">
         <div className="space-y-1">
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-50">
-              {project.name}
-            </h1>
+            <h1 className="text-2xl font-bold tracking-tight text-[#0F3D2E]">{project.name}</h1>
             <Badge
               variant="outline"
-              className="font-mono text-xs text-emerald-700 bg-emerald-50 dark:bg-emerald-950 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800"
+              className="font-mono text-xs text-[#0F3D2E] bg-[#8CC63F]/20 border border-[#8CC63F]/30"
             >
               {project.domain}
             </Badge>
           </div>
           {project.description ? (
-            <p className="text-sm text-neutral-500">{project.description}</p>
+            <p className="text-sm text-[#57534e]">{project.description}</p>
           ) : (
-            <p className="text-sm text-neutral-500">
+            <p className="text-sm text-[#57534e]">
               Executive SEO dashboard and agent control center.
             </p>
           )}
         </div>
         <div className="flex items-center gap-3">
           <Link href={`/projects/${projectId}/agent`}>
-            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 text-xs h-9">
-              <Sparkles className="h-4 w-4" /> Ask neemSEO Agent
+            <Button className="bg-[#0F3D2E] hover:bg-[#0A291F] text-white gap-2 text-xs h-9 rounded-xl shadow-xs">
+              <Sparkles className="h-4 w-4 text-[#8CC63F]" /> Ask neemSEO Agent
             </Button>
           </Link>
         </div>
@@ -141,14 +139,14 @@ export default async function ProjectOverviewPage({ params }: OverviewProps) {
 
       {/* KPI Overview Strip */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800">
+        <Card className="bg-white border border-[#ded9d2] rounded-2xl shadow-xs">
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-medium text-neutral-500 flex items-center gap-1.5">
-              <ShieldCheck className="h-4 w-4 text-emerald-600" /> Site Health
+            <CardTitle className="text-xs font-semibold text-[#57534e] flex items-center gap-1.5">
+              <ShieldCheck className="h-4 w-4 text-[#8CC63F]" /> Site Health
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-neutral-900 dark:text-neutral-50">
+            <div className="text-2xl font-bold text-[#0F3D2E]">
               {healthScore !== null ? `${healthScore}/100` : "92/100"}
             </div>
             <p className="text-[11px] text-neutral-500 mt-1">
@@ -157,14 +155,14 @@ export default async function ProjectOverviewPage({ params }: OverviewProps) {
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800">
+        <Card className="bg-white border border-[#ded9d2] rounded-2xl shadow-xs">
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-medium text-neutral-500 flex items-center gap-1.5">
-              <TrendingUp className="h-4 w-4 text-emerald-600" /> Avg Position
+            <CardTitle className="text-xs font-semibold text-[#57534e] flex items-center gap-1.5">
+              <TrendingUp className="h-4 w-4 text-[#8CC63F]" /> Avg Position
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-neutral-900 dark:text-neutral-50">
+            <div className="text-2xl font-bold text-[#0F3D2E]">
               {avgPosition ? `#${avgPosition}` : "#7.4"}
             </div>
             <p className="text-[11px] text-neutral-500 mt-1">
@@ -173,14 +171,14 @@ export default async function ProjectOverviewPage({ params }: OverviewProps) {
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800">
+        <Card className="bg-white border border-[#ded9d2] rounded-2xl shadow-xs">
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-medium text-neutral-500 flex items-center gap-1.5">
-              <Link2 className="h-4 w-4 text-emerald-600" /> Domain Rank
+            <CardTitle className="text-xs font-semibold text-[#57534e] flex items-center gap-1.5">
+              <Link2 className="h-4 w-4 text-[#8CC63F]" /> Domain Rank
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-emerald-600">
+            <div className="text-2xl font-bold text-[#0F3D2E]">
               {domainRank}
               <span className="text-xs font-normal text-neutral-400">/100</span>
             </div>
@@ -190,17 +188,17 @@ export default async function ProjectOverviewPage({ params }: OverviewProps) {
           </CardContent>
         </Card>
 
-        <Card className="bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-800">
+        <Card className="bg-white border border-[#ded9d2] rounded-2xl shadow-xs">
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-medium text-neutral-500 flex items-center gap-1.5">
-              <Bot className="h-4 w-4 text-emerald-600" /> AI Citation
+            <CardTitle className="text-xs font-semibold text-[#57534e] flex items-center gap-1.5">
+              <Bot className="h-4 w-4 text-[#8CC63F]" /> AI Citation
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-neutral-900 dark:text-neutral-50">
+            <div className="text-2xl font-bold text-[#0F3D2E]">
               {brandMentionRate !== null ? `${brandMentionRate}%` : "75%"}
             </div>
-            <p className="text-[11px] text-neutral-500 mt-1">ChatGPT, Claude & Perplexity</p>
+            <p className="text-[11px] text-neutral-500 mt-1">ChatGPT, Claude &amp; Perplexity</p>
           </CardContent>
         </Card>
       </div>
@@ -211,30 +209,30 @@ export default async function ProjectOverviewPage({ params }: OverviewProps) {
           const Icon = wf.icon;
           return (
             <Link key={wf.title} href={wf.href} className="group">
-              <Card className="h-full transition-all group-hover:border-emerald-500/50 group-hover:shadow-md">
+              <Card className="h-full rounded-2xl border border-[#ded9d2] bg-white shadow-xs transition-all group-hover:border-[#0F3D2E] group-hover:shadow-md">
                 <CardHeader>
                   <div className="flex items-center justify-between mb-2">
-                    <div className="h-10 w-10 rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400 flex items-center justify-center">
+                    <div className="h-10 w-10 rounded-xl bg-[#8CC63F]/20 text-[#0F3D2E] flex items-center justify-center">
                       <Icon className="h-5 w-5" />
                     </div>
                     <Badge
                       variant="secondary"
-                      className="group-hover:bg-emerald-100 dark:group-hover:bg-emerald-950 text-[11px]"
+                      className="border border-[#ded9d2] bg-[#f5f1ec] text-[#0F3D2E] text-[11px] font-semibold"
                     >
                       {wf.tag}
                     </Badge>
                   </div>
-                  <CardTitle className="text-base group-hover:text-emerald-600 transition-colors">
+                  <CardTitle className="text-base font-bold text-[#0F3D2E] group-hover:text-[#0A291F] transition-colors">
                     {wf.title}
                   </CardTitle>
-                  <CardDescription className="text-xs leading-relaxed">
+                  <CardDescription className="text-xs leading-relaxed text-[#57534e]">
                     {wf.description}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-0 text-xs font-medium text-neutral-500 flex items-center justify-between">
                   <span>{wf.stat}</span>
-                  <span className="text-emerald-600 font-semibold flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                    Open <ArrowRight className="h-3 w-3" />
+                  <span className="text-[#0F3D2E] font-semibold flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                    Open <ArrowRight className="h-3 w-3 text-[#8CC63F]" />
                   </span>
                 </CardContent>
               </Card>

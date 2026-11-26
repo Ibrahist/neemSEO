@@ -51,7 +51,40 @@ export async function getProjectById(
   return (rows[0] as ProjectRecord) || null;
 }
 
+export async function ensureOrganization(
+  organizationId: string,
+  name = "Default Organization"
+): Promise<void> {
+  const { db, schema } = await getDb();
+  try {
+    const existing = await (db as any)
+      .select()
+      .from((schema as any).organizations)
+      .where(eq((schema as any).organizations.id, organizationId));
+
+    if (!existing || existing.length === 0) {
+      const slug =
+        organizationId
+          .toLowerCase()
+          .replace(/[^a-z0-9]/g, "-")
+          .slice(0, 40) || "org-default";
+      await (db as any)
+        .insert((schema as any).organizations)
+        .values({
+          id: organizationId,
+          name,
+          slug: `${slug}-${Math.random().toString(36).substring(2, 7)}`,
+          createdAt: new Date(),
+        })
+        .onConflictDoNothing();
+    }
+  } catch {
+    // Ignore conflict or if organization already exists
+  }
+}
+
 export async function insertProject(data: CreateProjectInput): Promise<ProjectRecord> {
+  await ensureOrganization(data.organizationId);
   const { db, schema } = await getDb();
   const id = `proj_${crypto.randomUUID()}`;
   const now = new Date();

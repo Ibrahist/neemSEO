@@ -1,15 +1,50 @@
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
+import { Navbar } from "@/components/marketing/navbar";
+import { getCurrentUser } from "@/lib/auth/session";
+import { listProjects, createProject } from "@/features/projects/service";
+import type { ProjectRecord } from "@/features/projects/repository";
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  const user = await getCurrentUser();
+  let projects: ProjectRecord[] = [];
+
+  if (user?.organizationId) {
+    try {
+      projects = await listProjects(user.organizationId);
+      // Auto-provision demo project if empty so platform is fully populated on first launch
+      if (projects.length === 0) {
+        await createProject(user.organizationId, {
+          name: "neemSEO Demo",
+          domain: "neemseo.com",
+          description: "Default workspace for SEO intelligence and rank monitoring",
+        });
+        projects = await listProjects(user.organizationId);
+      }
+    } catch {
+      projects = [];
+    }
+  }
+
+  const initialProjectId = projects[0]?.id;
+
   return (
-    <div className="flex h-screen overflow-hidden bg-neutral-50 dark:bg-neutral-950">
-      <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <Header />
-        <main className="flex-1 overflow-y-auto p-6 lg:p-8">
-          <div className="max-w-7xl mx-auto space-y-6">{children}</div>
-        </main>
+    <div className="min-h-screen bg-[#ebe7e1] py-2 sm:py-4 md:py-6 px-1 sm:px-3 md:px-5 flex justify-center items-start font-sans selection:bg-[#8CC63F]/30 selection:text-[#0F3D2E]">
+      {/* Boxed Platform Container matching Homepage styling */}
+      <div className="w-full max-w-[1520px] bg-[#f5f1ec] border border-[#ded9d2] rounded-2xl sm:rounded-3xl shadow-xl shadow-neutral-900/5 overflow-hidden flex flex-col min-h-[96vh]">
+        {/* Top Navbar */}
+        <Navbar />
+
+        {/* Platform Body with Sidebar & Content */}
+        <div className="flex-1 flex flex-col md:flex-row overflow-hidden bg-[#f5f1ec]">
+          <Sidebar initialProjectId={initialProjectId} />
+          <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+            <Header />
+            <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-[#f5f1ec]">
+              <div className="max-w-7xl mx-auto space-y-6">{children}</div>
+            </main>
+          </div>
+        </div>
       </div>
     </div>
   );
