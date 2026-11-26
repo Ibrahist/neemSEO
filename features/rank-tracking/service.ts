@@ -77,32 +77,17 @@ export async function trackKeyword(params: {
         }
       }
     } catch (error) {
-      console.warn("Live SERP check failed, recording initial baseline:", error);
-      position = Math.floor(Math.random() * 25) + 3;
-      rankingUrl = `https://${targetDomain}/`;
+      console.warn("Live SERP check failed:", error);
+      position = null;
+      rankingUrl = null;
     }
   } else {
-    // Dev fixture: generate baseline ranking and 7-day historical trail
-    position = Math.floor(Math.random() * 20) + 4;
-    rankingUrl = `https://${targetDomain}/`;
-
-    // Populate historical days for testing charts
-    for (let i = 6; i >= 1; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      const dateStr = d.toISOString().split("T")[0];
-      const historicalPos = Math.max(1, position + (Math.floor(Math.random() * 7) - 3));
-      await rankRepo.insertRankSnapshot({
-        trackedKeywordId: tracked.id,
-        projectId,
-        position: historicalPos,
-        url: rankingUrl,
-        checkDate: dateStr,
-      });
-    }
+    // No DataForSEO key configured: position is unranked / not in top 100
+    position = null;
+    rankingUrl = null;
   }
 
-  // Record today's position snapshot
+  // Record today's position snapshot (no fabricated history)
   await rankRepo.insertRankSnapshot({
     trackedKeywordId: tracked.id,
     projectId,

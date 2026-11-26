@@ -131,7 +131,20 @@ export function PromptsHistoryTable({ prompts }: PromptsHistoryTableProps) {
                                   >
                                     <div className="flex items-center justify-between border-b border-border pb-2">
                                       <span className="font-bold text-xs uppercase tracking-wider text-primary">
-                                        {res.engine}
+                                        {(() => {
+                                          const modelMap: Record<string, string> = {
+                                            chatgpt: "LLM via OpenRouter (openai/gpt-4o-mini)",
+                                            claude:
+                                              "LLM via OpenRouter (anthropic/claude-3.5-haiku)",
+                                            perplexity: "LLM via OpenRouter (perplexity/sonar)",
+                                            gemini:
+                                              "LLM via OpenRouter (google/gemini-2.0-flash-001)",
+                                          };
+                                          return (
+                                            modelMap[res.engine.toLowerCase()] ||
+                                            `LLM via OpenRouter (${res.engine})`
+                                          );
+                                        })()}
                                       </span>
                                       <div className="flex items-center gap-2 text-xs">
                                         <span>

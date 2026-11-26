@@ -2,8 +2,9 @@ import { notFound } from "next/navigation";
 import { requireProjectAccess } from "@/lib/auth/session";
 import { AuditsService } from "@/features/audits/service";
 import { listTrackedKeywords } from "@/features/rank-tracking/service";
-import { getBacklinksOverview } from "@/features/backlinks/service";
+import { getStoredBacklinkSnapshot } from "@/features/backlinks/service";
 import { AiVisibilityService } from "@/features/ai-visibility/service";
+import { RefreshBacklinksButton } from "@/components/backlinks/refresh-backlinks-button";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -33,15 +34,15 @@ export default async function ProjectOverviewPage({ params }: OverviewProps) {
   } catch {
     notFound();
   }
-  const { user, project } = access;
+  const { project } = access;
 
   const auditsService = new AuditsService();
   const aiVisibilityService = new AiVisibilityService();
 
-  const [auditSummary, trackedKeywords, backlinksData, aiVisibility] = await Promise.all([
+  const [auditSummary, trackedKeywords, storedBacklinks, aiVisibility] = await Promise.all([
     auditsService.getLatestAuditSummary(projectId).catch(() => null),
     listTrackedKeywords(projectId).catch(() => []),
-    getBacklinksOverview({ projectId, userId: user.id, domain: project.domain }).catch(() => null),
+    getStoredBacklinkSnapshot(projectId, project.domain).catch(() => null),
     aiVisibilityService.getVisibilitySummary(projectId).catch(() => null),
   ]);
 
@@ -55,9 +56,9 @@ export default async function ProjectOverviewPage({ params }: OverviewProps) {
         ).toFixed(1)
       : null;
 
-  const domainRank = backlinksData?.snapshot?.rank ?? null;
-  const totalBacklinks = backlinksData?.snapshot?.totalBacklinks ?? 0;
-  const referringCount = backlinksData?.snapshot?.referringDomainsCount ?? 0;
+  const domainRank = storedBacklinks?.rank ?? null;
+  const totalBacklinks = storedBacklinks?.totalBacklinks ?? 0;
+  const referringCount = storedBacklinks?.referringDomainsCount ?? 0;
   const brandMentionRate =
     aiVisibility && aiVisibility.totalChecks > 0 ? aiVisibility.brandMentionRate : null;
 
@@ -143,6 +144,11 @@ export default async function ProjectOverviewPage({ params }: OverviewProps) {
           )}
         </div>
         <div className="flex items-center gap-3">
+          <RefreshBacklinksButton
+            projectId={projectId}
+            domain={project.domain}
+            label="Refresh Metrics (Est. $0.02)"
+          />
           <Link href={`/projects/${projectId}/agent`}>
             <Button className="bg-[#0F3D2E] hover:bg-[#0A291F] text-white gap-2 text-xs h-9 rounded-xl shadow-xs">
               <Sparkles className="h-4 w-4 text-[#8CC63F]" /> Ask neemSEO Agent

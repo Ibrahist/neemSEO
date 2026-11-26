@@ -88,9 +88,9 @@ export function getAgentTools(projectId: string, user: AuthUser) {
         });
         return {
           domain,
-          totalBacklinks: overview.snapshot.totalBacklinks,
-          referringDomainsCount: overview.snapshot.referringDomainsCount,
-          rank: overview.snapshot.rank,
+          totalBacklinks: overview.snapshot?.totalBacklinks ?? 0,
+          referringDomainsCount: overview.snapshot?.referringDomainsCount ?? 0,
+          rank: overview.snapshot?.rank ?? 0,
           topReferringDomains: overview.referringDomains.slice(0, 10),
         };
       },

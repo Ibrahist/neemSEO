@@ -25,7 +25,9 @@ export default async function CompetitorsPage({ params }: CompetitorsPageProps) 
 
   const { domains, metrics } = await getCompetitorOverview(projectId);
   const activeCompetitor = domains[0]?.competitorDomain || "";
-  const gapItems = activeCompetitor ? await getKeywordGap(projectId, activeCompetitor) : [];
+  const gapItems = activeCompetitor
+    ? await getKeywordGap(projectId, activeCompetitor, project.domain)
+    : [];
 
   return (
     <div className="space-y-6">

@@ -41,36 +41,45 @@ export function ReferringDomainsTable({ targetDomain, domains }: ReferringDomain
           </TableRow>
         </TableHeader>
         <TableBody>
-          {domains.map((d) => (
-            <TableRow key={d.id}>
-              <TableCell className="font-medium text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
-                <Globe className="h-4 w-4 text-neutral-400 shrink-0" />
-                <span>{d.referringDomain}</span>
-                <a
-                  href={`https://${d.referringDomain}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-neutral-400 hover:text-emerald-600"
-                >
-                  <ExternalLink className="h-3 w-3" />
-                </a>
-              </TableCell>
-              <TableCell>
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-neutral-100 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-200">
-                  {d.rank}/100
-                </span>
-              </TableCell>
-              <TableCell className="font-mono text-xs font-semibold">
-                {formatNumber(d.backlinksCount)}
-              </TableCell>
-              <TableCell className="text-xs text-neutral-500 font-mono">
-                {d.firstSeen || "—"}
-              </TableCell>
-              <TableCell className="text-right text-xs text-neutral-500 font-mono">
-                {d.lastSeen || "—"}
+          {domains.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={5} className="h-24 text-center text-sm text-neutral-500">
+                No referring domains discovered yet. Add your DataForSEO credentials in settings and
+                click Refresh to fetch live backlinks.
               </TableCell>
             </TableRow>
-          ))}
+          ) : (
+            domains.map((d) => (
+              <TableRow key={d.id}>
+                <TableCell className="font-medium text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+                  <Globe className="h-4 w-4 text-neutral-400 shrink-0" />
+                  <span>{d.referringDomain}</span>
+                  <a
+                    href={`https://${d.referringDomain}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-neutral-400 hover:text-emerald-600"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                </TableCell>
+                <TableCell>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-neutral-100 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-200">
+                    {d.rank}/100
+                  </span>
+                </TableCell>
+                <TableCell className="font-mono text-xs font-semibold">
+                  {formatNumber(d.backlinksCount)}
+                </TableCell>
+                <TableCell className="text-xs text-neutral-500 font-mono">
+                  {d.firstSeen || "—"}
+                </TableCell>
+                <TableCell className="text-right text-xs text-neutral-500 font-mono">
+                  {d.lastSeen || "—"}
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
     </div>

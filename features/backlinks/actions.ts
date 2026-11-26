@@ -21,5 +21,6 @@ export async function refreshBacklinksAction(rawInput: unknown) {
   });
 
   revalidatePath(`/projects/${input.projectId}/backlinks`);
+  revalidatePath(`/projects/${input.projectId}/overview`);
   return { success: true, data: result };
 }

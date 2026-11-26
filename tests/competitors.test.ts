@@ -26,10 +26,8 @@ describe("Competitor Insights Service", () => {
     spyMetrics.mockRestore();
   });
 
-  it("should return keyword gap opportunities vs competitor", async () => {
+  it("should return empty keyword gap opportunities when unconfigured (no fabricated keywords)", async () => {
     const gaps = await compService.getKeywordGap("proj_1", "ahrefs.com");
-    expect(gaps.length).toBeGreaterThan(0);
-    expect(gaps[0].opportunityScore).toBeGreaterThan(50);
-    expect(gaps[0].competitorPosition).toBeLessThanOrEqual(10);
+    expect(gaps).toEqual([]);
   });
 });

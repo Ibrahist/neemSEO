@@ -55,11 +55,11 @@ describe("Backlinks Service & Actions", () => {
       domain: "neemseo.com",
     });
 
-    expect(result.snapshot.domain).toBe("neemseo.com");
+    expect(result.snapshot?.domain).toBe("neemseo.com");
     expect(result.referringDomains[0].referringDomain).toBe("github.com");
-    expect(result.anchors.length).toBeGreaterThan(0);
-    expect(result.anchors[0].anchor).toBe("neemseo.com");
-    expect(result.newLostTrend.length).toBe(14);
+    // Without API key, no fabricated fake anchors or fake sin/cos trend
+    expect(result.anchors).toEqual([]);
+    expect(result.newLostTrend).toEqual([]);
 
     spyGetLatest.mockRestore();
     spyGetRef.mockRestore();
@@ -77,7 +77,7 @@ describe("Backlinks Service & Actions", () => {
     });
 
     expect(res.success).toBe(true);
-    expect(res.data.snapshot.domain).toBe("neemseo.com");
+    expect(res.data.snapshot?.domain).toBe("neemseo.com");
 
     spyGetLatest.mockRestore();
     spyGetRef.mockRestore();

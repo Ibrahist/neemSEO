@@ -9,14 +9,14 @@ import { GscService } from "./service";
 const connectGscSchema = z.object({
   projectId: z.string().min(1, "Project ID is required"),
   siteUrl: z.string().url("A valid site URL is required"),
-  accessToken: z.string().optional(),
+  accessToken: z.string().min(1, "A valid Google Search Console access token is required"),
 });
 
 export async function connectGscAction(formData: FormData) {
   const parsed = connectGscSchema.safeParse({
     projectId: formData.get("projectId"),
     siteUrl: formData.get("siteUrl"),
-    accessToken: formData.get("accessToken") || "mock_gsc_token_" + Date.now(),
+    accessToken: formData.get("accessToken") || undefined,
   });
 
   if (!parsed.success) {

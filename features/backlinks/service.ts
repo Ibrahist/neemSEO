@@ -17,29 +17,24 @@ export interface NewLostLinkRecord {
 }
 
 export interface BacklinksOverviewResult {
-  snapshot: backlinkRepo.BacklinkSnapshotRecord;
+  snapshot: backlinkRepo.BacklinkSnapshotRecord | null;
   referringDomains: backlinkRepo.ReferringDomainRecord[];
   anchors: AnchorRecord[];
   newLostTrend: NewLostLinkRecord[];
 }
 
-function computeDomainBaseline(cleanDomain: string) {
-  let hash = 0;
-  for (let i = 0; i < cleanDomain.length; i++) {
-    hash = (hash << 5) - hash + cleanDomain.charCodeAt(i);
-    hash |= 0;
-  }
-  const absHash = Math.abs(hash);
-
-  // Authority rank between 14 and 82 based on domain
-  const domainRank = 14 + (absHash % 69);
-  // Referring count between 12 and 1250 based on domain
-  const referringCount = 12 + (absHash % 1238);
-  // Total backlinks proportional to referring count
-  const multiplier = 3 + ((absHash >> 3) % 15);
-  const totalBacklinks = referringCount * multiplier + (absHash % 79);
-
-  return { domainRank, referringCount, totalBacklinks, absHash };
+/**
+ * Retrieves only the stored snapshot from the database without triggering any outbound network requests.
+ */
+export async function getStoredBacklinkSnapshot(
+  projectId: string,
+  domain: string
+): Promise<backlinkRepo.BacklinkSnapshotRecord | null> {
+  const cleanDomain = domain
+    .replace(/^https?:\/\//i, "")
+    .replace(/\/.*$/, "")
+    .toLowerCase();
+  return await backlinkRepo.getLatestBacklinkSnapshot(projectId, cleanDomain);
 }
 
 export async function getBacklinksOverview(params: {
@@ -54,7 +49,6 @@ export async function getBacklinksOverview(params: {
     .replace(/\/.*$/, "")
     .toLowerCase();
 
-  const brandName = cleanDomain.split(".")[0];
   const today = new Date().toISOString().split("T")[0];
 
   const existing = await backlinkRepo.getLatestBacklinkSnapshot(projectId, cleanDomain);
@@ -62,134 +56,127 @@ export async function getBacklinksOverview(params: {
   let referringDomains = existing
     ? await backlinkRepo.getReferringDomains(projectId, cleanDomain)
     : [];
+  let anchors: AnchorRecord[] = [];
+  let newLostTrend: NewLostLinkRecord[] = [];
 
-  if (!snapshot) {
-    const env = getEnv();
-    const apiKey = customApiKey || env.DATAFORSEO_API_KEY;
+  const env = getEnv();
+  const apiKey = customApiKey || env.DATAFORSEO_API_KEY;
 
-    const baseline = computeDomainBaseline(cleanDomain);
-    let totalBacklinks = baseline.totalBacklinks;
-    let referringCount = baseline.referringCount;
-    let domainRank = baseline.domainRank;
-
-    if (apiKey) {
-      try {
-        const endpoint = "backlinks/summary/live";
-        const payload = [{ target: cleanDomain }];
-        const res = await executeDataForSEOQuery<any>(endpoint, payload, {
-          projectId,
-          userId,
-          customApiKey,
-        });
-        const item = res.tasks?.[0]?.result?.[0];
-        if (item) {
-          totalBacklinks = item.backlinks || totalBacklinks;
-          referringCount = item.referring_domains || referringCount;
-          domainRank = item.rank || domainRank;
-        }
-      } catch (err) {
-        console.warn("DataForSEO backlinks API failed, using baseline:", err);
-      }
-    }
-
-    snapshot = await backlinkRepo.insertBacklinkSnapshot({
-      projectId,
-      domain: cleanDomain,
-      totalBacklinks,
-      referringDomainsCount: referringCount,
-      rank: domainRank,
-      snapshotDate: today,
-    });
-
-    const domainPool = [
-      "linkedin.com",
-      "twitter.com",
-      "github.com",
-      "producthunt.com",
-      "medium.com",
-      "dev.to",
-      "crunchbase.com",
-      "reddit.com",
-      "wikipedia.org",
-      "news.ycombinator.com",
-      "substack.com",
-      "bloomberg.com",
-    ];
-
-    const sampleReferring = [];
-    for (let i = 0; i < 5; i++) {
-      const idx = (baseline.absHash + i * 3) % domainPool.length;
-      const refDomain = domainPool[idx];
-      const linkCount = Math.max(
-        2,
-        Math.floor((totalBacklinks * (24 - i * 4)) / 100) + ((baseline.absHash >> i) % 12)
-      );
-      sampleReferring.push({
+  if (apiKey) {
+    // 1. Fetch real Backlinks Summary
+    try {
+      const summaryEndpoint = "backlinks/summary/live";
+      const summaryPayload = [{ target: cleanDomain }];
+      const summaryRes = await executeDataForSEOQuery<any>(summaryEndpoint, summaryPayload, {
         projectId,
-        targetDomain: cleanDomain,
-        referringDomain: refDomain,
-        backlinksCount: linkCount,
-        rank: Math.max(60, 95 - i * 5 - (baseline.absHash % 6)),
-        firstSeen: `2024-0${(i % 8) + 1}-15`,
-        lastSeen: today,
+        userId,
+        customApiKey,
       });
+      const item = summaryRes.tasks?.[0]?.result?.[0];
+
+      if (item) {
+        const totalBacklinks = item.backlinks ?? 0;
+        const referringCount = item.referring_domains ?? 0;
+        const domainRank = item.rank ?? 0;
+
+        snapshot = await backlinkRepo.insertBacklinkSnapshot({
+          projectId,
+          domain: cleanDomain,
+          totalBacklinks,
+          referringDomainsCount: referringCount,
+          rank: domainRank,
+          snapshotDate: today,
+        });
+      }
+    } catch (err) {
+      console.warn("DataForSEO backlinks/summary/live failed:", err);
     }
 
-    await backlinkRepo.insertReferringDomains(sampleReferring);
-    referringDomains = await backlinkRepo.getReferringDomains(projectId, cleanDomain);
-  }
+    // 2. Fetch real Referring Domains
+    try {
+      const refEndpoint = "backlinks/referring_domains/live";
+      const refPayload = [{ target: cleanDomain, limit: 20 }];
+      const refRes = await executeDataForSEOQuery<any>(refEndpoint, refPayload, {
+        projectId,
+        userId,
+        customApiKey,
+      });
+      const refItems = refRes.tasks?.[0]?.result?.[0]?.items || [];
 
-  const activeSnapshot = snapshot!;
+      if (refItems.length > 0) {
+        const recordsToInsert = refItems.map((r: any) => ({
+          projectId,
+          targetDomain: cleanDomain,
+          referringDomain: r.domain || r.referring_domain,
+          backlinksCount: r.backlinks || 1,
+          rank: r.rank || 0,
+          firstSeen: r.first_seen ? String(r.first_seen).split(" ")[0] : null,
+          lastSeen: r.last_seen ? String(r.last_seen).split(" ")[0] : null,
+        }));
 
-  // Anchor text distribution
-  const anchors: AnchorRecord[] = [
-    {
-      anchor: cleanDomain,
-      backlinksCount: Math.round(activeSnapshot.totalBacklinks * 0.42),
-      referringDomainsCount: Math.round(activeSnapshot.referringDomainsCount * 0.48),
-      percentage: 42,
-    },
-    {
-      anchor: brandName.toUpperCase(),
-      backlinksCount: Math.round(activeSnapshot.totalBacklinks * 0.28),
-      referringDomainsCount: Math.round(activeSnapshot.referringDomainsCount * 0.31),
-      percentage: 28,
-    },
-    {
-      anchor: `visit ${cleanDomain}`,
-      backlinksCount: Math.round(activeSnapshot.totalBacklinks * 0.14),
-      referringDomainsCount: Math.round(activeSnapshot.referringDomainsCount * 0.12),
-      percentage: 14,
-    },
-    {
-      anchor: "self hosted seo platform",
-      backlinksCount: Math.round(activeSnapshot.totalBacklinks * 0.09),
-      referringDomainsCount: Math.round(activeSnapshot.referringDomainsCount * 0.06),
-      percentage: 9,
-    },
-    {
-      anchor: "source code repository",
-      backlinksCount: Math.round(activeSnapshot.totalBacklinks * 0.07),
-      referringDomainsCount: Math.round(activeSnapshot.referringDomainsCount * 0.03),
-      percentage: 7,
-    },
-  ];
+        await backlinkRepo.insertReferringDomains(recordsToInsert);
+        referringDomains = await backlinkRepo.getReferringDomains(projectId, cleanDomain);
+      }
+    } catch (err) {
+      console.warn("DataForSEO backlinks/referring_domains/live failed:", err);
+    }
 
-  // 14-day new vs lost link velocity
-  const newLostTrend: NewLostLinkRecord[] = [];
-  for (let i = 13; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    const dateStr = d.toISOString().split("T")[0];
-    newLostTrend.push({
-      date: dateStr.slice(5), // MM-DD
-      newLinks: Math.floor(15 + Math.sin(i) * 8 + (i % 3) * 5),
-      lostLinks: Math.floor(4 + Math.cos(i) * 2 + (i % 2) * 2),
-    });
+    // 3. Fetch real Anchors
+    try {
+      const anchorsEndpoint = "backlinks/anchors/live";
+      const anchorsPayload = [{ target: cleanDomain, limit: 15 }];
+      const anchorsRes = await executeDataForSEOQuery<any>(anchorsEndpoint, anchorsPayload, {
+        projectId,
+        userId,
+        customApiKey,
+      });
+      const anchorItems = anchorsRes.tasks?.[0]?.result?.[0]?.items || [];
+
+      if (anchorItems.length > 0) {
+        const totalBacklinksCount = snapshot?.totalBacklinks || 1;
+        anchors = anchorItems.map((a: any) => ({
+          anchor: a.anchor || "—",
+          backlinksCount: a.backlinks || 0,
+          referringDomainsCount: a.referring_domains || 0,
+          percentage: Math.min(
+            100,
+            Math.round(((a.backlinks || 0) / Math.max(1, totalBacklinksCount)) * 100)
+          ),
+        }));
+      }
+    } catch (err) {
+      console.warn("DataForSEO backlinks/anchors/live failed:", err);
+    }
+
+    // 4. Fetch real Link Velocity (timeseries_new_lost_summary)
+    try {
+      const timeseriesEndpoint = "backlinks/timeseries_new_lost_summary/live";
+      const dFrom = new Date();
+      dFrom.setDate(dFrom.getDate() - 14);
+      const dateFromStr = dFrom.toISOString().split("T")[0];
+
+      const timeseriesPayload = [{ target: cleanDomain, date_from: dateFromStr, date_to: today }];
+      const tsRes = await executeDataForSEOQuery<any>(timeseriesEndpoint, timeseriesPayload, {
+        projectId,
+        userId,
+        customApiKey,
+      });
+      const tsItems = tsRes.tasks?.[0]?.result?.[0]?.items || [];
+
+      if (tsItems.length > 0) {
+        newLostTrend = tsItems.map((item: any) => ({
+          date: String(item.date || "").slice(5), // MM-DD
+          newLinks: item.new_backlinks ?? 0,
+          lostLinks: item.lost_backlinks ?? 0,
+        }));
+      }
+    } catch (err) {
+      console.warn("DataForSEO backlinks/timeseries_new_lost_summary/live failed:", err);
+    }
   }
 
   return {
-    snapshot: activeSnapshot,
+    snapshot,
     referringDomains,
     anchors,
     newLostTrend,

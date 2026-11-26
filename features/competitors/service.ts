@@ -6,23 +6,10 @@ import { getEnv } from "@/lib/env";
 export interface KeywordGapItem {
   keyword: string;
   searchVolume: number;
-  keywordDifficulty: number;
+  keywordDifficulty: number | null;
   competitorPosition: number;
   targetPosition: number | null; // null if unranked
   opportunityScore: number;
-}
-
-function computeCompetitorBaseline(domain: string) {
-  let hash = 0;
-  for (let i = 0; i < domain.length; i++) {
-    hash = (hash << 5) - hash + domain.charCodeAt(i);
-    hash |= 0;
-  }
-  const absHash = Math.abs(hash);
-  const rank = 15 + (absHash % 70);
-  const keywordsCount = 60 + (absHash % 3200);
-  const trafficEst = keywordsCount * (6 + (absHash % 24));
-  return { rank, keywordsCount, trafficEst };
 }
 
 export async function addCompetitor(params: {
@@ -48,10 +35,9 @@ export async function addCompetitor(params: {
   const env = getEnv();
   const apiKey = customApiKey || env.DATAFORSEO_API_KEY;
 
-  const baseline = computeCompetitorBaseline(cleanDomain);
-  let keywordsCount = baseline.keywordsCount;
-  let trafficEst = baseline.trafficEst;
-  let rank = baseline.rank;
+  let keywordsCount = 0;
+  let trafficEst = 0;
+  let rank = 0;
 
   if (apiKey) {
     try {
@@ -66,9 +52,9 @@ export async function addCompetitor(params: {
       });
       const metrics = res.tasks?.[0]?.result?.[0]?.metrics?.organic;
       if (metrics) {
-        keywordsCount = metrics.count || keywordsCount;
-        trafficEst = metrics.etv || trafficEst;
-        rank = metrics.pos_1 || rank;
+        keywordsCount = metrics.count || 0;
+        trafficEst = Math.round(metrics.etv || 0);
+        rank = metrics.pos_1 || 0;
       }
     } catch (err) {
       console.warn("Failed to fetch live competitor metrics:", err);
@@ -95,51 +81,67 @@ export async function getCompetitorOverview(projectId: string) {
 
 export async function getKeywordGap(
   projectId: string,
-  competitorDomain: string
+  competitorDomain: string,
+  targetDomain?: string,
+  customApiKey?: string
 ): Promise<KeywordGapItem[]> {
-  const cleanComp = competitorDomain.replace(/^www\./, "").toLowerCase();
+  const env = getEnv();
+  const apiKey = customApiKey || env.DATAFORSEO_API_KEY;
 
-  // Keyword Gap items (prioritizing high volume, low KD where competitor ranks in top 10)
-  return [
-    {
-      keyword: `${cleanComp.split(".")[0]} alternative`,
-      searchVolume: 12100,
-      keywordDifficulty: 38,
-      competitorPosition: 2,
-      targetPosition: null,
-      opportunityScore: 92,
-    },
-    {
-      keyword: "open source technical seo audit",
-      searchVolume: 8100,
-      keywordDifficulty: 42,
-      competitorPosition: 5,
-      targetPosition: 28,
-      opportunityScore: 86,
-    },
-    {
-      keyword: "automated serp tracker api",
-      searchVolume: 5400,
-      keywordDifficulty: 35,
-      competitorPosition: 4,
-      targetPosition: null,
-      opportunityScore: 84,
-    },
-    {
-      keyword: "free backlink monitoring tool",
-      searchVolume: 4400,
-      keywordDifficulty: 29,
-      competitorPosition: 3,
-      targetPosition: null,
-      opportunityScore: 89,
-    },
-    {
-      keyword: "dataforseo byok pricing",
-      searchVolume: 3200,
-      keywordDifficulty: 24,
-      competitorPosition: 6,
-      targetPosition: 44,
-      opportunityScore: 78,
-    },
-  ];
+  if (!apiKey || !targetDomain) {
+    // Return genuine empty list when unconfigured; never fabricate sample keywords
+    return [];
+  }
+
+  const cleanComp = competitorDomain
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .toLowerCase();
+  const cleanTarget = targetDomain
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .toLowerCase();
+
+  try {
+    const endpoint = "dataforseo_labs/google/domain_intersection/live";
+    const payload = [
+      {
+        target1: cleanComp,
+        target2: cleanTarget,
+        location_code: 2840,
+        language_code: "en",
+        limit: 20,
+      },
+    ];
+    const res = await executeDataForSEOQuery<any>(endpoint, payload, {
+      projectId,
+      customApiKey,
+    });
+    const items = res.tasks?.[0]?.result?.[0]?.items || [];
+
+    return items.map((item: any) => {
+      const keyword = item.keyword_data?.keyword || "unknown";
+      const searchVolume = item.keyword_data?.keyword_info?.search_volume || 0;
+      const keywordDifficulty = item.keyword_data?.keyword_properties?.keyword_difficulty ?? null;
+      const competitorPosition = item.first_domain_serp_element?.rank_group || 100;
+      const targetPosition = item.second_domain_serp_element?.rank_group ?? null;
+
+      const opportunityScore = Math.max(
+        10,
+        Math.min(99, Math.round((searchVolume / 1000) * 10 - (keywordDifficulty ?? 50) * 0.3))
+      );
+
+      return {
+        keyword,
+        searchVolume,
+        keywordDifficulty,
+        competitorPosition,
+        targetPosition,
+        opportunityScore,
+      };
+    });
+  } catch (err) {
+    console.warn("Failed to fetch domain intersection for keyword gap:", err);
+    return [];
+  }
 }

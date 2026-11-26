@@ -42,33 +42,42 @@ export function AnchorTextTable({ targetDomain, anchors }: AnchorTextTableProps)
           </TableRow>
         </TableHeader>
         <TableBody>
-          {anchors.map((item, idx) => (
-            <TableRow key={idx}>
-              <TableCell className="font-medium text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
-                <Hash className="h-3.5 w-3.5 text-neutral-400 shrink-0" />
-                <span className="font-mono text-xs font-semibold">{item.anchor}</span>
-              </TableCell>
-              <TableCell className="font-mono text-xs">
-                {formatNumber(item.backlinksCount)}
-              </TableCell>
-              <TableCell className="font-mono text-xs">
-                {formatNumber(item.referringDomainsCount)}
-              </TableCell>
-              <TableCell className="text-right">
-                <div className="flex items-center justify-end gap-2">
-                  <div className="w-24 bg-neutral-100 dark:bg-neutral-800 rounded-full h-2 overflow-hidden">
-                    <div
-                      className="bg-emerald-500 h-2 rounded-full transition-all"
-                      style={{ width: `${Math.min(item.percentage, 100)}%` }}
-                    />
-                  </div>
-                  <span className="text-xs font-mono font-semibold text-neutral-700 dark:text-neutral-300 w-9 text-right">
-                    {item.percentage}%
-                  </span>
-                </div>
+          {anchors.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={4} className="h-24 text-center text-sm text-neutral-500">
+                No anchor text data recorded yet. Click Refresh above with a valid DataForSEO key to
+                populate.
               </TableCell>
             </TableRow>
-          ))}
+          ) : (
+            anchors.map((item, idx) => (
+              <TableRow key={idx}>
+                <TableCell className="font-medium text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
+                  <Hash className="h-3.5 w-3.5 text-neutral-400 shrink-0" />
+                  <span className="font-mono text-xs font-semibold">{item.anchor}</span>
+                </TableCell>
+                <TableCell className="font-mono text-xs">
+                  {formatNumber(item.backlinksCount)}
+                </TableCell>
+                <TableCell className="font-mono text-xs">
+                  {formatNumber(item.referringDomainsCount)}
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex items-center justify-end gap-2">
+                    <div className="w-24 bg-neutral-100 dark:bg-neutral-800 rounded-full h-2 overflow-hidden">
+                      <div
+                        className="bg-emerald-500 h-2 rounded-full transition-all"
+                        style={{ width: `${Math.min(item.percentage, 100)}%` }}
+                      />
+                    </div>
+                    <span className="text-xs font-mono font-semibold text-neutral-700 dark:text-neutral-300 w-9 text-right">
+                      {item.percentage}%
+                    </span>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
     </div>

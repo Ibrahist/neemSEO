@@ -112,35 +112,34 @@ export async function searchKeywords(params: {
   let keywordItems: DataForSEOKeywordItem[] = [];
 
   if (apiKey) {
-    try {
-      const endpoint = "keywords_data/google/keywords_for_keywords/live";
-      const payload = [
-        {
-          keywords: [seedKeyword.trim()],
-          location_code: locationCode,
-          language_code: languageCode,
-          include_serp_info: false,
-          limit: 100,
-        },
-      ];
+    const endpoint = "keywords_data/google/keywords_for_keywords/live";
+    const payload = [
+      {
+        keywords: [seedKeyword.trim()],
+        location_code: locationCode,
+        language_code: languageCode,
+        include_serp_info: false,
+        limit: 100,
+      },
+    ];
 
-      const response = await executeDataForSEOQuery<DataForSEOKeywordItem>(endpoint, payload, {
-        projectId,
-        userId,
-        customApiKey,
-      });
+    const response = await executeDataForSEOQuery<DataForSEOKeywordItem>(endpoint, payload, {
+      projectId,
+      userId,
+      customApiKey,
+    });
 
-      const task = response.tasks?.[0];
-      if (task?.result && Array.isArray(task.result)) {
-        keywordItems = task.result;
-      }
-    } catch (error) {
-      console.warn("DataForSEO API call failed, falling back to local dataset:", error);
-      keywordItems = generateDevKeywordFixtures(seedKeyword);
+    const task = response.tasks?.[0];
+    if (task?.result && Array.isArray(task.result)) {
+      keywordItems = task.result;
     }
-  } else {
-    // Zero-config local development mode: generate structured realistic suggestions
+  } else if (process.env.DEMO_MODE === "true" || process.env.NODE_ENV === "test") {
+    // Demo / test mode: generate structured realistic suggestions
     keywordItems = generateDevKeywordFixtures(seedKeyword);
+  } else {
+    throw new Error(
+      "DataForSEO credentials are required. Please configure DATAFORSEO_LOGIN and DATAFORSEO_PASSWORD or provide a custom API key in settings."
+    );
   }
 
   // Format and save keywords

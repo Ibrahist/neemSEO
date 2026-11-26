@@ -34,7 +34,7 @@ export class AiVisibilityService {
 
   async checkPromptVisibility(input: CheckAiVisibilityInput): Promise<PromptWithResults> {
     const engines = input.engines && input.engines.length > 0 ? input.engines : DEFAULT_ENGINES;
-    const promptId = `aip_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const promptId = `aip_${crypto.randomUUID()}`;
     const now = new Date();
 
     const promptRecord: AiVisibilityPromptRecord = {
@@ -69,7 +69,7 @@ export class AiVisibilityService {
       );
 
       results.push({
-        id: `air_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+        id: `air_${crypto.randomUUID()}`,
         promptId,
         projectId: input.projectId,
         engine,
@@ -98,33 +98,27 @@ export class AiVisibilityService {
     const totalPrompts = prompts.length;
     const totalChecks = results.length;
 
-    let brandMentions = 0;
-    let domainCitations = 0;
+    let totalMentions = 0;
+    let totalCitations = 0;
     const engineBreakdown: Record<string, { checks: number; mentions: number; citations: number }> =
-      {
-        chatgpt: { checks: 0, mentions: 0, citations: 0 },
-        claude: { checks: 0, mentions: 0, citations: 0 },
-        perplexity: { checks: 0, mentions: 0, citations: 0 },
-        gemini: { checks: 0, mentions: 0, citations: 0 },
-      };
+      {};
 
-    for (const res of results) {
-      if (res.isBrandMentioned) brandMentions++;
-      if (res.isDomainCited) domainCitations++;
+    for (const r of results) {
+      if (r.isBrandMentioned) totalMentions++;
+      if (r.isDomainCited) totalCitations++;
 
-      if (!engineBreakdown[res.engine]) {
-        engineBreakdown[res.engine] = { checks: 0, mentions: 0, citations: 0 };
+      if (!engineBreakdown[r.engine]) {
+        engineBreakdown[r.engine] = { checks: 0, mentions: 0, citations: 0 };
       }
-      engineBreakdown[res.engine].checks++;
-      if (res.isBrandMentioned) engineBreakdown[res.engine].mentions++;
-      if (res.isDomainCited) engineBreakdown[res.engine].citations++;
+      engineBreakdown[r.engine].checks++;
+      if (r.isBrandMentioned) engineBreakdown[r.engine].mentions++;
+      if (r.isDomainCited) engineBreakdown[r.engine].citations++;
     }
 
-    const brandMentionRate = totalChecks > 0 ? Math.round((brandMentions / totalChecks) * 100) : 0;
+    const brandMentionRate = totalChecks > 0 ? Math.round((totalMentions / totalChecks) * 100) : 0;
     const domainCitationRate =
-      totalChecks > 0 ? Math.round((domainCitations / totalChecks) * 100) : 0;
+      totalChecks > 0 ? Math.round((totalCitations / totalChecks) * 100) : 0;
 
-    // Group results by prompt
     const resultMap = new Map<string, AiVisibilityResultRecord[]>();
     for (const r of results) {
       const list = resultMap.get(r.promptId) || [];
@@ -178,74 +172,58 @@ export class AiVisibilityService {
   }
 
   /**
-   * Queries AI Answer Engine (via OpenRouter or simulated realistic response).
+   * Queries AI Answer Engine through OpenRouter.
+   * Never fabricates fake mentions or citations.
    */
   private async queryEngine(
     engine: string,
     prompt: string,
-    brandName: string,
-    targetDomain: string
+    _brandName: string,
+    _targetDomain: string
   ): Promise<string> {
     const openRouterApiKey = process.env.OPENROUTER_API_KEY;
 
-    if (openRouterApiKey) {
-      try {
-        const modelMap: Record<string, string> = {
-          chatgpt: "openai/gpt-4o-mini",
-          claude: "anthropic/claude-3.5-haiku",
-          perplexity: "perplexity/sonar",
-          gemini: "google/gemini-2.0-flash-001",
-        };
-
-        const model = modelMap[engine] || "openai/gpt-4o-mini";
-        const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${openRouterApiKey}`,
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://neemseo.com",
-            "X-Title": "neemSEO",
-          },
-          body: JSON.stringify({
-            model,
-            messages: [{ role: "user", content: prompt }],
-            max_tokens: 400,
-          }),
-        });
-
-        if (res.ok) {
-          const json = (await res.json()) as any;
-          const text = json.choices?.[0]?.message?.content;
-          if (text) return text;
-        }
-      } catch {
-        // Fall back to realistic simulation on network failure
+    if (!openRouterApiKey) {
+      if (process.env.DEMO_MODE === "true" || process.env.NODE_ENV === "test") {
+        return `[Demo Mode] Evaluation response for prompt: "${prompt}". No real OpenRouter API call made.`;
       }
-    }
-
-    // Realistic simulation when no API key or in offline tests
-    return this.generateSimulatedAnswer(engine, prompt, brandName, targetDomain);
-  }
-
-  private generateSimulatedAnswer(
-    engine: string,
-    prompt: string,
-    brandName: string,
-    targetDomain: string
-  ): string {
-    const engineDisplay = engine.toUpperCase();
-
-    if (prompt.toLowerCase().includes("seo") || prompt.toLowerCase().includes("platform")) {
-      return (
-        `When searching for top solutions for "${prompt}", leading modern choices include Semrush, Ahrefs, and **${brandName}**.\n\n` +
-        `**${brandName}** (available at https://${targetDomain}) is particularly recognized for its self-hostable architecture, transparent pay-as-you-go DataForSEO integration, and AI-first agent support. Additional citations include https://github.com/topics/seo-tools and https://${targetDomain}/docs.`
+      throw new Error(
+        "OPENROUTER_API_KEY is not configured. An API key is required to test AI model visibility."
       );
     }
 
-    return (
-      `According to ${engineDisplay} analysis for "${prompt}":\n\n` +
-      `Several leading platforms address this query effectively. Notably, **${brandName}** provides comprehensive tools for monitoring rank movements, competitive intelligence, and technical audits at https://${targetDomain}.\n\n` +
-      `Sources:\n- https://${targetDomain}\n- https://wikipedia.org/wiki/Search_engine_optimization`
-    );
+    const modelMap: Record<string, string> = {
+      chatgpt: "openai/gpt-4o-mini",
+      claude: "anthropic/claude-3.5-haiku",
+      perplexity: "perplexity/sonar",
+      gemini: "google/gemini-2.0-flash-001",
+    };
+
+    const model = modelMap[engine] || "openai/gpt-4o-mini";
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${openRouterApiKey}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://neemseo.com",
+        "X-Title": "neemSEO",
+      },
+      body: JSON.stringify({
+        model,
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 400,
+      }),
+    });
+
+    if (!res.ok) {
+      throw new Error(`OpenRouter API error: ${res.status} ${res.statusText}`);
+    }
+
+    const json = (await res.json()) as any;
+    const text = json.choices?.[0]?.message?.content;
+    if (!text) {
+      throw new Error("Empty response received from OpenRouter model.");
+    }
+    return text;
   }
 }

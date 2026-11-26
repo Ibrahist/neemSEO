@@ -41,38 +41,47 @@ export function KeywordGapTable({ competitorDomain, items }: KeywordGapTableProp
           </TableRow>
         </TableHeader>
         <TableBody>
-          {items.map((item) => (
-            <TableRow key={item.keyword}>
-              <TableCell className="font-medium text-neutral-900 dark:text-neutral-100">
-                {item.keyword}
-              </TableCell>
-              <TableCell className="font-mono text-xs font-semibold">
-                {formatNumber(item.searchVolume)}
-              </TableCell>
-              <TableCell>
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
-                  {item.keywordDifficulty}%
-                </span>
-              </TableCell>
-              <TableCell>
-                <span className="font-bold text-neutral-900 dark:text-neutral-100">
-                  #{item.competitorPosition}
-                </span>
-              </TableCell>
-              <TableCell>
-                {item.targetPosition ? (
-                  <span className="text-xs text-neutral-500">#{item.targetPosition}</span>
-                ) : (
-                  <span className="text-xs text-red-500 font-medium">Unranked</span>
-                )}
-              </TableCell>
-              <TableCell className="text-right">
-                <span className="inline-flex items-center px-2 py-0.5 rounded font-bold text-xs bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-200">
-                  {item.opportunityScore}/100
-                </span>
+          {items.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={6} className="h-24 text-center text-sm text-neutral-500">
+                No keyword gap opportunities discovered yet. Configure DataForSEO credentials to
+                fetch live intersection rankings.
               </TableCell>
             </TableRow>
-          ))}
+          ) : (
+            items.map((item) => (
+              <TableRow key={item.keyword}>
+                <TableCell className="font-medium text-neutral-900 dark:text-neutral-100">
+                  {item.keyword}
+                </TableCell>
+                <TableCell className="font-mono text-xs font-semibold">
+                  {formatNumber(item.searchVolume)}
+                </TableCell>
+                <TableCell>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                    {item.keywordDifficulty !== null ? `${item.keywordDifficulty}%` : "—"}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <span className="font-bold text-neutral-900 dark:text-neutral-100">
+                    #{item.competitorPosition}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  {item.targetPosition ? (
+                    <span className="text-xs text-neutral-500">#{item.targetPosition}</span>
+                  ) : (
+                    <span className="text-xs text-red-500 font-medium">Unranked</span>
+                  )}
+                </TableCell>
+                <TableCell className="text-right">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded font-bold text-xs bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-200">
+                    {item.opportunityScore}/100
+                  </span>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
     </div>

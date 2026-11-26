@@ -81,83 +81,113 @@ export class GscService {
   }
 
   /**
-   * Fetches real or simulated Search Console query performance data.
+   * Fetches real Search Console query performance data when connected.
+   * If not configured or not connected, returns configured: false with setup instructions.
    */
   async getPerformanceData(
     projectId: string,
     targetDomain: string,
-    _startDate?: string,
-    _endDate?: string
-  ): Promise<{ rows: GscPerformanceRow[]; totalClicks: number; totalImpressions: number }> {
+    startDate?: string,
+    endDate?: string
+  ): Promise<{
+    configured: boolean;
+    rows: GscPerformanceRow[];
+    totalClicks: number;
+    totalImpressions: number;
+  }> {
     const status = await this.getConnectionStatus(projectId);
 
-    // If live integration is configured with tokens, decrypt and use token
-    if (status.isConnected) {
-      const integration = await gscRepo.getProjectIntegration(projectId, "gsc");
-
-      if (integration?.encryptedTokens) {
-        try {
-          const decrypted = JSON.parse(decryptSecret(integration.encryptedTokens));
-          if (decrypted.accessToken) {
-            // Live Search Console API call would happen here
-          }
-        } catch {
-          // Fall back
-        }
-      }
+    if (!status.isConnected) {
+      return {
+        configured: false,
+        rows: [],
+        totalClicks: 0,
+        totalImpressions: 0,
+      };
     }
 
-    // Realistic Search Console query performance simulation
-    const mockData: GscPerformanceRow[] = [
-      {
-        query: `${targetDomain} reviews`,
-        page: `https://${targetDomain}/reviews`,
-        clicks: 842,
-        impressions: 4320,
-        ctr: 0.1949,
-        position: 1.4,
-      },
-      {
-        query: `${targetDomain} login`,
-        page: `https://${targetDomain}/login`,
-        clicks: 654,
-        impressions: 1820,
-        ctr: 0.3593,
-        position: 1.1,
-      },
-      {
-        query: `best seo tool alternative`,
-        page: `https://${targetDomain}/blog/best-seo-tools`,
-        clicks: 412,
-        impressions: 8900,
-        ctr: 0.0462,
-        position: 4.8,
-      },
-      {
-        query: `how to run a technical seo audit`,
-        page: `https://${targetDomain}/docs/site-audit`,
-        clicks: 298,
-        impressions: 6150,
-        ctr: 0.0484,
-        position: 5.2,
-      },
-      {
-        query: `free keyword difficulty checker`,
-        page: `https://${targetDomain}/tools/keywords`,
-        clicks: 215,
-        impressions: 5400,
-        ctr: 0.0398,
-        position: 7.1,
-      },
-    ];
+    const integration = await gscRepo.getProjectIntegration(projectId, "gsc");
+    if (!integration?.encryptedTokens) {
+      return {
+        configured: false,
+        rows: [],
+        totalClicks: 0,
+        totalImpressions: 0,
+      };
+    }
 
-    const totalClicks = mockData.reduce((acc, row) => acc + row.clicks, 0);
-    const totalImpressions = mockData.reduce((acc, row) => acc + row.impressions, 0);
+    try {
+      const decrypted = JSON.parse(decryptSecret(integration.encryptedTokens));
+      const accessToken = decrypted.accessToken;
 
-    return {
-      rows: mockData,
-      totalClicks,
-      totalImpressions,
-    };
+      if (!accessToken || accessToken.startsWith("mock_")) {
+        return {
+          configured: false,
+          rows: [],
+          totalClicks: 0,
+          totalImpressions: 0,
+        };
+      }
+
+      const siteUrl = status.siteUrl || `sc-domain:${targetDomain}`;
+      const today = new Date();
+      const defaultStart = new Date(today.getTime() - 28 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split("T")[0];
+      const defaultEnd = today.toISOString().split("T")[0];
+
+      const res = await fetch(
+        `https://www.googleapis.com/webmasters/v3/sites/${encodeURIComponent(siteUrl)}/searchAnalytics/query`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            startDate: startDate || defaultStart,
+            endDate: endDate || defaultEnd,
+            dimensions: ["query", "page"],
+            rowLimit: 50,
+          }),
+        }
+      );
+
+      if (!res.ok) {
+        return {
+          configured: true,
+          rows: [],
+          totalClicks: 0,
+          totalImpressions: 0,
+        };
+      }
+
+      const data = (await res.json()) as any;
+      const rows: GscPerformanceRow[] = (data.rows || []).map((r: any) => ({
+        query: r.keys?.[0] || "",
+        page: r.keys?.[1] || "",
+        clicks: r.clicks || 0,
+        impressions: r.impressions || 0,
+        ctr: r.ctr || 0,
+        position: r.position || 0,
+      }));
+
+      const totalClicks = rows.reduce((acc, row) => acc + row.clicks, 0);
+      const totalImpressions = rows.reduce((acc, row) => acc + row.impressions, 0);
+
+      return {
+        configured: true,
+        rows,
+        totalClicks,
+        totalImpressions,
+      };
+    } catch {
+      return {
+        configured: true,
+        rows: [],
+        totalClicks: 0,
+        totalImpressions: 0,
+      };
+    }
   }
 }
