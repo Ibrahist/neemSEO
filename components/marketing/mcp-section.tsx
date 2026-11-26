@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Copy, Check, Terminal, ExternalLink, Bot, Sparkles, ArrowRight } from "lucide-react";
+import { Copy, Check, Terminal, ExternalLink, Bot, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 
 interface ClientData {
@@ -452,8 +452,7 @@ export function McpSection() {
     <section className="py-16 max-w-[1120px] mx-auto px-6" id="mcp">
       {/* Header */}
       <div className="text-center max-w-2xl mx-auto mb-10">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[#0F3D2E] text-xs font-semibold mb-3">
-          <Sparkles className="h-3.5 w-3.5 text-[#8CC63F]" />
+        <div className="inline-flex items-center px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[#0F3D2E] text-xs font-semibold mb-3">
           <span>Model Context Protocol &amp; Autonomous Agents</span>
         </div>
         <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-[#0F3D2E]">

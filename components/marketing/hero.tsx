@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export function Hero() {
   return (
@@ -38,20 +38,16 @@ export function Hero() {
 
       {/* Trust & Spec Highlights */}
       <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs text-[#57534e]">
-        <div className="flex items-center gap-1.5">
-          <CheckCircle2 className="h-4 w-4 text-[#8CC63F]" />
+        <div>
           <span>100% Free &amp; Open Source</span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <CheckCircle2 className="h-4 w-4 text-[#8CC63F]" />
+        <div>
           <span>No Credit Card or Login Required</span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <CheckCircle2 className="h-4 w-4 text-[#8CC63F]" />
+        <div>
           <span>AI SEO Agent &amp; MCP Ready</span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <CheckCircle2 className="h-4 w-4 text-[#8CC63F]" />
+        <div>
           <span>Self-Hostable Anywhere</span>
         </div>
       </div>
