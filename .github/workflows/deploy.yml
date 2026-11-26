@@ -52,7 +52,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          pnpm dlx wrangler d1 migrations apply DB --remote --env staging || true
+          pnpm dlx wrangler d1 migrations apply DB --remote --env staging
 
       - name: Deploy to Cloudflare Workers (Staging)
         id: deploy
@@ -68,7 +68,7 @@ jobs:
       - name: Smoke Test Staging Healthz
         run: |
           echo "Running healthcheck smoke test against staging..."
-          curl -f --retry 5 --retry-delay 3 --max-time 10 https://staging.neemseo.com/api/healthz || echo "Staging health endpoint verified"
+          curl -f --retry 5 --retry-delay 3 --max-time 10 https://staging.neemseo.com/api/healthz
 
   deploy-production:
     name: Deploy to Production
@@ -110,7 +110,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          pnpm dlx wrangler d1 migrations apply DB --remote || true
+          pnpm dlx wrangler d1 migrations apply DB --remote
 
       - name: Deploy to Cloudflare Workers (Production)
         id: deploy
@@ -124,7 +124,7 @@ jobs:
         id: smoke
         run: |
           echo "Running healthcheck smoke test against production..."
-          curl -f --retry 5 --retry-delay 3 --max-time 10 https://app.neemseo.com/api/healthz || echo "Production health verified"
+          curl -f --retry 5 --retry-delay 3 --max-time 10 https://app.neemseo.com/api/healthz
 
       - name: Automatic Rollback on Smoke Test Failure
         if: failure() && steps.deploy.outcome == 'success'

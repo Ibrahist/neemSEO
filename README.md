@@ -36,7 +36,7 @@ neemSEO provides a focused, high-performance SEO platform that gives you total o
 ## 🛠️ Cross-Cutting Capabilities
 
 - **100% Free Forever**: No recurring subscription fees or paywalls. Run locally or deploy to your own Cloudflare/Docker infrastructure.
-- **Dynamic Site-Specific Dashboards**: Every project dashboard reflects genuine real-time metrics, crawl status, and authority baselines tailored to its domain.
+- **Genuine Metrics & Transparent Caching**: Metrics reflect real DataForSEO API responses (requires user BYOK key) and live crawler runs with no fabricated data. Outbound queries are cached for 7 days via normalized SHA-256 request hashing (`api_cache`) to prevent redundant upstream charges. Overview dashboards display stored snapshots with explicit user-triggered refresh to protect your budget.
 - **Streamlined Light Theme UI**: Distraction-free, clean light interface with dedicated project switcher and rapid workflow navigation.
 - **Model Context Protocol (MCP)**: Full JSON-RPC 2.0 MCP server served at `/api/mcp` with OAuth 2.0 support for AI agents (Claude Desktop, Cursor, Codex, ChatGPT).
 - **In-App AI SEO Agent**: Interactive chat assistant at `/projects/[projectId]/agent` powered by OpenRouter and Vercel AI SDK, executing internal tool capabilities.
@@ -99,7 +99,7 @@ See [Cloudflare Deployment Guide](docs/SELF_HOSTING_CLOUDFLARE.md).
 
 ## 🤖 Connect AI Agents via MCP
 
-neemSEO exposes all 6 workflows as typed MCP tools at `/api/mcp`.
+neemSEO exposes 14 typed MCP tools at `/api/mcp` covering all core SEO workflows.
 
 ### Claude Desktop Configuration
 
@@ -110,7 +110,10 @@ Add to your `claude_desktop_config.json`:
   "mcpServers": {
     "neemseo": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-fetch", "http://localhost:3000/api/mcp"]
+      "args": ["-y", "@modelcontextprotocol/server-fetch", "http://localhost:3000/api/mcp"],
+      "headers": {
+        "x-api-key": "your_neemseo_api_key_here"
+      }
     }
   }
 }
@@ -123,23 +126,24 @@ In Cursor Settings &rarr; Features &rarr; MCP:
 - **Type**: `command` (or `sse`/`http`)
 - **URL**: `http://localhost:3000/api/mcp`
 
-### Available MCP Tools
+### Available MCP Tools (14 Tools)
 
-| MCP Tool                            | Description                                    |
-| :---------------------------------- | :--------------------------------------------- |
-| `neemseo_list_projects`             | List all monitored projects and active domains |
-| `neemseo_get_project`               | Get project metadata and configuration         |
-| `neemseo_search_keywords`           | Search volumes, difficulty, intent, and CPC    |
-| `neemseo_track_keyword`             | Add keyword to daily position monitoring       |
-| `neemseo_get_rank_history`          | Retrieve historical SERP ranking positions     |
-| `neemseo_add_competitor`            | Add competitor domain for organic overlap      |
-| `neemseo_get_keyword_gap`           | Identify keyword gaps and opportunities        |
-| `neemseo_get_backlinks_summary`     | Total backlinks, referring domains, and rank   |
-| `neemseo_run_site_audit`            | Launch SSRF-safe technical crawler             |
-| `neemseo_get_audit_issues`          | Severity-ranked site issues and fixes          |
-| `neemseo_check_ai_visibility`       | Test brand citation across 4 AI engines        |
-| `neemseo_get_ai_visibility_summary` | Summary of brand mention rates                 |
-| `neemseo_get_gsc_performance`       | Organic impressions, clicks, and CTR           |
+| MCP Tool                            | Description                                                |
+| :---------------------------------- | :--------------------------------------------------------- |
+| `neemseo_list_projects`             | List all monitored projects and active domains             |
+| `neemseo_get_project`               | Get project metadata and configuration                     |
+| `neemseo_search_keywords`           | Search volumes, difficulty, intent, and CPC (BYOK)         |
+| `neemseo_get_keywords`              | Retrieve discovered keywords from a research search        |
+| `neemseo_export_keywords_csv`       | Export keyword research results to CSV format              |
+| `neemseo_track_keyword`             | Add keyword to daily position monitoring                   |
+| `neemseo_get_rank_history`          | Retrieve historical SERP ranking positions                 |
+| `neemseo_add_competitor`            | Add competitor domain for organic overlap                  |
+| `neemseo_get_keyword_gap`           | Identify high-opportunity keyword gaps against competitors |
+| `neemseo_get_backlinks_summary`     | Total backlinks, referring domains, and domain rank (BYOK) |
+| `neemseo_start_site_audit`          | Launch SSRF-safe technical site crawler                    |
+| `neemseo_get_audit_issues`          | Severity-ranked site crawl issues and remediation advice   |
+| `neemseo_check_ai_visibility`       | Test brand mention & citation across 4 AI answer engines   |
+| `neemseo_get_ai_visibility_summary` | Aggregate AI visibility score and mention rates            |
 
 ---
 

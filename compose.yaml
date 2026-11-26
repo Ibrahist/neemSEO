@@ -1,14 +1,32 @@
 services:
+  # Database migration init container
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    container_name: neemseo-migrate
+    command: pnpm db:migrate
+    restart: "no"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL:-file:/app/data/neemseo.sqlite}
+    volumes:
+      - neemseo_data:/app/data
+
   # Standalone neemSEO Application
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    image: ghcr.io/neemseo/neemseo:latest
+    image: ghcr.io/ibrahist/neemseo:latest
     container_name: neemseo-app
     restart: unless-stopped
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     environment:
       - NODE_ENV=production
       - AUTH_MODE=${AUTH_MODE:-local_noauth} # local_noauth, cloudflare_access, hosted
@@ -48,7 +66,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-neemseo}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-neemseo_secure_password}
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:

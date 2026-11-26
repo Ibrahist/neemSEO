@@ -1,5 +1,6 @@
 import "server-only";
 import { z } from "zod";
+import Papa from "papaparse";
 import * as projectService from "@/features/projects/service";
 import * as keywordService from "@/features/keywords/service";
 import * as rankService from "@/features/rank-tracking/service";
@@ -126,6 +127,33 @@ export const MCP_TOOLS: Record<string, McpToolDefinition> = {
     },
   },
 
+  neemseo_export_keywords_csv: {
+    name: "neemseo_export_keywords_csv",
+    description: "Export discovered keywords from a research search as formatted CSV text.",
+    parameters: z.object({
+      projectId: z.string().describe("The target project ID"),
+      searchId: z.string().describe("The search ID returned by neemseo_search_keywords"),
+    }),
+    execute: async (input: { projectId: string; searchId: string }, user) => {
+      await projectService.getProject(input.projectId, user.organizationId);
+      const keywords = await keywordService.getKeywordsForSearch(input.searchId, input.projectId);
+      const data = keywords.map((k) => ({
+        Keyword: k.keyword,
+        "Search Volume": k.searchVolume ?? 0,
+        "Keyword Difficulty": k.keywordDifficulty ?? "",
+        CPC: k.cpc ?? 0,
+        Competition: k.competition ?? "",
+        Intent: k.intent ?? "",
+      }));
+      const csv = Papa.unparse(data, { escapeFormulae: true });
+      return {
+        searchId: input.searchId,
+        totalKeywords: keywords.length,
+        csv,
+      };
+    },
+  },
+
   // Rank Tracking
   neemseo_track_keyword: {
     name: "neemseo_track_keyword",
@@ -243,6 +271,40 @@ export const MCP_TOOLS: Record<string, McpToolDefinition> = {
     name: "neemseo_run_site_audit",
     description:
       "Initiate a full technical site audit crawl for a domain. Checks HTTP status codes, titles, meta tags, H1 headings, canonicals, and indexability with SSRF protection.",
+    parameters: z.object({
+      projectId: z.string().describe("The target project ID"),
+      startUrl: z.string().describe("The starting URL to crawl (e.g. https://example.com)"),
+      maxPages: z
+        .number()
+        .int()
+        .min(1)
+        .max(50)
+        .optional()
+        .default(15)
+        .describe("Maximum number of pages to crawl (1-50)"),
+    }),
+    execute: async (input: { projectId: string; startUrl: string; maxPages?: number }, user) => {
+      await projectService.getProject(input.projectId, user.organizationId);
+      const auditsService = new AuditsService();
+      const summary = await auditsService.runAudit(
+        input.projectId,
+        input.startUrl,
+        input.maxPages ?? 15
+      );
+      return {
+        audit: summary.audit,
+        healthScore: summary.audit.healthScore,
+        pagesCrawled: summary.pages.length,
+        criticalIssuesCount: summary.issues.filter((i) => i.severity === "critical").length,
+        warningsCount: summary.issues.filter((i) => i.severity === "warning").length,
+        topIssues: summary.issues.slice(0, 10),
+      };
+    },
+  },
+
+  neemseo_start_site_audit: {
+    name: "neemseo_start_site_audit",
+    description: "Initiate a full technical site audit crawl for a domain with SSRF protection.",
     parameters: z.object({
       projectId: z.string().describe("The target project ID"),
       startUrl: z.string().describe("The starting URL to crawl (e.g. https://example.com)"),

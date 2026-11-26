@@ -1,12 +1,36 @@
+import type { Metadata } from "next";
 import { Navbar } from "@/components/marketing/navbar";
 import { Footer } from "@/components/marketing/footer";
 import { Terminal, Server, Cpu, ShieldCheck, ExternalLink } from "lucide-react";
 import Link from "next/link";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Documentation & Resources - neemSEO",
   description:
     "Comprehensive guides for self-hosting, MCP server configuration, agent skills, and DataForSEO BYOK setup.",
+  openGraph: {
+    title: "Documentation & Resources - neemSEO",
+    description:
+      "Comprehensive guides for self-hosting, MCP server configuration, agent skills, and DataForSEO BYOK setup.",
+    url: "https://neemseo.com/docs",
+    siteName: "neemSEO",
+    images: [
+      {
+        url: "https://neemseo.com/og.png",
+        width: 1200,
+        height: 630,
+        alt: "neemSEO Documentation",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Documentation & Resources - neemSEO",
+    description:
+      "Comprehensive guides for self-hosting, MCP server configuration, agent skills, and DataForSEO BYOK setup.",
+    images: ["https://neemseo.com/og.png"],
+  },
 };
 
 export default function DocsPage() {

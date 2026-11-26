@@ -53,6 +53,10 @@ describe("MCP Server JSON-RPC 2.0 Endpoint", () => {
     expect(toolNames).toContain("neemseo_get_project");
     expect(toolNames).toContain("neemseo_search_keywords");
     expect(toolNames).toContain("neemseo_get_keywords");
+    expect(toolNames).toContain("neemseo_export_keywords_csv");
+    expect(toolNames).toContain("neemseo_start_site_audit");
+    expect(toolNames).toContain("neemseo_get_keyword_gap");
+    expect(toolNames).toContain("neemseo_check_ai_visibility");
   });
 
   it("should execute tools/call for neemseo_list_projects", async () => {

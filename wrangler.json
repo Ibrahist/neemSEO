@@ -12,7 +12,8 @@
     {
       "binding": "DB",
       "database_name": "neemseo-db",
-      "database_id": "placeholder-d1-id"
+      "database_id": "placeholder-d1-id",
+      "migrations_dir": "db/migrations/sqlite"
     }
   ],
   "kv_namespaces": [
@@ -20,5 +21,24 @@
       "binding": "KV_STORAGE",
       "id": "placeholder-kv-id"
     }
-  ]
+  ],
+  "env": {
+    "staging": {
+      "name": "neemseo-staging",
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "neemseo-db-staging",
+          "database_id": "placeholder-staging-d1-id",
+          "migrations_dir": "db/migrations/sqlite"
+        }
+      ],
+      "kv_namespaces": [
+        {
+          "binding": "KV_STORAGE",
+          "id": "placeholder-staging-kv-id"
+        }
+      ]
+    }
+  }
 }

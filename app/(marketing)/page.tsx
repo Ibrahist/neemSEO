@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Navbar } from "@/components/marketing/navbar";
 import { Hero } from "@/components/marketing/hero";
 import { McpSection } from "@/components/marketing/mcp-section";
@@ -6,6 +7,35 @@ import { BeyondData } from "@/components/marketing/beyond-data";
 import { OpenSource } from "@/components/marketing/open-source";
 import { ToolkitDemo } from "@/components/marketing/toolkit-demo";
 import { Footer } from "@/components/marketing/footer";
+
+export const metadata: Metadata = {
+  title: "neemSEO — 100% Free, Open-Source SEO Intelligence",
+  description:
+    "Professional SEO intelligence. Completely free, forever. Integrated with Claude, Cursor, and modern LLM coding agents via Model Context Protocol (MCP).",
+  openGraph: {
+    title: "neemSEO — 100% Free, Open-Source SEO Intelligence",
+    description:
+      "Professional SEO intelligence. Completely free, forever. Track rankings, analyze backlinks, audit technical SEO, and inspect competitors.",
+    url: "https://neemseo.com",
+    siteName: "neemSEO",
+    images: [
+      {
+        url: "https://neemseo.com/og.png",
+        width: 1200,
+        height: 630,
+        alt: "neemSEO Open-Source SEO Platform",
+      },
+    ],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "neemSEO — 100% Free, Open-Source SEO Intelligence",
+    description:
+      "Professional SEO intelligence. Completely free, forever. MCP server + self-hosted dashboard.",
+    images: ["https://neemseo.com/og.png"],
+  },
+};
 
 export default function MarketingPage() {
   return (
