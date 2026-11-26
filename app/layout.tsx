@@ -4,9 +4,9 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://neemseo.com"),
-  title: "neemSEO | Pay-as-you-go open-source SEO platform",
+  title: "neemSEO | Professional SEO intelligence. Completely free, forever.",
   description:
-    "A simple, focused, self-hostable alternative to Semrush and Ahrefs. Bring your own DataForSEO key and pay only for what you use.",
+    "A simple, focused, self-hostable SEO platform. Completely free, open-source, and private.",
   icons: {
     icon: "/neemseo-mark.svg",
     shortcut: "/neemseo-mark.svg",

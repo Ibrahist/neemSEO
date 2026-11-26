@@ -1,28 +1,29 @@
 "use client";
 
-import { DollarSign, Shield, Database, Lock } from "lucide-react";
+import Link from "next/link";
+import { Sparkles, Shield, Database, Lock, Gift, ArrowRight } from "lucide-react";
 
 export function ComparisonSection() {
   const valueProps = [
     {
-      icon: DollarSign,
-      title: "Wholesale API Pricing",
-      desc: "A keyword search costs $0.0075. Tracked rank checks cost $0.001. Pay pennies per month directly to DataForSEO instead of $130+/mo fixed subscription markups.",
+      icon: Gift,
+      title: "100% Free & Open Source",
+      desc: "Zero software licenses, zero seat limits, and zero paywalled tools. Run it locally or deploy on your own servers with complete autonomy.",
     },
     {
       icon: Lock,
-      title: "Strict Tenant Isolation",
-      desc: "Every keyword, audit, competitor, and GSC token is scoped to your organizationId and projectId. Zero data leaking across teams or agency clients.",
+      title: "Strict Privacy & Data Ownership",
+      desc: "Every keyword, audit, competitor benchmark, and GSC token belongs to you. Zero data selling, zero telemetry, and strict tenant isolation.",
     },
     {
       icon: Database,
-      title: "Dual-Dialect Engine",
-      desc: "Deploy on Cloudflare D1 with SQLite for zero-maintenance serverless edge hosting, or scale to PostgreSQL with Docker. Dual schemas tested on both dialects.",
+      title: "Dual-Dialect Self-Hosting",
+      desc: "Deploy for free on Cloudflare D1 with SQLite for zero-maintenance edge hosting, or scale to PostgreSQL with Docker. Dual schemas tested on both.",
     },
     {
       icon: Shield,
-      title: "SSRF-Protected Crawler",
-      desc: "Our site audit engine blocks private IPv4/IPv6 ranges, loopback, and cloud metadata endpoints (169.254.169.254) with automatic re-validation after redirects.",
+      title: "SSRF-Protected Security",
+      desc: "Our site audit engine blocks private IPv4/IPv6 ranges, loopback, and cloud metadata endpoints (169.254.169.254) with automatic re-validation.",
     },
   ];
 
@@ -30,12 +31,17 @@ export function ComparisonSection() {
     <section className="max-w-[1120px] mx-auto px-6 my-14">
       <div className="rounded-3xl bg-[#0F3D2E] text-white p-8 md:p-14 shadow-2xl border border-emerald-950">
         <div className="max-w-2xl mb-12">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#8CC63F]/20 border border-[#8CC63F]/30 text-[#8CC63F] text-xs font-semibold mb-4">
+            <Sparkles className="h-3.5 w-3.5" />
+            <span>100% Free Forever · No Subscription · No Credit Card</span>
+          </div>
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-white">
-            Why pay $130+/month for bloated suites?
+            Full SEO power. Completely free, forever.
           </h2>
           <p className="mt-3 text-sm md:text-base text-neutral-300 leading-relaxed">
-            Traditional SEO suites lock you into expensive monthly plans with arbitrary keyword and
-            seat limits. neemSEO gives you the exact same commercial data with 0% software markup.
+            No paywalls, no monthly subscription fees, and no artificial feature limits. neemSEO
+            gives you the full power of a modern SEO platform completely free, self-hostable, and
+            fully open-source.
           </p>
         </div>
 
@@ -58,6 +64,21 @@ export function ComparisonSection() {
               </div>
             );
           })}
+        </div>
+
+        {/* Bottom Callout Banner */}
+        <div className="mt-10 pt-8 border-t border-emerald-900/60 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="text-xs text-neutral-300">
+            <span className="font-semibold text-white">Instant Access:</span> No registration, no
+            login, and no payment required.
+          </div>
+          <Link
+            href="/projects"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#8CC63F] text-[#0F3D2E] text-xs font-bold hover:bg-[#9de047] transition-colors shadow-xs shrink-0"
+          >
+            <span>Launch Free Platform</span>
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
         </div>
       </div>
     </section>

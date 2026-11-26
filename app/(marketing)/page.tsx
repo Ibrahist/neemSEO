@@ -23,7 +23,7 @@ export default function MarketingPage() {
           {/* Superpowers with neemSEO MCP Section */}
           <McpSection />
 
-          {/* Why Pay $130+/mo vs neemSEO Wholesale Comparison */}
+          {/* 100% Free SEO Intelligence Section */}
           <ComparisonSection />
 
           {/* Beyond Data Section */}

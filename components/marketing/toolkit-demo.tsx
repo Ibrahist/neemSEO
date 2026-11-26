@@ -104,7 +104,7 @@ export function ToolkitDemo() {
               </h4>
             </div>
             <p className="text-xs text-neutral-500 mt-0.5">
-              Wholesale DataForSEO API · Cached in api_cache · Scoped to project
+              100% Free Platform · Instant DataForSEO Insights · Project Scoped
             </p>
           </div>
 
