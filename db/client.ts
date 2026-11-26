@@ -28,19 +28,7 @@ export function getDialect(): Dialect {
   return "sqlite";
 }
 
-export async function getDb() {
-  const runtime = getRuntimeEnvironment();
-
-  if (runtime === "cloudflare") {
-    const cfEnv = await getCloudflareEnv();
-    if (cfEnv?.DB) {
-      if (!d1Instance) {
-        d1Instance = drizzleD1(cfEnv.DB, { schema: sqliteSchema });
-      }
-      return { db: d1Instance, dialect: "sqlite" as const, schema: sqliteSchema };
-    }
-  }
-
+export function getSyncDb() {
   const dialect = getDialect();
 
   if (dialect === "postgres") {
@@ -68,4 +56,20 @@ export async function getDb() {
   }
 
   return { db: sqliteInstance, dialect: "sqlite" as const, schema: sqliteSchema };
+}
+
+export async function getDb() {
+  const runtime = getRuntimeEnvironment();
+
+  if (runtime === "cloudflare") {
+    const cfEnv = await getCloudflareEnv();
+    if (cfEnv?.DB) {
+      if (!d1Instance) {
+        d1Instance = drizzleD1(cfEnv.DB, { schema: sqliteSchema });
+      }
+      return { db: d1Instance, dialect: "sqlite" as const, schema: sqliteSchema };
+    }
+  }
+
+  return getSyncDb();
 }

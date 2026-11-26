@@ -149,4 +149,64 @@ describe("MCP Server JSON-RPC 2.0 Endpoint", () => {
     spyGetProj.mockRestore();
     spySearch.mockRestore();
   });
+
+  it("should handle ping request", async () => {
+    const req = new NextRequest("http://localhost:3000/api/mcp", {
+      method: "POST",
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: "ping-1",
+        method: "ping",
+      }),
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.id).toBe("ping-1");
+    expect(json.result).toEqual({});
+  });
+
+  it("should ignore notifications without id and return 204", async () => {
+    const req = new NextRequest("http://localhost:3000/api/mcp", {
+      method: "POST",
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        method: "notifications/initialized",
+      }),
+    });
+    const res = await POST(req);
+    expect(res.status).toBe(204);
+  });
+
+  it("should echo supported protocolVersion in initialize", async () => {
+    const req = new NextRequest("http://localhost:3000/api/mcp", {
+      method: "POST",
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: 99,
+        method: "initialize",
+        params: { protocolVersion: "2024-11-05" },
+      }),
+    });
+    const res = await POST(req);
+    const json = await res.json();
+    expect(json.result.protocolVersion).toBe("2024-11-05");
+  });
+
+  it("should output accurate JSON schema types in tools/list including capped maxPages", async () => {
+    const req = new NextRequest("http://localhost:3000/api/mcp", {
+      method: "POST",
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: 5,
+        method: "tools/list",
+      }),
+    });
+    const res = await POST(req);
+    const json = await res.json();
+    const auditTool = json.result.tools.find((t: any) => t.name === "neemseo_run_site_audit");
+    expect(auditTool).toBeDefined();
+    expect(auditTool.inputSchema.properties.maxPages.type).toMatch(/integer|number/);
+    expect(auditTool.inputSchema.properties.maxPages.maximum).toBe(50);
+  });
 });

@@ -101,7 +101,14 @@ export function getAgentTools(projectId: string, user: AuthUser) {
         "Initiate a full technical crawler audit for a website to find broken links, missing tags, and errors.",
       parameters: z.object({
         startUrl: z.string().describe("Starting URL to crawl"),
-        maxPages: z.number().optional().default(10).describe("Max pages to crawl"),
+        maxPages: z
+          .number()
+          .int()
+          .min(1)
+          .max(50)
+          .optional()
+          .default(10)
+          .describe("Max pages to crawl (1-50)"),
       }),
       execute: async ({ startUrl, maxPages }) => {
         const service = new AuditsService();

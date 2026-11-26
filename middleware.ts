@@ -2,10 +2,11 @@ import { NextResponse, type NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const authMode = process.env.AUTH_MODE || "local_noauth";
 
-  // Platform is 100% free with no login required.
-  // Redirect any visits to /login or /register straight to the platform dashboard.
-  if (pathname === "/login" || pathname === "/register") {
+  // In local_noauth mode, platform requires no credentials,
+  // so /login and /register redirect directly to /projects.
+  if (authMode === "local_noauth" && (pathname === "/login" || pathname === "/register")) {
     return NextResponse.redirect(new URL("/projects", request.url));
   }
 

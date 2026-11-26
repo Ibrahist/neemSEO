@@ -8,6 +8,13 @@
       "when": 1795639845056,
       "tag": "0000_boring_wallflower",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1795696467295,
+      "tag": "0001_eminent_johnny_blaze",
+      "breakpoints": true
     }
   ]
 }

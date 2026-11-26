@@ -1,9 +1,21 @@
 import "server-only";
 import { streamText, createDataStreamResponse } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
+import { z } from "zod";
 import { requireAuth } from "@/lib/auth/session";
 import { getProject } from "@/features/projects/service";
 import { getAgentTools } from "@/features/agent/tools";
+import { getEnv } from "@/lib/env";
+
+const chatRequestSchema = z.object({
+  messages: z.array(
+    z.object({
+      role: z.enum(["user", "assistant", "system", "data"]),
+      content: z.string(),
+    })
+  ),
+  projectId: z.string().min(1, "projectId is required"),
+});
 
 export async function POST(req: Request) {
   let user;
@@ -16,25 +28,48 @@ export async function POST(req: Request) {
     });
   }
 
-  const { messages, projectId } = await req.json();
-
-  if (!projectId) {
-    return new Response(JSON.stringify({ error: "projectId is required" }), {
+  let rawBody: unknown;
+  try {
+    rawBody = await req.json();
+  } catch {
+    return new Response(JSON.stringify({ error: "Invalid JSON body" }), {
       status: 400,
       headers: { "Content-Type": "application/json" },
     });
   }
 
-  // Tenant boundary verification
-  const project = await getProject(projectId, user.organizationId);
-  if (!project) {
+  const parsed = chatRequestSchema.safeParse(rawBody);
+  if (!parsed.success) {
+    return new Response(
+      JSON.stringify({ error: parsed.error.issues[0]?.message || "Invalid request" }),
+      {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
+
+  const { messages, projectId } = parsed.data;
+
+  // Tenant boundary verification (catch throw from getProject)
+  let project;
+  try {
+    project = await getProject(projectId, user.organizationId);
+    if (!project) {
+      return new Response(JSON.stringify({ error: "Project not found or access denied" }), {
+        status: 404,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+  } catch {
     return new Response(JSON.stringify({ error: "Project not found or access denied" }), {
       status: 404,
       headers: { "Content-Type": "application/json" },
     });
   }
 
-  const openRouterApiKey = process.env.OPENROUTER_API_KEY;
+  const env = getEnv();
+  const openRouterApiKey = env.OPENROUTER_API_KEY;
 
   if (openRouterApiKey) {
     const openrouter = createOpenAI({
@@ -47,9 +82,7 @@ export async function POST(req: Request) {
     });
 
     const result = streamText({
-      model: openrouter(
-        process.env.OPENROUTER_MODEL || "anthropic/claude-3.5-haiku"
-      ) as unknown as Parameters<typeof streamText>[0]["model"],
+      model: openrouter(env.OPENROUTER_MODEL),
       system: `You are neemSEO AI, an autonomous senior technical SEO engineer assisting the user with their website "${project.domain}" (Project: "${project.name}").
 You have direct access to tools for keyword research, competitor gap analysis, rank tracking, backlink intelligence, technical site crawler audits, and AI visibility checks.
 Always invoke the relevant tools to fetch actual project metrics when asked questions about keywords, rankings, competitors, audits, or visibility.

@@ -161,7 +161,7 @@ export async function searchKeywords(params: {
       searchVolume: item.search_volume ?? 0,
       cpc: Number(item.cpc ?? 0),
       competition: Number(item.competition ?? 0),
-      keywordDifficulty: item.keyword_difficulty ?? Math.floor(Math.random() * 60 + 20),
+      keywordDifficulty: item.keyword_difficulty ?? null,
       intent,
       rawDataJson: JSON.stringify(item),
     };

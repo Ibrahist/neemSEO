@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { authenticateMcpRequest } from "@/lib/mcp/auth";
 import { MCP_TOOLS } from "@/features/mcp/tools";
+import { zodToJsonSchema } from "zod-to-json-schema";
 
 export const dynamic = "force-dynamic";
 
@@ -31,17 +32,28 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const id = body.id as string | number | null;
+  const id = body.id as string | number | null | undefined;
   const method = body.method as string;
   const params = body.params as Record<string, unknown> | undefined;
 
+  // Ignore any JSON-RPC notifications (e.g. notifications/* with no id or notifications/initialized)
+  if (method?.startsWith("notifications/")) {
+    return new NextResponse(null, { status: 204 });
+  }
+
   switch (method) {
-    case "initialize":
+    case "initialize": {
+      const clientVersion = (params?.protocolVersion as string) || "2024-11-05";
+      const supportedVersions = ["2024-11-05", "2024-10-07"];
+      const protocolVersion = supportedVersions.includes(clientVersion)
+        ? clientVersion
+        : "2024-11-05";
+
       return NextResponse.json({
         jsonrpc: "2.0",
-        id,
+        id: id ?? null,
         result: {
-          protocolVersion: "2024-11-05",
+          protocolVersion,
           capabilities: {
             tools: { listChanged: false },
           },
@@ -51,30 +63,23 @@ export async function POST(request: NextRequest) {
           },
         },
       });
+    }
 
-    case "notifications/initialized":
-      return new NextResponse(null, { status: 204 });
+    case "ping":
+      return NextResponse.json({
+        jsonrpc: "2.0",
+        id: id ?? null,
+        result: {},
+      });
 
     case "tools/list": {
       const toolList = Object.values(MCP_TOOLS).map((tool) => {
-        const shape = tool.parameters.shape;
-        const properties: Record<string, { type: string; description: string }> = {};
-        const required: string[] = [];
+        const rawJsonSchema = zodToJsonSchema(tool.parameters, {
+          $refStrategy: "none",
+        }) as Record<string, unknown>;
 
-        for (const [key, prop] of Object.entries(
-          shape as Record<
-            string,
-            { _def: { typeName?: string; description?: string }; isOptional?: () => boolean }
-          >
-        )) {
-          properties[key] = {
-            type: prop._def.typeName === "ZodNumber" ? "number" : "string",
-            description: prop._def.description || key,
-          };
-          if (!prop.isOptional?.()) {
-            required.push(key);
-          }
-        }
+        const properties = (rawJsonSchema.properties as Record<string, unknown>) || {};
+        const required = (rawJsonSchema.required as string[]) || [];
 
         return {
           name: tool.name,
@@ -89,7 +94,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         jsonrpc: "2.0",
-        id,
+        id: id ?? null,
         result: { tools: toolList },
       });
     }
@@ -101,7 +106,7 @@ export async function POST(request: NextRequest) {
       if (!toolName) {
         return NextResponse.json({
           jsonrpc: "2.0",
-          id,
+          id: id ?? null,
           error: { code: -32602, message: "Missing tool name in params" },
         });
       }
@@ -110,7 +115,7 @@ export async function POST(request: NextRequest) {
       if (!tool) {
         return NextResponse.json({
           jsonrpc: "2.0",
-          id,
+          id: id ?? null,
           error: { code: -32601, message: `Tool '${toolName}' not found` },
         });
       }
@@ -121,7 +126,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({
           jsonrpc: "2.0",
-          id,
+          id: id ?? null,
           result: {
             content: [
               {
@@ -136,7 +141,7 @@ export async function POST(request: NextRequest) {
         const errorMsg = err instanceof Error ? err.message : "Tool execution failed";
         return NextResponse.json({
           jsonrpc: "2.0",
-          id,
+          id: id ?? null,
           result: {
             content: [{ type: "text", text: `Error: ${errorMsg}` }],
             isError: true,
@@ -148,7 +153,7 @@ export async function POST(request: NextRequest) {
     default:
       return NextResponse.json({
         jsonrpc: "2.0",
-        id,
+        id: id ?? null,
         error: { code: -32601, message: `Method '${method}' not supported` },
       });
   }

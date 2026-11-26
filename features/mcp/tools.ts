@@ -246,7 +246,14 @@ export const MCP_TOOLS: Record<string, McpToolDefinition> = {
     parameters: z.object({
       projectId: z.string().describe("The target project ID"),
       startUrl: z.string().describe("The starting URL to crawl (e.g. https://example.com)"),
-      maxPages: z.number().optional().default(15).describe("Maximum number of pages to crawl"),
+      maxPages: z
+        .number()
+        .int()
+        .min(1)
+        .max(50)
+        .optional()
+        .default(15)
+        .describe("Maximum number of pages to crawl (1-50)"),
     }),
     execute: async (input: { projectId: string; startUrl: string; maxPages?: number }, user) => {
       await projectService.getProject(input.projectId, user.organizationId);

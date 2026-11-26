@@ -119,6 +119,9 @@ export function KeywordTable({ searchId, projectId, seedKeyword, keywords }: Key
         ),
         cell: ({ row }) => {
           const kd = row.original.keywordDifficulty;
+          if (kd === null || kd === undefined) {
+            return <span className="text-neutral-400 font-mono text-xs">—</span>;
+          }
           let color = "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/60";
           if (kd >= 70) color = "text-red-600 bg-red-50 dark:bg-red-950/60";
           else if (kd >= 50) color = "text-amber-600 bg-amber-50 dark:bg-amber-950/60";

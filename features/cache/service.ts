@@ -5,11 +5,32 @@ import * as cacheRepo from "./repository";
 const DEFAULT_TTL_SECONDS = 7 * 24 * 60 * 60; // 7 days cache TTL for expensive SEO queries
 
 /**
+ * Deterministic recursive JSON stringification:
+ * - Sorts object keys at all depths
+ * - Preserves array elements in their original order
+ * - Recursively normalizes nested structures
+ */
+export function stableStringify(value: unknown): string {
+  if (value === null || typeof value !== "object") {
+    return JSON.stringify(value);
+  }
+  if (Array.isArray(value)) {
+    return `[${value.map((item) => stableStringify(item)).join(",")}]`;
+  }
+  const obj = value as Record<string, unknown>;
+  const sortedKeys = Object.keys(obj).sort();
+  const entries = sortedKeys.map((key) => `${JSON.stringify(key)}:${stableStringify(obj[key])}`);
+  return `{${entries.join(",")}}`;
+}
+
+/**
  * Creates a deterministic SHA-256 hash of endpoint + sorted JSON payload.
+ * Prefixed with "v2:" to invalidate legacy poisoned cache rows.
  */
 export function hashRequest(endpoint: string, payload: unknown): string {
-  const normalized = JSON.stringify(payload, Object.keys(payload || {}).sort());
-  return createHash("sha256").update(`${endpoint}:${normalized}`).digest("hex");
+  const normalized = stableStringify(payload);
+  const hash = createHash("sha256").update(`${endpoint}:${normalized}`).digest("hex");
+  return `v2:${hash}`;
 }
 
 export async function getFromCache<T>(endpoint: string, payload: unknown): Promise<T | null> {

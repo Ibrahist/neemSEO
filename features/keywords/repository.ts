@@ -19,7 +19,7 @@ export interface KeywordRecord {
   searchVolume: number;
   cpc: number;
   competition: number;
-  keywordDifficulty: number;
+  keywordDifficulty: number | null;
   intent: "informational" | "navigational" | "commercial" | "transactional";
   rawDataJson: string | null;
   updatedAt: Date;
@@ -39,7 +39,7 @@ export interface CreateKeywordInput {
   searchVolume: number;
   cpc: number;
   competition: number;
-  keywordDifficulty: number;
+  keywordDifficulty: number | null;
   intent: "informational" | "navigational" | "commercial" | "transactional";
   rawDataJson?: string | null;
 }

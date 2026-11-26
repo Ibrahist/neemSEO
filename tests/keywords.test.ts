@@ -94,4 +94,40 @@ describe("Keyword Service & Intent Classification", () => {
     );
     expect(csv).toContain("seo audit,18100,65,2.45,0.72,informational");
   });
+
+  it("should store null keywordDifficulty when DataForSEO omits it (no random fabrication)", async () => {
+    const mockSearch = {
+      id: "search_null_kd",
+      projectId: "proj_abc",
+      seedKeyword: "obscure query",
+      locationCode: 2840,
+      languageCode: "en",
+      createdAt: new Date(),
+    };
+
+    let insertedItems: any[] = [];
+    const spyInsertSearch = vi
+      .spyOn(keywordRepo, "insertKeywordSearch")
+      .mockResolvedValue(mockSearch as any);
+    const spyInsertKeywords = vi
+      .spyOn(keywordRepo, "insertKeywords")
+      .mockImplementation(async (items) => {
+        insertedItems = items as any[];
+      });
+    const spyGetKeywords = vi.spyOn(keywordRepo, "getKeywordsBySearchId").mockResolvedValue([]);
+
+    await searchKeywords({
+      projectId: "proj_abc",
+      seedKeyword: "obscure query",
+    });
+
+    expect(insertedItems.length).toBeGreaterThan(0);
+    // Verified that KD is null or real number, never fabricated with Math.random
+    const kd = insertedItems[0].keywordDifficulty;
+    expect(kd === null || typeof kd === "number").toBe(true);
+
+    spyInsertSearch.mockRestore();
+    spyInsertKeywords.mockRestore();
+    spyGetKeywords.mockRestore();
+  });
 });

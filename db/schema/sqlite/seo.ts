@@ -52,7 +52,7 @@ export const keywords = sqliteTable("keywords", {
   searchVolume: integer("search_volume").default(0).notNull(),
   cpc: real("cpc").default(0).notNull(),
   competition: real("competition").default(0).notNull(),
-  keywordDifficulty: integer("keyword_difficulty").default(0).notNull(),
+  keywordDifficulty: integer("keyword_difficulty"),
   intent: text("intent").default("informational").notNull(),
   rawDataJson: text("raw_data_json"),
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
