@@ -8,7 +8,7 @@ The simplest way to self-host neemSEO is using Docker Compose with local SQLite 
 
 ```bash
 # Clone the repository
-git clone https://github.com/neemseo/neemseo.git
+git clone https://github.com/Ibrahist/neemSEO.git
 cd neemseo
 
 # Set your secrets in a .env file

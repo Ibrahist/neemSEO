@@ -178,7 +178,7 @@ export function Footer() {
               <ul className="space-y-2 text-neutral-600">
                 <li>
                   <a
-                    href="https://github.com"
+                    href="https://github.com/Ibrahist/neemSEO"
                     target="_blank"
                     rel="noreferrer"
                     className="hover:text-neutral-900 transition-colors"
@@ -188,7 +188,7 @@ export function Footer() {
                 </li>
                 <li>
                   <a
-                    href="https://github.com"
+                    href="https://github.com/Ibrahist/neemSEO/blob/main/LICENSE"
                     target="_blank"
                     rel="noreferrer"
                     className="hover:text-neutral-900 transition-colors"
@@ -198,7 +198,7 @@ export function Footer() {
                 </li>
                 <li>
                   <a
-                    href="https://github.com"
+                    href="https://github.com/Ibrahist/neemSEO/issues"
                     target="_blank"
                     rel="noreferrer"
                     className="hover:text-neutral-900 transition-colors"
@@ -208,7 +208,7 @@ export function Footer() {
                 </li>
                 <li>
                   <a
-                    href="https://github.com"
+                    href="https://github.com/Ibrahist/neemSEO/releases"
                     target="_blank"
                     rel="noreferrer"
                     className="hover:text-neutral-900 transition-colors"
@@ -230,7 +230,7 @@ export function Footer() {
 
             <div className="flex items-center gap-4 text-neutral-600">
               <a
-                href="https://github.com"
+                href="https://github.com/Ibrahist/neemSEO"
                 target="_blank"
                 rel="noreferrer"
                 className="hover:text-neutral-900 flex items-center gap-1"
@@ -248,7 +248,7 @@ export function Footer() {
 
       {/* Floating Action Button */}
       <a
-        href="https://github.com"
+        href="https://github.com/Ibrahist/neemSEO"
         target="_blank"
         rel="noreferrer"
         className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-2 rounded-full bg-[#0F3D2E] px-4 py-2 text-xs font-semibold text-white shadow-lg hover:bg-[#0A291F] transition-all hover:scale-105"

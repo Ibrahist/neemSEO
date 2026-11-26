@@ -325,7 +325,7 @@ export function Navbar() {
             </div>
 
             <a
-              href="https://github.com"
+              href="https://github.com/Ibrahist/neemSEO"
               target="_blank"
               rel="noreferrer"
               className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[#ded9d2] bg-white px-3 text-xs font-semibold text-neutral-700 hover:text-neutral-950 hover:bg-neutral-50 transition-colors shadow-2xs"

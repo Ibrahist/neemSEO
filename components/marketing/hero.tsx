@@ -33,7 +33,7 @@ export function Hero() {
           Launch Platform <ArrowRight className="ml-2 h-4 w-4" />
         </Link>
         <a
-          href="https://github.com"
+          href="https://github.com/Ibrahist/neemSEO"
           target="_blank"
           rel="noreferrer"
           className="inline-flex h-12 md:h-14 items-center justify-center rounded-xl border border-[#ded9d2] bg-white px-7 text-base font-semibold text-neutral-800 shadow-xs hover:bg-neutral-50 transition-all"

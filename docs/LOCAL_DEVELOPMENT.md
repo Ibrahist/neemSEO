@@ -13,7 +13,7 @@ Welcome to the **neemSEO** local development environment.
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/neemseo/neemseo.git
+git clone https://github.com/Ibrahist/neemSEO.git
 cd neemseo
 pnpm install
 ```

@@ -20,7 +20,7 @@ export function OpenSource() {
 
         <div className="flex flex-wrap items-center gap-4">
           <a
-            href="https://github.com"
+            href="https://github.com/Ibrahist/neemSEO"
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[#0F3D2E] text-sm font-semibold text-white hover:bg-[#0A291F] shadow-sm transition-all"

@@ -7,8 +7,8 @@
 Usable by humans through a modern web UI, and usable by autonomous AI agents through an MCP server.
 Users bring their own DataForSEO API key and pay only for wholesale data they consume.
 
-[![CI Pipeline](https://github.com/neemseo/neemseo/actions/workflows/ci.yml/badge.svg)](https://github.com/neemseo/neemseo/actions/workflows/ci.yml)
-[![Security Scan](https://github.com/neemseo/neemseo/actions/workflows/security.yml/badge.svg)](https://github.com/neemseo/neemseo/actions/workflows/security.yml)
+[![CI Pipeline](https://github.com/Ibrahist/neemSEO/actions/workflows/ci.yml/badge.svg)](https://github.com/Ibrahist/neemSEO/actions/workflows/ci.yml)
+[![Security Scan](https://github.com/Ibrahist/neemSEO/actions/workflows/security.yml/badge.svg)](https://github.com/Ibrahist/neemSEO/actions/workflows/security.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
 [![Next.js 15](https://img.shields.io/badge/Next.js-15.5-black.svg)](https://nextjs.org/)
 [![React 19](https://img.shields.io/badge/React-19-blue.svg)](https://react.dev/)
@@ -46,7 +46,7 @@ neemSEO replaces bloated, expensive recurring SEO subscriptions ($130–$400/mo)
 ### 1. Run with Docker Compose (1-Click)
 
 ```bash
-git clone https://github.com/neemseo/neemseo.git
+git clone https://github.com/Ibrahist/neemSEO.git
 cd neemseo
 
 # Start with local SQLite storage
