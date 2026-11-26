@@ -45,8 +45,8 @@ export function AnchorTextTable({ targetDomain, anchors }: AnchorTextTableProps)
           {anchors.length === 0 ? (
             <TableRow>
               <TableCell colSpan={4} className="h-24 text-center text-sm text-neutral-500">
-                No anchor text data recorded yet. Click Refresh above with a valid DataForSEO key to
-                populate.
+                No anchor text data recorded yet. Ensure your DataForSEO credentials are configured
+                to populate.
               </TableCell>
             </TableRow>
           ) : (

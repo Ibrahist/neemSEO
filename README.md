@@ -36,7 +36,7 @@ neemSEO provides a focused, high-performance SEO platform that gives you total o
 ## 🛠️ Cross-Cutting Capabilities
 
 - **100% Free Forever**: No recurring subscription fees or paywalls. Run locally or deploy to your own Cloudflare/Docker infrastructure.
-- **Genuine Metrics & Transparent Caching**: Metrics reflect real DataForSEO API responses (requires user BYOK key) and live crawler runs with no fabricated data. Outbound queries are cached for 7 days via normalized SHA-256 request hashing (`api_cache`) to prevent redundant upstream charges. Overview dashboards display stored snapshots with explicit user-triggered refresh to protect your budget.
+- **Genuine Metrics & Transparent Caching**: Metrics reflect real DataForSEO API responses (requires user BYOK key) and live crawler runs with no fabricated data. Outbound queries are cached for 7 days via normalized SHA-256 request hashing (`api_cache`) to prevent redundant upstream charges. Overview dashboards display stored snapshots to protect your budget.
 - **Streamlined Light Theme UI**: Distraction-free, clean light interface with dedicated project switcher and rapid workflow navigation.
 - **Model Context Protocol (MCP)**: Full JSON-RPC 2.0 MCP server served at `/api/mcp` with OAuth 2.0 support for AI agents (Claude Desktop, Cursor, Codex, ChatGPT).
 - **In-App AI SEO Agent**: Interactive chat assistant at `/projects/[projectId]/agent` powered by OpenRouter and Vercel AI SDK, executing internal tool capabilities.

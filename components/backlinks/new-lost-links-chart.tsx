@@ -31,7 +31,7 @@ export function NewLostLinksChart({ data }: NewLostLinksChartProps) {
       <div className="h-72 w-full pt-2">
         {data.length === 0 ? (
           <div className="h-full w-full flex items-center justify-center text-sm text-neutral-500">
-            No link velocity data available. Click Refresh above with a valid DataForSEO key to
+            No link velocity data available. Ensure your DataForSEO credentials are configured to
             fetch live trend data.
           </div>
         ) : (

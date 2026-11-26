@@ -5,7 +5,6 @@ import { getBacklinksOverview } from "@/features/backlinks/service";
 import { ReferringDomainsTable } from "@/components/backlinks/referring-domains-table";
 import { AnchorTextTable } from "@/components/backlinks/anchor-text-table";
 import { NewLostLinksChart } from "@/components/backlinks/new-lost-links-chart";
-import { RefreshBacklinksButton } from "@/components/backlinks/refresh-backlinks-button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { formatNumber } from "@/lib/utils";
@@ -44,8 +43,6 @@ export default async function BacklinksPage({ params }: BacklinksPageProps) {
             {project.domain}
           </p>
         </div>
-
-        <RefreshBacklinksButton projectId={projectId} domain={project.domain} />
       </div>
 
       {/* Snapshot Cards */}

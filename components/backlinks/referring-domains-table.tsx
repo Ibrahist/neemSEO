@@ -44,8 +44,8 @@ export function ReferringDomainsTable({ targetDomain, domains }: ReferringDomain
           {domains.length === 0 ? (
             <TableRow>
               <TableCell colSpan={5} className="h-24 text-center text-sm text-neutral-500">
-                No referring domains discovered yet. Add your DataForSEO credentials in settings and
-                click Refresh to fetch live backlinks.
+                No referring domains discovered yet. Add your DataForSEO credentials in settings to
+                fetch live backlinks.
               </TableCell>
             </TableRow>
           ) : (
