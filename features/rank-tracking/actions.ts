@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { requireAuth } from "@/lib/auth/session";
+import { requireProjectAccess } from "@/lib/auth/session";
 import * as rankService from "./service";
 import { revalidatePath } from "next/cache";
 
@@ -15,8 +15,8 @@ const trackKeywordSchema = z.object({
 });
 
 export async function trackKeywordAction(rawInput: unknown) {
-  const user = await requireAuth();
   const input = trackKeywordSchema.parse(rawInput);
+  const { user } = await requireProjectAccess(input.projectId);
 
   const result = await rankService.trackKeyword({
     projectId: input.projectId,

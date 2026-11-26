@@ -2,14 +2,14 @@ import "server-only";
 import { headers } from "next/headers";
 import { getEnv } from "@/lib/env";
 import { LOCAL_DEV_USER, verifyCloudflareAccessJwt, type AuthUser } from "./modes";
+import { getProject } from "@/features/projects/service";
 
 /**
  * Resolves current user session based on AUTH_MODE.
- * The platform is 100% free with no login required.
- * If no explicit authenticated session is found, it automatically returns
- * the default free workspace user so all tools and workflows are immediately usable.
+ * In local_noauth mode: returns trusted LOCAL_DEV_USER.
+ * In hosted or cloudflare_access mode: returns authenticated user or null.
  */
-export async function getCurrentUser(): Promise<AuthUser> {
+export async function getCurrentUser(): Promise<AuthUser | null> {
   const env = getEnv();
 
   if (env.AUTH_MODE === "local_noauth") {
@@ -25,7 +25,10 @@ export async function getCurrentUser(): Promise<AuthUser> {
         const cfUser = await verifyCloudflareAccessJwt(jwt);
         if (cfUser) return cfUser;
       }
-    } else if (env.AUTH_MODE === "hosted") {
+      return null;
+    }
+
+    if (env.AUTH_MODE === "hosted") {
       const { auth } = await import("./index");
       const session = await auth.api.getSession({
         headers: reqHeaders,
@@ -45,19 +48,33 @@ export async function getCurrentUser(): Promise<AuthUser> {
           image: session.user.image,
         };
       }
+      return null;
     }
   } catch {
-    // Fall back to free default user
+    return null;
   }
 
-  // 100% Free Access: Default workspace user
-  return LOCAL_DEV_USER;
+  return null;
 }
 
 /**
- * Enforces authentication. With completely free open access,
- * this always resolves the active user and never throws or redirects.
+ * Enforces authentication.
+ * Throws "Unauthorized" if no authenticated session exists outside local_noauth.
  */
 export async function requireAuth(): Promise<AuthUser> {
-  return await getCurrentUser();
+  const user = await getCurrentUser();
+  if (!user) {
+    throw new Error("Unauthorized");
+  }
+  return user;
+}
+
+/**
+ * Enforces tenant-scoped access to a specific project.
+ * Authenticates user and validates that the project exists within user's organizationId.
+ */
+export async function requireProjectAccess(projectId: string) {
+  const user = await requireAuth();
+  const project = await getProject(projectId, user.organizationId);
+  return { user, project };
 }

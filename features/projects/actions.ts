@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { requireAuth } from "@/lib/auth/session";
+import { requireAuth, requireProjectAccess } from "@/lib/auth/session";
 import * as projectService from "./service";
 import { revalidatePath } from "next/cache";
 
@@ -29,8 +29,8 @@ const updateProjectSchema = z.object({
 });
 
 export async function updateProjectAction(rawInput: unknown) {
-  const user = await requireAuth();
   const input = updateProjectSchema.parse(rawInput);
+  const { user } = await requireProjectAccess(input.projectId);
 
   const project = await projectService.updateProject(input.projectId, user.organizationId, {
     name: input.name,

@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
-import { requireAuth } from "@/lib/auth/session";
-import { getProject } from "@/features/projects/service";
+import { requireProjectAccess } from "@/lib/auth/session";
 import { AiVisibilityService } from "@/features/ai-visibility/service";
 import { CheckVisibilityForm } from "@/components/ai-visibility/check-visibility-form";
 import { VisibilityOverviewCards } from "@/components/ai-visibility/visibility-overview-cards";
@@ -13,12 +12,13 @@ interface AiVisibilityPageProps {
 
 export default async function AiVisibilityPage({ params }: AiVisibilityPageProps) {
   const { projectId } = await params;
-  const user = await requireAuth();
-  const project = await getProject(projectId, user.organizationId);
-
-  if (!project) {
+  let access;
+  try {
+    access = await requireProjectAccess(projectId);
+  } catch {
     notFound();
   }
+  const { project } = access;
 
   const service = new AiVisibilityService();
   const summary = await service.getVisibilitySummary(projectId);

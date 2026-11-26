@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireAuth } from "@/lib/auth/session";
 import { listProjects } from "@/features/projects/service";
 import type { ProjectRecord } from "@/features/projects/repository";
 
 export default async function ProjectsIndexPage() {
-  const user = await getCurrentUser();
+  const user = await requireAuth();
 
   let projects: ProjectRecord[] = [];
   try {

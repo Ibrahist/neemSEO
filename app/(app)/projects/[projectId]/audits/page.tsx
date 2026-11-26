@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
-import { requireAuth } from "@/lib/auth/session";
-import { getProject } from "@/features/projects/service";
+import { requireProjectAccess } from "@/lib/auth/session";
 import { AuditsService } from "@/features/audits/service";
 import { StartAuditForm } from "@/components/audits/start-audit-form";
 import { AuditHealthCard } from "@/components/audits/audit-health-card";
@@ -15,12 +14,13 @@ interface AuditsPageProps {
 
 export default async function AuditsPage({ params }: AuditsPageProps) {
   const { projectId } = await params;
-  const user = await requireAuth();
-  const project = await getProject(projectId, user.organizationId);
-
-  if (!project) {
+  let access;
+  try {
+    access = await requireProjectAccess(projectId);
+  } catch {
     notFound();
   }
+  const { project } = access;
 
   const auditsService = new AuditsService();
   const summary = await auditsService.getLatestAuditSummary(projectId);

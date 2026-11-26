@@ -3,7 +3,7 @@
 import "server-only";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
-import { requireAuth } from "@/lib/auth/session";
+import { requireProjectAccess } from "@/lib/auth/session";
 import { AiVisibilityService } from "./service";
 
 const checkAiVisibilitySchema = z.object({
@@ -15,8 +15,6 @@ const checkAiVisibilitySchema = z.object({
 });
 
 export async function checkAiVisibilityAction(formData: FormData) {
-  await requireAuth();
-
   const enginesRaw = formData.getAll("engines");
   const engines = enginesRaw.length > 0 ? (enginesRaw as string[]) : undefined;
 
@@ -34,6 +32,8 @@ export async function checkAiVisibilityAction(formData: FormData) {
       error: parsed.error.issues[0]?.message || "Invalid input parameters",
     };
   }
+
+  await requireProjectAccess(parsed.data.projectId);
 
   try {
     const service = new AiVisibilityService();

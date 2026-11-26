@@ -12,7 +12,7 @@ services:
     environment:
       - NODE_ENV=production
       - AUTH_MODE=${AUTH_MODE:-local_noauth} # local_noauth, cloudflare_access, hosted
-      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET:-replace_with_a_secure_32_character_secret_key!}
+      - BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET:?set a secret}
       - BETTER_AUTH_URL=${BETTER_AUTH_URL:-http://localhost:3000}
       - DATAFORSEO_LOGIN=${DATAFORSEO_LOGIN:-}
       - DATAFORSEO_PASSWORD=${DATAFORSEO_PASSWORD:-}

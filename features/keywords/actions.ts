@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { requireAuth } from "@/lib/auth/session";
+import { requireProjectAccess } from "@/lib/auth/session";
 import * as keywordService from "./service";
 import { revalidatePath } from "next/cache";
 import Papa from "papaparse";
@@ -14,8 +14,8 @@ const searchKeywordsSchema = z.object({
 });
 
 export async function searchKeywordsAction(rawInput: unknown) {
-  const user = await requireAuth();
   const input = searchKeywordsSchema.parse(rawInput);
+  const { user } = await requireProjectAccess(input.projectId);
 
   const result = await keywordService.searchKeywords({
     projectId: input.projectId,
@@ -33,7 +33,7 @@ export async function exportKeywordsCsvAction(
   searchId: string,
   projectId: string
 ): Promise<string> {
-  await requireAuth();
+  await requireProjectAccess(projectId);
   const keywords = await keywordService.getKeywordsForSearch(searchId, projectId);
 
   const rows = keywords.map((kw) => ({
@@ -46,5 +46,5 @@ export async function exportKeywordsCsvAction(
     "Last Updated": new Date(kw.updatedAt).toISOString(),
   }));
 
-  return Papa.unparse(rows);
+  return Papa.unparse(rows, { escapeFormulae: true });
 }

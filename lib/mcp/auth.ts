@@ -3,13 +3,15 @@ import { type NextRequest } from "next/server";
 import { getEnv } from "@/lib/env";
 import { LOCAL_DEV_USER, type AuthUser } from "@/lib/auth/modes";
 import { jwtVerify } from "jose";
+import { createHash } from "node:crypto";
+import { getApiKeyByHash } from "@/features/auth/api-keys-repository";
 
 /**
  * Validates authentication for incoming MCP requests.
  * Supports:
- * 1. Bearer Token (API key or signed JWT token)
+ * 1. Bearer Token (signed OAuth JWT token)
  * 2. local_noauth dev fallback
- * 3. x-api-key header
+ * 3. x-api-key header or Bearer API key validated against hashed api_keys table
  */
 export async function authenticateMcpRequest(request: NextRequest): Promise<AuthUser | null> {
   const env = getEnv();
@@ -31,7 +33,7 @@ export async function authenticateMcpRequest(request: NextRequest): Promise<Auth
     return null;
   }
 
-  // Check if token is a valid signed JWT from our OAuth flow
+  // 1. Check if token is a valid signed JWT from our OAuth flow
   try {
     const secret = new TextEncoder().encode(env.BETTER_AUTH_SECRET);
     const { payload } = await jwtVerify(token, secret, {
@@ -48,10 +50,28 @@ export async function authenticateMcpRequest(request: NextRequest): Promise<Auth
       };
     }
   } catch {
-    // If not a JWT, check against stored static secret or API key pattern
-    if (token === env.BETTER_AUTH_SECRET) {
-      return LOCAL_DEV_USER;
+    // Not a valid JWT, proceed to check API key database table
+  }
+
+  // 2. Validate against hashed rows in api_keys table
+  try {
+    const keyHash = createHash("sha256").update(token).digest("hex");
+    const apiKey = await getApiKeyByHash(keyHash);
+
+    if (apiKey) {
+      if (apiKey.expiresAt && new Date(apiKey.expiresAt).getTime() <= Date.now()) {
+        return null; // Expired key
+      }
+      return {
+        id: apiKey.userId,
+        name: `API Key (${apiKey.name})`,
+        email: "apikey@neemseo.com",
+        role: "admin",
+        organizationId: apiKey.organizationId,
+      };
     }
+  } catch {
+    return null;
   }
 
   return null;

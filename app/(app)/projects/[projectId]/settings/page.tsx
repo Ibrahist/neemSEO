@@ -1,5 +1,5 @@
-import { requireAuth } from "@/lib/auth/session";
-import { getProject } from "@/features/projects/service";
+import { notFound } from "next/navigation";
+import { requireProjectAccess } from "@/lib/auth/session";
 import { GscService } from "@/features/integrations/gsc/service";
 import { GscCard } from "@/components/integrations/gsc-card";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -12,8 +12,13 @@ export default async function ProjectSettingsPage({
   params: Promise<{ projectId: string }>;
 }) {
   const { projectId } = await params;
-  const user = await requireAuth();
-  const project = await getProject(projectId, user.organizationId);
+  let access;
+  try {
+    access = await requireProjectAccess(projectId);
+  } catch {
+    notFound();
+  }
+  const { project } = access;
 
   const gscService = new GscService();
   const gscStatus = await gscService.getConnectionStatus(projectId);

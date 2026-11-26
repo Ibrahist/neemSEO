@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { requireAuth } from "@/lib/auth/session";
+import { requireProjectAccess } from "@/lib/auth/session";
 import * as backlinkService from "./service";
 import { revalidatePath } from "next/cache";
 
@@ -11,8 +11,8 @@ const refreshBacklinksSchema = z.object({
 });
 
 export async function refreshBacklinksAction(rawInput: unknown) {
-  const user = await requireAuth();
   const input = refreshBacklinksSchema.parse(rawInput);
+  const { user } = await requireProjectAccess(input.projectId);
 
   const result = await backlinkService.getBacklinksOverview({
     projectId: input.projectId,

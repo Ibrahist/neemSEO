@@ -11,6 +11,10 @@ vi.mock("@/lib/auth/session", () => ({
   requireAuth: vi
     .fn()
     .mockResolvedValue({ id: "user_1", email: "user@example.com", organizationId: "org_1" }),
+  requireProjectAccess: vi.fn().mockResolvedValue({
+    user: { id: "user_1", email: "user@example.com", organizationId: "org_1" },
+    project: { id: "proj_1", name: "neemSEO", domain: "neemseo.com", organizationId: "org_1" },
+  }),
 }));
 
 describe("Backlinks Service & Actions", () => {

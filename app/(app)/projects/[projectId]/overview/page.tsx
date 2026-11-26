@@ -1,5 +1,5 @@
-import { requireAuth } from "@/lib/auth/session";
-import { getProject } from "@/features/projects/service";
+import { notFound } from "next/navigation";
+import { requireProjectAccess } from "@/lib/auth/session";
 import { AuditsService } from "@/features/audits/service";
 import { listTrackedKeywords } from "@/features/rank-tracking/service";
 import { getBacklinksOverview } from "@/features/backlinks/service";
@@ -27,8 +27,13 @@ interface OverviewProps {
 
 export default async function ProjectOverviewPage({ params }: OverviewProps) {
   const { projectId } = await params;
-  const user = await requireAuth();
-  const project = await getProject(projectId, user.organizationId);
+  let access;
+  try {
+    access = await requireProjectAccess(projectId);
+  } catch {
+    notFound();
+  }
+  const { user, project } = access;
 
   const auditsService = new AuditsService();
   const aiVisibilityService = new AiVisibilityService();

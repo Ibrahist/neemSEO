@@ -3,7 +3,7 @@
 import "server-only";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
-import { requireAuth } from "@/lib/auth/session";
+import { requireProjectAccess } from "@/lib/auth/session";
 import { AuditsService } from "./service";
 import { validateSafeUrl } from "@/lib/crawler/ssrf";
 
@@ -14,8 +14,6 @@ const startSiteAuditSchema = z.object({
 });
 
 export async function startSiteAuditAction(formData: FormData) {
-  await requireAuth();
-
   const parsed = startSiteAuditSchema.safeParse({
     projectId: formData.get("projectId"),
     startUrl: formData.get("startUrl"),
@@ -30,6 +28,7 @@ export async function startSiteAuditAction(formData: FormData) {
   }
 
   const { projectId, startUrl, maxPages } = parsed.data;
+  await requireProjectAccess(projectId);
 
   // Pre-validate SSRF safety before starting crawler
   try {

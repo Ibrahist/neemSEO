@@ -1,6 +1,6 @@
 import { Suspense } from "react";
-import { requireAuth } from "@/lib/auth/session";
-import { getProject } from "@/features/projects/service";
+import { notFound } from "next/navigation";
+import { requireProjectAccess } from "@/lib/auth/session";
 import { getBacklinksOverview } from "@/features/backlinks/service";
 import { ReferringDomainsTable } from "@/components/backlinks/referring-domains-table";
 import { AnchorTextTable } from "@/components/backlinks/anchor-text-table";
@@ -17,8 +17,13 @@ interface BacklinksPageProps {
 
 export default async function BacklinksPage({ params }: BacklinksPageProps) {
   const { projectId } = await params;
-  const user = await requireAuth();
-  const project = await getProject(projectId, user.organizationId);
+  let access;
+  try {
+    access = await requireProjectAccess(projectId);
+  } catch {
+    notFound();
+  }
+  const { user, project } = access;
 
   const { snapshot, referringDomains, anchors, newLostTrend } = await getBacklinksOverview({
     projectId,

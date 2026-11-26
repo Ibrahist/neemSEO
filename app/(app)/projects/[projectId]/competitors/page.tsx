@@ -1,6 +1,6 @@
 import { Suspense } from "react";
-import { requireAuth } from "@/lib/auth/session";
-import { getProject } from "@/features/projects/service";
+import { notFound } from "next/navigation";
+import { requireProjectAccess } from "@/lib/auth/session";
 import { getCompetitorOverview, getKeywordGap } from "@/features/competitors/service";
 import { AddCompetitorForm } from "@/components/competitors/add-competitor-form";
 import { KeywordGapTable } from "@/components/competitors/keyword-gap-table";
@@ -15,8 +15,13 @@ interface CompetitorsPageProps {
 
 export default async function CompetitorsPage({ params }: CompetitorsPageProps) {
   const { projectId } = await params;
-  const user = await requireAuth();
-  const project = await getProject(projectId, user.organizationId);
+  let access;
+  try {
+    access = await requireProjectAccess(projectId);
+  } catch {
+    notFound();
+  }
+  const { project } = access;
 
   const { domains, metrics } = await getCompetitorOverview(projectId);
   const activeCompetitor = domains[0]?.competitorDomain || "";

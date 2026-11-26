@@ -1,6 +1,6 @@
 import { Suspense } from "react";
-import { requireAuth } from "@/lib/auth/session";
-import { getProject } from "@/features/projects/service";
+import { notFound } from "next/navigation";
+import { requireProjectAccess } from "@/lib/auth/session";
 import { listTrackedKeywords, getRankHistory } from "@/features/rank-tracking/service";
 import { TrackKeywordForm } from "@/components/rank-tracking/track-keyword-form";
 import { RankHistoryChart } from "@/components/rank-tracking/rank-history-chart";
@@ -24,8 +24,13 @@ export default async function RankTrackingPage({ params, searchParams }: RankTra
   const { projectId } = await params;
   const { keywordId } = await searchParams;
 
-  const user = await requireAuth();
-  const project = await getProject(projectId, user.organizationId);
+  let access;
+  try {
+    access = await requireProjectAccess(projectId);
+  } catch {
+    notFound();
+  }
+  const { project } = access;
 
   const trackedKeywords = await listTrackedKeywords(projectId);
   const activeKeyword = keywordId

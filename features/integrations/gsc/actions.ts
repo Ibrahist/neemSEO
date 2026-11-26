@@ -3,7 +3,7 @@
 import "server-only";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
-import { requireAuth } from "@/lib/auth/session";
+import { requireProjectAccess } from "@/lib/auth/session";
 import { GscService } from "./service";
 
 const connectGscSchema = z.object({
@@ -13,8 +13,6 @@ const connectGscSchema = z.object({
 });
 
 export async function connectGscAction(formData: FormData) {
-  await requireAuth();
-
   const parsed = connectGscSchema.safeParse({
     projectId: formData.get("projectId"),
     siteUrl: formData.get("siteUrl"),
@@ -27,6 +25,8 @@ export async function connectGscAction(formData: FormData) {
       error: parsed.error.issues[0]?.message || "Invalid GSC parameters",
     };
   }
+
+  await requireProjectAccess(parsed.data.projectId);
 
   try {
     const service = new GscService();
@@ -46,12 +46,12 @@ export async function connectGscAction(formData: FormData) {
 }
 
 export async function disconnectGscAction(formData: FormData) {
-  await requireAuth();
-
   const projectId = formData.get("projectId") as string;
   if (!projectId) {
     return { success: false, error: "Project ID is required" };
   }
+
+  await requireProjectAccess(projectId);
 
   try {
     const service = new GscService();

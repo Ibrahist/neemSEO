@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
-import { requireAuth } from "@/lib/auth/session";
-import { getProject } from "@/features/projects/service";
+import { requireProjectAccess } from "@/lib/auth/session";
 import { ChatInterface } from "@/components/agent/chat-interface";
 
 interface AgentPageProps {
@@ -9,12 +8,13 @@ interface AgentPageProps {
 
 export default async function AgentPage({ params }: AgentPageProps) {
   const { projectId } = await params;
-  const user = await requireAuth();
-  const project = await getProject(projectId, user.organizationId);
-
-  if (!project) {
+  let access;
+  try {
+    access = await requireProjectAccess(projectId);
+  } catch {
     notFound();
   }
+  const { project } = access;
 
   return (
     <div className="space-y-4">

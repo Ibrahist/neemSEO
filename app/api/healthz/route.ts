@@ -1,49 +1,25 @@
 import { NextResponse } from "next/server";
-import { getDb, getDialect } from "@/db/client";
-import { getRuntimeEnvironment } from "@/lib/runtime";
-import { sql } from "drizzle-orm";
+import { getSystemHealth } from "@/lib/health";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const startTime = Date.now();
-  let dbStatus = "unknown";
-  let dbError: string | null = null;
-
-  try {
-    const { db } = await getDb();
-    const executable = db as {
-      run?: (q: unknown) => Promise<unknown>;
-      execute?: (q: unknown) => Promise<unknown>;
-    };
-    if (typeof executable.run === "function") {
-      await executable.run(sql`SELECT 1`);
-    } else if (typeof executable.execute === "function") {
-      await executable.execute(sql`SELECT 1`);
-    }
-    dbStatus = "connected";
-  } catch (error: unknown) {
-    dbStatus = "error";
-    dbError = error instanceof Error ? error.message : "Database connection failed";
-  }
-
-  const status = dbStatus === "connected" ? "healthy" : "degraded";
-  const statusCode = status === "healthy" ? 200 : 503;
+  const health = await getSystemHealth();
 
   return NextResponse.json(
     {
-      status,
+      status: health.status,
       timestamp: new Date().toISOString(),
-      uptime: process.uptime ? process.uptime() : undefined,
-      version: "0.1.0",
-      runtime: getRuntimeEnvironment(),
+      uptime: health.uptimeSeconds,
+      version: health.version,
+      runtime: health.runtime,
       database: {
-        dialect: getDialect(),
-        status: dbStatus,
-        error: dbError,
-        latencyMs: Date.now() - startTime,
+        dialect: health.database.dialect,
+        status: health.database.status,
+        latencyMs: health.database.latencyMs,
       },
+      services: health.services,
     },
-    { status: statusCode }
+    { status: health.statusCode }
   );
 }

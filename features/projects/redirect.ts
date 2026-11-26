@@ -1,11 +1,11 @@
 import "server-only";
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/auth/session";
+import { requireAuth } from "@/lib/auth/session";
 import { listProjects } from "./service";
 import type { ProjectRecord } from "./repository";
 
 export async function redirectToProjectWorkflow(workflowSlug: string) {
-  const user = await getCurrentUser();
+  const user = await requireAuth();
 
   let projects: ProjectRecord[] = [];
   try {

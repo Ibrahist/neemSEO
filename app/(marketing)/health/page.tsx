@@ -1,10 +1,9 @@
 import { Navbar } from "@/components/marketing/navbar";
 import { Footer } from "@/components/marketing/footer";
-import { getDb, getDialect } from "@/db/client";
-import { getRuntimeEnvironment } from "@/lib/runtime";
-import { sql } from "drizzle-orm";
+import { getSystemHealth } from "@/lib/health";
 import {
   CheckCircle2,
+  AlertCircle,
   Database,
   Server,
   Terminal,
@@ -20,37 +19,18 @@ export const dynamic = "force-dynamic";
 export const metadata = {
   title: "System Health & Uptime Status - neemSEO",
   description: "Real-time system health, database latency, and runtime diagnostics for neemSEO.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default async function HealthPage() {
-  const startTime = Date.now();
-  let dbStatus = "unknown";
-  let dbError: string | null = null;
+  const health = await getSystemHealth();
 
-  try {
-    const { db } = await getDb();
-    const executable = db as {
-      run?: (q: unknown) => Promise<unknown>;
-      execute?: (q: unknown) => Promise<unknown>;
-    };
-    if (typeof executable.run === "function") {
-      await executable.run(sql`SELECT 1`);
-    } else if (typeof executable.execute === "function") {
-      await executable.execute(sql`SELECT 1`);
-    }
-    dbStatus = "connected";
-  } catch (error: unknown) {
-    dbStatus = "error";
-    dbError = error instanceof Error ? error.message : "Database connection failed";
-  }
-
-  const latencyMs = Date.now() - startTime;
-  const dialect = getDialect();
-  const runtime = getRuntimeEnvironment();
-  const isHealthy = dbStatus === "connected";
-  const uptimeSeconds = process.uptime ? Math.floor(process.uptime()) : 0;
-  const hours = Math.floor(uptimeSeconds / 3600);
-  const minutes = Math.floor((uptimeSeconds % 3600) / 60);
+  const isHealthy = health.status === "healthy";
+  const hours = Math.floor(health.uptimeSeconds / 3600);
+  const minutes = Math.floor((health.uptimeSeconds % 3600) / 60);
 
   return (
     <div className="min-h-screen bg-[#ebe7e1] py-3 sm:py-6 md:py-8 px-2 sm:px-4 md:px-6 flex justify-center items-start font-sans selection:bg-[#8CC63F]/30 selection:text-[#0F3D2E]">
@@ -103,10 +83,16 @@ export default async function HealthPage() {
                 </span>
                 <Database className="h-4 w-4 text-[#8CC63F]" />
               </div>
-              <div className="text-2xl font-bold text-[#0F3D2E] capitalize">{dbStatus}</div>
+              <div className="text-2xl font-bold text-[#0F3D2E] capitalize">
+                {health.database.status}
+              </div>
               <div className="text-[11px] text-neutral-500 flex items-center gap-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                <span>Dialect: {dialect}</span>
+                <span
+                  className={`h-1.5 w-1.5 rounded-full ${
+                    health.database.status === "connected" ? "bg-emerald-500" : "bg-red-500"
+                  }`}
+                />
+                <span>Dialect: {health.database.dialect}</span>
               </div>
             </div>
 
@@ -117,7 +103,9 @@ export default async function HealthPage() {
                 </span>
                 <Activity className="h-4 w-4 text-[#8CC63F]" />
               </div>
-              <div className="text-2xl font-bold text-[#0F3D2E]">{latencyMs} ms</div>
+              <div className="text-2xl font-bold text-[#0F3D2E]">
+                {health.database.latencyMs} ms
+              </div>
               <div className="text-[11px] text-neutral-500 flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 <span>SELECT 1 verification</span>
@@ -131,7 +119,7 @@ export default async function HealthPage() {
                 </span>
                 <Server className="h-4 w-4 text-[#8CC63F]" />
               </div>
-              <div className="text-2xl font-bold text-[#0F3D2E] capitalize">{runtime}</div>
+              <div className="text-2xl font-bold text-[#0F3D2E] capitalize">{health.runtime}</div>
               <div className="text-[11px] text-neutral-500 flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 <span>Dual-Dialect Engine</span>
@@ -150,7 +138,7 @@ export default async function HealthPage() {
               </div>
               <div className="text-[11px] text-neutral-500 flex items-center gap-1.5">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                <span>Version 0.1.0 (MIT)</span>
+                <span>Version {health.version} (MIT)</span>
               </div>
             </div>
           </div>
@@ -174,9 +162,15 @@ export default async function HealthPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-semibold text-[11px]">
-                    <CheckCircle2 className="h-3.5 w-3.5" /> Operational
-                  </span>
+                  {health.database.status === "connected" ? (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-semibold text-[11px]">
+                      <CheckCircle2 className="h-3.5 w-3.5" /> Operational
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-100 text-red-800 font-semibold text-[11px]">
+                      <AlertCircle className="h-3.5 w-3.5" /> Connection Failed
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -186,7 +180,7 @@ export default async function HealthPage() {
                     neemSEO Model Context Protocol (MCP) Server
                   </div>
                   <div className="text-neutral-500">
-                    Exposes 5 typed SEO tools at <code>/api/mcp</code> for Claude, Cursor, and
+                    Exposes 14 typed SEO tools at <code>/api/mcp</code> for Claude, Cursor, and
                     Codex.
                   </div>
                 </div>
@@ -223,46 +217,64 @@ export default async function HealthPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-semibold text-[11px]">
-                    <CheckCircle2 className="h-3.5 w-3.5" /> Active
-                  </span>
+                  {health.services.dataforseo.configured ? (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-semibold text-[11px]">
+                      <CheckCircle2 className="h-3.5 w-3.5" /> Configured
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 font-semibold text-[11px]">
+                      <AlertCircle className="h-3.5 w-3.5" /> Key Required
+                    </span>
+                  )}
                 </div>
               </div>
 
               <div className="p-4 sm:px-6 flex items-center justify-between gap-4">
                 <div className="space-y-0.5">
-                  <div className="font-bold text-[#0F3D2E] text-sm">Platform Access Mode</div>
+                  <div className="font-bold text-[#0F3D2E] text-sm">Autonomous In-App AI Agent</div>
                   <div className="text-neutral-500">
-                    100% Free Access enabled · Zero login or subscription required.
+                    LLM reasoning via OpenRouter ({health.services.aiAgent.model}).
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-semibold text-[11px]">
-                    <CheckCircle2 className="h-3.5 w-3.5" /> 100% Free
-                  </span>
+                  {health.services.aiAgent.configured ? (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 font-semibold text-[11px]">
+                      <CheckCircle2 className="h-3.5 w-3.5" /> Enabled
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-neutral-100 text-neutral-600 font-semibold text-[11px]">
+                      Optional Key
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Diagnostic Code Box */}
-          <div className="rounded-2xl border border-[#ded9d2] bg-white p-6 space-y-4">
-            <h3 className="font-bold text-[#0F3D2E] text-sm flex items-center gap-2">
-              <Terminal className="h-4 w-4 text-[#8CC63F]" /> Machine-Readable Health Probe
-            </h3>
-            <p className="text-xs text-neutral-600">
-              Uptime monitors (such as Uptime Kuma, Datadog, or BetterStack) can poll the automated
-              JSON healthcheck endpoint:
-            </p>
-            <div className="rounded-xl bg-[#1a1714] text-neutral-200 p-4 font-mono text-xs overflow-x-auto leading-relaxed">
-              <p className="text-neutral-500"># Command to probe health status</p>
-              <p className="text-[#8CC63F]">curl -i http://localhost:3000/api/healthz</p>
-            </div>
-            {dbError && (
-              <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-800 font-mono">
-                Error: {dbError}
+          {/* Diagnostics Log Console */}
+          <div className="rounded-2xl border border-[#ded9d2] bg-white p-6 shadow-xs space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm font-bold text-[#0F3D2E]">
+                <Terminal className="h-4 w-4 text-[#8CC63F]" />
+                <span>Runtime Configuration Snapshot</span>
               </div>
-            )}
+              <span className="text-[11px] text-neutral-400 font-mono">live probe</span>
+            </div>
+
+            <div className="bg-[#1c2420] text-emerald-400 p-4 rounded-xl font-mono text-xs overflow-x-auto space-y-1.5 leading-relaxed">
+              <div>&gt; neemseo --version: 0.1.0</div>
+              <div>&gt; runtime.target: {health.runtime}</div>
+              <div>&gt; database.dialect: {health.database.dialect}</div>
+              <div>&gt; database.status: {health.database.status}</div>
+              <div>&gt; database.latency: {health.database.latencyMs}ms</div>
+              <div>&gt; dataforseo.status: {health.services.dataforseo.status}</div>
+              <div>
+                &gt; ai.reasoning:{" "}
+                {health.services.aiAgent.configured
+                  ? `live (${health.services.aiAgent.model})`
+                  : "offline"}
+              </div>
+            </div>
           </div>
         </main>
 

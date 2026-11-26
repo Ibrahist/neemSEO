@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { requireAuth } from "@/lib/auth/session";
+import { requireProjectAccess } from "@/lib/auth/session";
 import * as compService from "./service";
 import { revalidatePath } from "next/cache";
 
@@ -11,8 +11,8 @@ const addCompetitorSchema = z.object({
 });
 
 export async function addCompetitorAction(rawInput: unknown) {
-  const user = await requireAuth();
   const input = addCompetitorSchema.parse(rawInput);
+  const { user } = await requireProjectAccess(input.projectId);
 
   const competitor = await compService.addCompetitor({
     projectId: input.projectId,

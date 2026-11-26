@@ -22,6 +22,13 @@ const envSchema = z.object({
 
 export type Env = z.infer<typeof envSchema>;
 
+const KNOWN_SECRET_PLACEHOLDERS = new Set([
+  "dev-secret-key-at-least-32-chars-long!",
+  "replace_with_a_secure_32_character_secret_key!",
+  "your-secure-32-byte-secret-key-here-for-encryption",
+  "change-me-to-a-secure-secret-key-min-32-chars",
+]);
+
 let parsedEnv: Env | null = null;
 
 export function getEnv(): Env {
@@ -37,14 +44,25 @@ export function getEnv(): Env {
         )
       : undefined);
 
+  const authMode = process.env.AUTH_MODE || "local_noauth";
+  const rawSecret = process.env.BETTER_AUTH_SECRET;
+
+  if (process.env.NODE_ENV === "production" && authMode !== "local_noauth") {
+    if (!rawSecret || rawSecret.length < 32 || KNOWN_SECRET_PLACEHOLDERS.has(rawSecret)) {
+      throw new Error(
+        "In production, BETTER_AUTH_SECRET must be set to a secure string of at least 32 characters and cannot use default placeholders."
+      );
+    }
+  }
+
   const rawEnv = {
     DATAFORSEO_API_KEY: dataForSeoApiKey,
     DATAFORSEO_LOGIN: process.env.DATAFORSEO_LOGIN,
     DATAFORSEO_PASSWORD: process.env.DATAFORSEO_PASSWORD,
-    AUTH_MODE: process.env.AUTH_MODE || "local_noauth",
+    AUTH_MODE: authMode,
     TEAM_DOMAIN: process.env.TEAM_DOMAIN,
     POLICY_AUD: process.env.POLICY_AUD,
-    BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET || "dev-secret-key-at-least-32-chars-long!",
+    BETTER_AUTH_SECRET: rawSecret || "dev-secret-key-at-least-32-chars-long!",
     BETTER_AUTH_URL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,

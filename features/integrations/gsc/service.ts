@@ -1,7 +1,6 @@
 import "server-only";
-import { eq, and } from "drizzle-orm";
-import { getDb } from "@/db/client";
 import { encryptSecret, decryptSecret } from "@/lib/crypto";
+import * as gscRepo from "./repository";
 
 export interface GscPerformanceRow {
   query: string;
@@ -23,24 +22,12 @@ export class GscService {
    * Retrieves the current Google Search Console connection for a project.
    */
   async getConnectionStatus(projectId: string): Promise<GscConnectionStatus> {
-    const { db, schema } = await getDb();
+    const integration = await gscRepo.getProjectIntegration(projectId, "gsc");
 
-    const rows = await (db as any)
-      .select()
-      .from(schema.projectIntegrations)
-      .where(
-        and(
-          eq(schema.projectIntegrations.projectId, projectId),
-          eq(schema.projectIntegrations.provider, "gsc")
-        )
-      )
-      .limit(1);
-
-    if (rows.length === 0) {
+    if (!integration) {
       return { isConnected: false, siteUrl: null, lastSyncedAt: null };
     }
 
-    const integration = rows[0];
     let siteUrl = null;
     if (integration.settingsJson) {
       try {
@@ -69,9 +56,6 @@ export class GscService {
       siteUrl: string;
     }
   ): Promise<void> {
-    const { db, schema } = await getDb();
-    const now = new Date();
-
     const encryptedTokens = encryptSecret(
       JSON.stringify({
         accessToken: data.accessToken,
@@ -83,48 +67,17 @@ export class GscService {
       siteUrl: data.siteUrl,
     });
 
-    const existing = await this.getConnectionStatus(projectId);
-    if (existing.isConnected) {
-      await (db as any)
-        .update(schema.projectIntegrations)
-        .set({
-          encryptedTokens,
-          settingsJson,
-          updatedAt: now,
-        })
-        .where(
-          and(
-            eq(schema.projectIntegrations.projectId, projectId),
-            eq(schema.projectIntegrations.provider, "gsc")
-          )
-        );
-    } else {
-      const id = `int_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-      await (db as any).insert(schema.projectIntegrations).values({
-        id,
-        projectId,
-        provider: "gsc",
-        encryptedTokens,
-        settingsJson,
-        createdAt: now,
-        updatedAt: now,
-      });
-    }
+    await gscRepo.upsertProjectIntegration(projectId, {
+      encryptedTokens,
+      settingsJson,
+    });
   }
 
   /**
    * Disconnects GSC integration for a project.
    */
   async disconnect(projectId: string): Promise<void> {
-    const { db, schema } = await getDb();
-    await (db as any)
-      .delete(schema.projectIntegrations)
-      .where(
-        and(
-          eq(schema.projectIntegrations.projectId, projectId),
-          eq(schema.projectIntegrations.provider, "gsc")
-        )
-      );
+    await gscRepo.deleteProjectIntegration(projectId, "gsc");
   }
 
   /**
@@ -140,28 +93,16 @@ export class GscService {
 
     // If live integration is configured with tokens, decrypt and use token
     if (status.isConnected) {
-      const { db, schema } = await getDb();
-      const rows = await (db as any)
-        .select()
-        .from(schema.projectIntegrations)
-        .where(
-          and(
-            eq(schema.projectIntegrations.projectId, projectId),
-            eq(schema.projectIntegrations.provider, "gsc")
-          )
-        )
-        .limit(1);
+      const integration = await gscRepo.getProjectIntegration(projectId, "gsc");
 
-      if (rows.length > 0 && rows[0].encryptedTokens) {
+      if (integration?.encryptedTokens) {
         try {
-          const decrypted = JSON.parse(decryptSecret(rows[0].encryptedTokens));
+          const decrypted = JSON.parse(decryptSecret(integration.encryptedTokens));
           if (decrypted.accessToken) {
-            // Can query Google Search Console API:
-            // https://www.googleapis.com/webmasters/v3/sites/.../searchAnalytics/query
-            // If offline, fall through to realistic data
+            // Live Search Console API call would happen here
           }
         } catch {
-          // Fall back to simulated metrics
+          // Fall back
         }
       }
     }
@@ -169,49 +110,49 @@ export class GscService {
     // Realistic Search Console query performance simulation
     const mockData: GscPerformanceRow[] = [
       {
-        query: `${targetDomain} pricing`,
-        page: `https://${targetDomain}/pricing`,
-        clicks: 342,
-        impressions: 4200,
-        ctr: 0.081,
+        query: `${targetDomain} reviews`,
+        page: `https://${targetDomain}/reviews`,
+        clicks: 842,
+        impressions: 4320,
+        ctr: 0.1949,
         position: 1.4,
       },
       {
-        query: "self hosted seo platform",
-        page: `https://${targetDomain}/`,
+        query: `${targetDomain} login`,
+        page: `https://${targetDomain}/login`,
+        clicks: 654,
+        impressions: 1820,
+        ctr: 0.3593,
+        position: 1.1,
+      },
+      {
+        query: `best seo tool alternative`,
+        page: `https://${targetDomain}/blog/best-seo-tools`,
+        clicks: 412,
+        impressions: 8900,
+        ctr: 0.0462,
+        position: 4.8,
+      },
+      {
+        query: `how to run a technical seo audit`,
+        page: `https://${targetDomain}/docs/site-audit`,
+        clicks: 298,
+        impressions: 6150,
+        ctr: 0.0484,
+        position: 5.2,
+      },
+      {
+        query: `free keyword difficulty checker`,
+        page: `https://${targetDomain}/tools/keywords`,
         clicks: 215,
-        impressions: 3100,
-        ctr: 0.069,
-        position: 2.8,
-      },
-      {
-        query: "open source ahrefs alternative",
-        page: `https://${targetDomain}/blog/open-source-ahrefs-alternative`,
-        clicks: 184,
-        impressions: 2800,
-        ctr: 0.065,
-        position: 3.2,
-      },
-      {
-        query: "pay as you go keyword research tool",
-        page: `https://${targetDomain}/keywords`,
-        clicks: 142,
-        impressions: 1950,
-        ctr: 0.072,
-        position: 2.1,
-      },
-      {
-        query: "dataforseo ui dashboard",
-        page: `https://${targetDomain}/docs/dataforseo`,
-        clicks: 98,
-        impressions: 1400,
-        ctr: 0.07,
-        position: 1.8,
+        impressions: 5400,
+        ctr: 0.0398,
+        position: 7.1,
       },
     ];
 
-    const totalClicks = mockData.reduce((sum, r) => sum + r.clicks, 0);
-    const totalImpressions = mockData.reduce((sum, r) => sum + r.impressions, 0);
+    const totalClicks = mockData.reduce((acc, row) => acc + row.clicks, 0);
+    const totalImpressions = mockData.reduce((acc, row) => acc + row.impressions, 0);
 
     return {
       rows: mockData,

@@ -1,6 +1,6 @@
 import { Suspense } from "react";
-import { requireAuth } from "@/lib/auth/session";
-import { getProject } from "@/features/projects/service";
+import { notFound } from "next/navigation";
+import { requireProjectAccess } from "@/lib/auth/session";
 import { getRecentKeywordSearches, getKeywordsForSearch } from "@/features/keywords/service";
 import { KeywordSearchForm } from "@/components/keywords/keyword-search-form";
 import { KeywordTable } from "@/components/keywords/keyword-table";
@@ -16,8 +16,13 @@ export default async function KeywordsPage({ params, searchParams }: KeywordsPag
   const { projectId } = await params;
   const { searchId } = await searchParams;
 
-  const user = await requireAuth();
-  const project = await getProject(projectId, user.organizationId);
+  let access;
+  try {
+    access = await requireProjectAccess(projectId);
+  } catch {
+    notFound();
+  }
+  const { project } = access;
 
   const recentSearches = await getRecentKeywordSearches(projectId, 6);
   const activeSearch = searchId

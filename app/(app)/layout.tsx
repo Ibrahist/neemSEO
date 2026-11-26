@@ -3,9 +3,17 @@ import { Navbar } from "@/components/marketing/navbar";
 import { getCurrentUser } from "@/lib/auth/session";
 import { listProjects } from "@/features/projects/service";
 import type { ProjectRecord } from "@/features/projects/repository";
+import { redirect } from "next/navigation";
+import { getEnv } from "@/lib/env";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
+  const env = getEnv();
+
+  if (!user && env.AUTH_MODE !== "local_noauth") {
+    redirect("/login");
+  }
+
   let projects: ProjectRecord[] = [];
 
   if (user?.organizationId) {
