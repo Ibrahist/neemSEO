@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Shield, Database, Lock, Gift } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
@@ -79,6 +79,10 @@ function ParallaxMobileCard({
 }
 
 export function ComparisonSection() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   return (
     <section className="max-w-[1120px] mx-auto px-6 my-14">
       <div className="rounded-3xl bg-[#0F3D2E] text-white p-8 md:p-14 shadow-2xl border border-emerald-950">
@@ -116,9 +120,24 @@ export function ComparisonSection() {
 
         {/* Mobile: Smooth Scroll Parallax Cards */}
         <div className="flex md:hidden flex-col gap-4">
-          {valueProps.map((prop, idx) => (
-            <ParallaxMobileCard key={idx} prop={prop} index={idx} total={valueProps.length} />
-          ))}
+          {valueProps.map((prop, idx) =>
+            mounted ? (
+              <ParallaxMobileCard key={idx} prop={prop} index={idx} total={valueProps.length} />
+            ) : (
+              <div
+                key={idx}
+                className="p-6 rounded-2xl bg-[#0A291F] border border-emerald-900/60 flex flex-col justify-between space-y-4 shadow-xl"
+              >
+                <div className="space-y-3">
+                  <div className="h-10 w-10 rounded-xl bg-[#8CC63F]/20 text-[#8CC63F] flex items-center justify-center">
+                    <prop.icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-white">{prop.title}</h3>
+                  <p className="text-xs text-neutral-300 leading-relaxed">{prop.desc}</p>
+                </div>
+              </div>
+            )
+          )}
         </div>
 
         {/* Bottom Callout Banner */}

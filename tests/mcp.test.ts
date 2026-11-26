@@ -6,12 +6,26 @@ import * as keywordService from "@/features/keywords/service";
 
 describe("MCP Server JSON-RPC 2.0 Endpoint", () => {
   it("should return server status on GET /api/mcp", async () => {
-    const res = await GET();
+    const res = await GET(new NextRequest("http://localhost:3000/api/mcp"));
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.status).toBe("ok");
     expect(json.server).toBe("neemseo-mcp-server");
     expect(json.toolsCount).toBeGreaterThanOrEqual(4);
+  });
+
+  it("should return HTML inspector page when Accept includes text/html on GET /api/mcp", async () => {
+    const req = new NextRequest("http://localhost:3000/api/mcp", {
+      headers: {
+        accept: "text/html,application/xhtml+xml",
+      },
+    });
+    const res = await GET(req);
+    expect(res.status).toBe(200);
+    expect(res.headers.get("content-type")).toContain("text/html");
+    const html = await res.text();
+    expect(html).toContain("neemSEO MCP Server");
+    expect(html).toContain("Available MCP Tools");
   });
 
   it("should handle initialize handshake", async () => {
