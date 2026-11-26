@@ -44,37 +44,37 @@ export function Footer() {
               <p className="font-bold uppercase tracking-wider text-[#0F3D2E]">Workflows</p>
               <ul className="space-y-2 text-neutral-600">
                 <li>
-                  <Link href="/projects" className="hover:text-neutral-900 transition-colors">
+                  <Link href="/keywords" className="hover:text-neutral-900 transition-colors">
                     Keyword Research
                   </Link>
                 </li>
                 <li>
-                  <Link href="/projects" className="hover:text-neutral-900 transition-colors">
+                  <Link href="/rank-tracking" className="hover:text-neutral-900 transition-colors">
                     Rank Tracking
                   </Link>
                 </li>
                 <li>
-                  <Link href="/projects" className="hover:text-neutral-900 transition-colors">
+                  <Link href="/competitors" className="hover:text-neutral-900 transition-colors">
                     Competitor Insights
                   </Link>
                 </li>
                 <li>
-                  <Link href="/projects" className="hover:text-neutral-900 transition-colors">
+                  <Link href="/backlinks" className="hover:text-neutral-900 transition-colors">
                     Backlink Profile
                   </Link>
                 </li>
                 <li>
-                  <Link href="/projects" className="hover:text-neutral-900 transition-colors">
+                  <Link href="/audits" className="hover:text-neutral-900 transition-colors">
                     Technical Site Audits
                   </Link>
                 </li>
                 <li>
-                  <Link href="/projects" className="hover:text-neutral-900 transition-colors">
+                  <Link href="/ai-visibility" className="hover:text-neutral-900 transition-colors">
                     AI Search Visibility
                   </Link>
                 </li>
                 <li>
-                  <Link href="/projects" className="hover:text-neutral-900 transition-colors">
+                  <Link href="/settings" className="hover:text-neutral-900 transition-colors">
                     GSC Integration
                   </Link>
                 </li>
@@ -91,22 +91,22 @@ export function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/projects" className="hover:text-neutral-900 transition-colors">
+                  <Link href="/api/mcp" className="hover:text-neutral-900 transition-colors">
                     Claude Code Tooling
                   </Link>
                 </li>
                 <li>
-                  <Link href="/projects" className="hover:text-neutral-900 transition-colors">
+                  <Link href="/api/mcp" className="hover:text-neutral-900 transition-colors">
                     Cursor MCP Integration
                   </Link>
                 </li>
                 <li>
-                  <Link href="/projects" className="hover:text-neutral-900 transition-colors">
+                  <Link href="/api/mcp" className="hover:text-neutral-900 transition-colors">
                     Codex Integration
                   </Link>
                 </li>
                 <li>
-                  <Link href="/projects" className="hover:text-neutral-900 transition-colors">
+                  <Link href="/agent" className="hover:text-neutral-900 transition-colors">
                     In-App Streaming Agent
                   </Link>
                 </li>
@@ -150,12 +150,12 @@ export function Footer() {
               <p className="font-bold uppercase tracking-wider text-[#0F3D2E]">Resources</p>
               <ul className="space-y-2 text-neutral-600">
                 <li>
-                  <Link href="/projects" className="hover:text-neutral-900 transition-colors">
+                  <Link href="/settings" className="hover:text-neutral-900 transition-colors">
                     BYOK DataForSEO Guide
                   </Link>
                 </li>
                 <li>
-                  <Link href="/projects" className="hover:text-neutral-900 transition-colors">
+                  <Link href="/agent" className="hover:text-neutral-900 transition-colors">
                     Agent Skills Plugin
                   </Link>
                 </li>
@@ -165,7 +165,7 @@ export function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/projects" className="hover:text-neutral-900 transition-colors">
+                  <Link href="/settings" className="hover:text-neutral-900 transition-colors">
                     Cost Tracking &amp; Cache
                   </Link>
                 </li>

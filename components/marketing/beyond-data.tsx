@@ -30,7 +30,7 @@ export function BeyondData() {
             </p>
           </div>
           <Link
-            href="/projects"
+            href="/settings"
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0F3D2E] hover:text-[#8CC63F] transition-colors"
           >
             <span>Connect Search Console</span>
@@ -72,7 +72,7 @@ export function BeyondData() {
             </p>
           </div>
           <Link
-            href="/projects"
+            href="/agent"
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0F3D2E] hover:text-[#8CC63F] transition-colors"
           >
             <span>Chat with AI agent</span>

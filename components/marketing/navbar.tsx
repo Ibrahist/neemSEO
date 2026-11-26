@@ -253,7 +253,7 @@ export function Navbar() {
                       </Link>
 
                       <Link
-                        href="/projects"
+                        href="/agent"
                         className="group flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-[#f5f1ec]"
                       >
                         <div className="h-8 w-8 rounded-lg bg-neutral-100 text-neutral-800 flex items-center justify-center shrink-0 mt-0.5">

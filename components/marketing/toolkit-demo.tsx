@@ -46,6 +46,15 @@ export function ToolkitDemo() {
     },
   ];
 
+  const workflowLinks: Record<string, string> = {
+    keywords: "/keywords",
+    rank: "/rank-tracking",
+    competitors: "/competitors",
+    backlinks: "/backlinks",
+    audits: "/audits",
+    visibility: "/ai-visibility",
+  };
+
   return (
     <section className="py-16 max-w-[1120px] mx-auto px-6">
       <div className="max-w-2xl mb-10">
@@ -100,7 +109,7 @@ export function ToolkitDemo() {
           </div>
 
           <Link
-            href="/projects"
+            href={workflowLinks[activeTab] || "/projects"}
             className="inline-flex h-9 items-center justify-center rounded-lg bg-[#0F3D2E] px-4 text-xs font-semibold text-white hover:bg-[#0A291F] transition-colors shrink-0"
           >
             Launch Workflow &rarr;

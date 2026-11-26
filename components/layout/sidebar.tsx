@@ -14,14 +14,16 @@ import {
   LayoutDashboard,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Logo } from "@/components/ui/logo";
+import { ProjectSwitcher } from "./project-switcher";
+import type { ProjectRecord } from "@/features/projects/repository";
 
 interface SidebarProps {
   projectId?: string;
   initialProjectId?: string;
+  projects?: ProjectRecord[];
 }
 
-export function Sidebar({ projectId, initialProjectId }: SidebarProps) {
+export function Sidebar({ projectId, initialProjectId, projects = [] }: SidebarProps) {
   const pathname = usePathname();
   const params = useParams();
 
@@ -78,11 +80,15 @@ export function Sidebar({ projectId, initialProjectId }: SidebarProps) {
 
   return (
     <aside className="w-64 border-r border-[#ded9d2] bg-[#f5f1ec] flex flex-col select-none shrink-0 min-h-full">
-      {/* Brand Header with Official Logo */}
-      <div className="h-16 flex items-center px-5 border-b border-[#ded9d2] bg-[#f5f1ec]">
-        <Link href="/" className="hover:opacity-90 transition-opacity flex items-center">
-          <Logo size={28} showText={true} />
-        </Link>
+      {/* Active Project Switcher at Top of Sidebar */}
+      <div className="p-3 border-b border-[#ded9d2] bg-[#f5f1ec]">
+        <div className="text-[10px] font-bold uppercase tracking-wider text-[#0F3D2E]/70 px-1 mb-1.5 flex items-center justify-between">
+          <span>Active Project</span>
+          <span className="text-[10px] font-bold bg-[#8CC63F]/20 text-[#0F3D2E] px-1.5 py-0.5 rounded border border-[#8CC63F]/30">
+            Free
+          </span>
+        </div>
+        <ProjectSwitcher projects={projects} />
       </div>
 
       {/* Navigation Links */}

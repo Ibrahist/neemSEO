@@ -1,5 +1,4 @@
 import { Sidebar } from "@/components/layout/sidebar";
-import { Header } from "@/components/layout/header";
 import { Navbar } from "@/components/marketing/navbar";
 import { getCurrentUser } from "@/lib/auth/session";
 import { listProjects, createProject } from "@/features/projects/service";
@@ -32,14 +31,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="min-h-screen bg-[#ebe7e1] py-2 sm:py-4 md:py-6 px-1 sm:px-3 md:px-5 flex justify-center items-start font-sans selection:bg-[#8CC63F]/30 selection:text-[#0F3D2E]">
       {/* Boxed Platform Container matching Homepage styling */}
       <div className="w-full max-w-[1520px] bg-[#f5f1ec] border border-[#ded9d2] rounded-2xl sm:rounded-3xl shadow-xl shadow-neutral-900/5 overflow-hidden flex flex-col min-h-[96vh]">
-        {/* Top Navbar */}
+        {/* Strictly One Top Header */}
         <Navbar />
 
-        {/* Platform Body with Sidebar & Content */}
+        {/* Platform Body with Sidebar & Content (Second header removed) */}
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden bg-[#f5f1ec]">
-          <Sidebar initialProjectId={initialProjectId} />
+          <Sidebar initialProjectId={initialProjectId} projects={projects} />
           <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-            <Header />
             <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-[#f5f1ec]">
               <div className="max-w-7xl mx-auto space-y-6">{children}</div>
             </main>
