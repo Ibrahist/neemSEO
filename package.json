@@ -44,6 +44,7 @@
     "dataforseo-client": "^2.0.0",
     "drizzle-orm": "^0.45.2",
     "fast-xml-parser": "^5.0.8",
+    "framer-motion": "^14.14.0",
     "htmlparser2": "^10.0.0",
     "jose": "^6.0.8",
     "lucide-react": "^0.475.0",

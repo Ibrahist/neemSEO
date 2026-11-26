@@ -7,11 +7,11 @@ export function OpenSource() {
   return (
     <section className="border-y border-[#ded9d2] bg-[#faf8f5] py-16">
       <div className="max-w-[1120px] mx-auto px-6">
-        <div className="max-w-2xl mb-8">
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-[#0F3D2E]">
+        <div className="max-w-4xl mb-8">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-[#0F3D2E] md:whitespace-nowrap">
             100% Open Source &amp; Self-Hostable
           </h2>
-          <p className="mt-3 text-base text-[#57534e] leading-relaxed">
+          <p className="mt-3 text-base text-[#57534e] leading-relaxed max-w-2xl">
             Own your SEO infrastructure. Deploy on Cloudflare Workers using OpenNext with zero
             cold-starts, or spin up with Docker Compose on your own server. Full dual-dialect SQLite
             and Postgres support.
