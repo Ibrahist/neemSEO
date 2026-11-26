@@ -52,3 +52,17 @@ body {
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   min-height: 100vh;
 }
+
+/* Force light theme for all form inputs across all pages */
+input:not([type="checkbox"]):not([type="radio"]),
+textarea,
+select {
+  background-color: #ffffff !important;
+  color: #171717 !important;
+  border-color: #ded9d2 !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #a8a29e !important;
+}

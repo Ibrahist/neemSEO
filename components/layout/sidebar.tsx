@@ -106,16 +106,16 @@ export function Sidebar({ projectId, initialProjectId, projects = [] }: SidebarP
               key={item.label}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 px-3 py-2 text-sm font-semibold rounded-xl transition-all",
+                "flex items-center gap-3 px-3 py-2 text-sm font-semibold rounded-xl transition-all border",
                 isActive
-                  ? "bg-[#0F3D2E] text-white shadow-xs"
-                  : "text-neutral-700 hover:text-neutral-950 hover:bg-[#ebe7e1]/90"
+                  ? "bg-white text-[#0F3D2E] border-[#ded9d2] shadow-xs font-bold ring-1 ring-[#8CC63F]/40"
+                  : "border-transparent text-neutral-700 hover:text-neutral-950 hover:bg-white/70"
               )}
             >
               <Icon
                 className={cn(
                   "h-4 w-4 shrink-0 transition-colors",
-                  isActive ? "text-[#8CC63F]" : "text-neutral-500"
+                  isActive ? "text-[#0F3D2E]" : "text-neutral-500"
                 )}
               />
               <span>{item.label}</span>

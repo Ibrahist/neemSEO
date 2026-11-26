@@ -16,7 +16,7 @@ interface CheckVisibilityFormProps {
 
 const SAMPLE_PROMPTS = [
   "What is the best self-hosted SEO tool for agencies?",
-  "What are the top open-source alternatives to Ahrefs and Semrush?",
+  "What are the top open-source alternatives for SEO intelligence?",
   "How to track keyword rankings and backlinks with pay-as-you-go pricing?",
 ];
 

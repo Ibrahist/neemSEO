@@ -40,18 +40,16 @@ export function AddCompetitorForm({ projectId }: AddCompetitorFormProps) {
   }
 
   return (
-    <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl p-5 shadow-sm space-y-4">
+    <div className="bg-white border border-[#ded9d2] rounded-xl p-5 shadow-sm space-y-4">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
         <div>
-          <h2 className="text-base font-semibold text-neutral-900 dark:text-neutral-50">
-            Monitor Competitor Domain
-          </h2>
+          <h2 className="text-base font-semibold text-neutral-900">Monitor Competitor Domain</h2>
           <p className="text-xs text-neutral-500">
             Compare organic keyword overlap and reveal high-opportunity keyword gaps.
           </p>
         </div>
 
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-xs font-medium text-emerald-800 dark:text-emerald-300">
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-50 border border-emerald-200 text-xs font-medium text-emerald-800">
           <Coins className="h-3.5 w-3.5" />
           <span>Est. Cost: $0.01 USD/check</span>
         </div>

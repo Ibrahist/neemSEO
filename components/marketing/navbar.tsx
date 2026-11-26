@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Logo } from "@/components/ui/logo";
 import { cn } from "@/lib/utils";
 import {
@@ -24,7 +25,12 @@ import {
   ExternalLink,
 } from "lucide-react";
 
-export function Navbar() {
+interface NavbarProps {
+  minimal?: boolean;
+}
+
+export function Navbar({ minimal }: NavbarProps = {}) {
+  const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [featuresOpen, setFeaturesOpen] = React.useState(false);
   const [resourcesOpen, setResourcesOpen] = React.useState(false);
@@ -42,6 +48,41 @@ export function Navbar() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  const isPlatform =
+    minimal ||
+    (pathname
+      ? pathname === "/projects" ||
+        pathname.startsWith("/projects/") ||
+        pathname.startsWith("/keywords") ||
+        pathname.startsWith("/rank-tracking") ||
+        pathname.startsWith("/competitors") ||
+        pathname.startsWith("/backlinks") ||
+        pathname.startsWith("/audits") ||
+        pathname.startsWith("/ai-visibility") ||
+        pathname.startsWith("/agent") ||
+        pathname.startsWith("/settings")
+      : false);
+
+  if (isPlatform) {
+    return (
+      <header className="sticky top-0 z-50 w-full border-b border-[#ded9d2] bg-[#f5f1ec]/95 backdrop-blur-xl">
+        <div className="w-full px-4 sm:px-8">
+          <nav
+            aria-label="Platform navigation"
+            className="flex h-16 md:h-20 items-center justify-between"
+          >
+            {/* Platform View: ONLY name and logo of neemSEO are visible */}
+            <div className="flex items-center">
+              <Link href="/" className="hover:opacity-90 transition-opacity flex items-center">
+                <Logo size={34} showText={true} />
+              </Link>
+            </div>
+          </nav>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#ded9d2] bg-[#f5f1ec]/95 backdrop-blur-xl">
