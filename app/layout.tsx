@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { Comfortaa } from "next/font/google";
+import { IBM_Plex_Sans } from "next/font/google";
 import { Providers } from "@/components/layout/providers";
 import "./globals.css";
 
-const comfortaa = Comfortaa({
+const ibmPlexSans = IBM_Plex_Sans({
   subsets: ["latin"],
-  variable: "--font-comfortaa",
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-ibm-plex-sans",
   display: "swap",
 });
 
@@ -27,8 +28,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={comfortaa.variable} suppressHydrationWarning>
-      <body className={`${comfortaa.className} bg-neutral-50 text-neutral-900 antialiased`}>
+    <html lang="en" className={ibmPlexSans.variable} suppressHydrationWarning>
+      <body className={`${ibmPlexSans.className} bg-neutral-50 text-neutral-900 antialiased`}>
         <Providers>{children}</Providers>
       </body>
     </html>
