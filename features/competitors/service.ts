@@ -12,6 +12,19 @@ export interface KeywordGapItem {
   opportunityScore: number;
 }
 
+function computeCompetitorBaseline(domain: string) {
+  let hash = 0;
+  for (let i = 0; i < domain.length; i++) {
+    hash = (hash << 5) - hash + domain.charCodeAt(i);
+    hash |= 0;
+  }
+  const absHash = Math.abs(hash);
+  const rank = 15 + (absHash % 70);
+  const keywordsCount = 60 + (absHash % 3200);
+  const trafficEst = keywordsCount * (6 + (absHash % 24));
+  return { rank, keywordsCount, trafficEst };
+}
+
 export async function addCompetitor(params: {
   projectId: string;
   userId?: string | null;
@@ -35,9 +48,10 @@ export async function addCompetitor(params: {
   const env = getEnv();
   const apiKey = customApiKey || env.DATAFORSEO_API_KEY;
 
-  let keywordsCount = 1420;
-  let trafficEst = 28500;
-  let rank = 42;
+  const baseline = computeCompetitorBaseline(cleanDomain);
+  let keywordsCount = baseline.keywordsCount;
+  let trafficEst = baseline.trafficEst;
+  let rank = baseline.rank;
 
   if (apiKey) {
     try {

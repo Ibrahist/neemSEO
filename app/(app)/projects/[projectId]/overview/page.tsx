@@ -40,7 +40,7 @@ export default async function ProjectOverviewPage({ params }: OverviewProps) {
     aiVisibilityService.getVisibilitySummary(projectId).catch(() => null),
   ]);
 
-  // Compute metrics
+  // Compute metrics dynamically for THIS specific project
   const healthScore = auditSummary?.audit?.healthScore ?? null;
   const trackedCount = trackedKeywords?.length ?? 0;
   const avgPosition =
@@ -50,10 +50,11 @@ export default async function ProjectOverviewPage({ params }: OverviewProps) {
         ).toFixed(1)
       : null;
 
-  const domainRank = backlinksData?.snapshot?.rank ?? 48;
-  const totalBacklinks = backlinksData?.snapshot?.totalBacklinks ?? 18450;
-  const referringCount = backlinksData?.snapshot?.referringDomainsCount ?? 680;
-  const brandMentionRate = aiVisibility?.brandMentionRate ?? null;
+  const domainRank = backlinksData?.snapshot?.rank ?? null;
+  const totalBacklinks = backlinksData?.snapshot?.totalBacklinks ?? 0;
+  const referringCount = backlinksData?.snapshot?.referringDomainsCount ?? 0;
+  const brandMentionRate =
+    aiVisibility && aiVisibility.totalChecks > 0 ? aiVisibility.brandMentionRate : null;
 
   const workflows = [
     {
@@ -61,16 +62,16 @@ export default async function ProjectOverviewPage({ params }: OverviewProps) {
       description: "Search volumes, keyword difficulty, CPC, and intent exploration.",
       href: `/projects/${projectId}/keywords`,
       icon: Search,
-      tag: "Explore",
-      stat: "Live DataForSEO",
+      tag: "Live Data",
+      stat: `Explore keywords for ${project.domain}`,
     },
     {
       title: "Rank Tracking",
       description: "Monitor daily keyword positions and SERP trends over time.",
       href: `/projects/${projectId}/rank-tracking`,
       icon: TrendingUp,
-      tag: `${trackedCount} Keywords`,
-      stat: avgPosition ? `Avg Pos #${avgPosition}` : "Ready to track",
+      tag: trackedCount > 0 ? `${trackedCount} Keywords` : "0 Tracked",
+      stat: avgPosition ? `Avg Pos #${avgPosition}` : "Start tracking positions",
     },
     {
       title: "Competitor Insights",
@@ -78,23 +79,28 @@ export default async function ProjectOverviewPage({ params }: OverviewProps) {
       href: `/projects/${projectId}/competitors`,
       icon: Users,
       tag: "Gap Analysis",
-      stat: "Domain Compare",
+      stat: `Compare against ${project.domain} rivals`,
     },
     {
       title: "Backlink Profile",
       description: "Referring domains, anchor text distribution, and link velocity.",
       href: `/projects/${projectId}/backlinks`,
       icon: Link2,
-      tag: `Rank ${domainRank}/100`,
-      stat: `${formatNumber(totalBacklinks)} links from ${formatNumber(referringCount)} domains`,
+      tag: domainRank !== null ? `Rank ${domainRank}/100` : "Profile Ready",
+      stat:
+        domainRank !== null
+          ? `${formatNumber(totalBacklinks)} links from ${formatNumber(referringCount)} domains`
+          : "Analyze inbound links",
     },
     {
       title: "Site Audits",
       description: "SSRF-safe technical crawler with health score & ranked issues.",
       href: `/projects/${projectId}/audits`,
       icon: FileCheck2,
-      tag: healthScore ? `Score ${healthScore}/100` : "Audit Ready",
-      stat: auditSummary ? `${auditSummary.pages.length} pages indexed` : "Launch crawl",
+      tag: healthScore !== null ? `Score ${healthScore}/100` : "Not Crawled",
+      stat: auditSummary
+        ? `${auditSummary.pages.length} pages (${auditSummary.issues.length} issues)`
+        : `Run crawler on ${project.domain}`,
     },
     {
       title: "AI Visibility",
@@ -102,7 +108,10 @@ export default async function ProjectOverviewPage({ params }: OverviewProps) {
       href: `/projects/${projectId}/ai-visibility`,
       icon: Bot,
       tag: brandMentionRate !== null ? `${brandMentionRate}% Mentioned` : "4 AI Engines",
-      stat: aiVisibility ? `${aiVisibility.totalChecks} checks logged` : "Query prompts",
+      stat:
+        aiVisibility && aiVisibility.totalChecks > 0
+          ? `${aiVisibility.totalChecks} checks logged`
+          : `Query prompts for ${project.domain}`,
     },
   ];
 
@@ -139,68 +148,116 @@ export default async function ProjectOverviewPage({ params }: OverviewProps) {
 
       {/* KPI Overview Strip */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="bg-white border border-[#ded9d2] rounded-2xl shadow-xs">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-semibold text-[#57534e] flex items-center gap-1.5">
-              <ShieldCheck className="h-4 w-4 text-[#8CC63F]" /> Site Health
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#0F3D2E]">
-              {healthScore !== null ? `${healthScore}/100` : "92/100"}
-            </div>
-            <p className="text-[11px] text-neutral-500 mt-1">
-              {auditSummary ? `${auditSummary.issues.length} issues detected` : "Baseline score"}
-            </p>
-          </CardContent>
-        </Card>
+        {/* Site Health */}
+        <Link href={`/projects/${projectId}/audits`} className="group block">
+          <Card className="h-full bg-white border border-[#ded9d2] rounded-2xl shadow-xs transition-all group-hover:border-[#0F3D2E]">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xs font-semibold text-[#57534e] flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <ShieldCheck className="h-4 w-4 text-[#8CC63F]" /> Site Health
+                </span>
+                <span className="text-[11px] text-[#0F3D2E] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 font-bold">
+                  Audit <ArrowRight className="h-3 w-3" />
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-[#0F3D2E]">
+                {healthScore !== null ? `${healthScore}/100` : "—"}
+              </div>
+              <p className="text-[11px] text-neutral-500 mt-1">
+                {auditSummary
+                  ? `${auditSummary.issues.length} issues across ${auditSummary.pages.length} pages`
+                  : "No audit run yet · Click to crawl"}
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
 
-        <Card className="bg-white border border-[#ded9d2] rounded-2xl shadow-xs">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-semibold text-[#57534e] flex items-center gap-1.5">
-              <TrendingUp className="h-4 w-4 text-[#8CC63F]" /> Avg Position
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#0F3D2E]">
-              {avgPosition ? `#${avgPosition}` : "#7.4"}
-            </div>
-            <p className="text-[11px] text-neutral-500 mt-1">
-              Across {trackedCount > 0 ? trackedCount : 4} tracked keywords
-            </p>
-          </CardContent>
-        </Card>
+        {/* Avg Position */}
+        <Link href={`/projects/${projectId}/rank-tracking`} className="group block">
+          <Card className="h-full bg-white border border-[#ded9d2] rounded-2xl shadow-xs transition-all group-hover:border-[#0F3D2E]">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xs font-semibold text-[#57534e] flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <TrendingUp className="h-4 w-4 text-[#8CC63F]" /> Avg Position
+                </span>
+                <span className="text-[11px] text-[#0F3D2E] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 font-bold">
+                  Track <ArrowRight className="h-3 w-3" />
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-[#0F3D2E]">
+                {avgPosition ? `#${avgPosition}` : "—"}
+              </div>
+              <p className="text-[11px] text-neutral-500 mt-1">
+                {trackedCount > 0
+                  ? `Across ${trackedCount} tracked ${trackedCount === 1 ? "keyword" : "keywords"}`
+                  : "0 keywords tracked · Click to add"}
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
 
-        <Card className="bg-white border border-[#ded9d2] rounded-2xl shadow-xs">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-semibold text-[#57534e] flex items-center gap-1.5">
-              <Link2 className="h-4 w-4 text-[#8CC63F]" /> Domain Rank
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#0F3D2E]">
-              {domainRank}
-              <span className="text-xs font-normal text-neutral-400">/100</span>
-            </div>
-            <p className="text-[11px] text-neutral-500 mt-1">
-              {formatNumber(referringCount)} referring domains
-            </p>
-          </CardContent>
-        </Card>
+        {/* Domain Rank */}
+        <Link href={`/projects/${projectId}/backlinks`} className="group block">
+          <Card className="h-full bg-white border border-[#ded9d2] rounded-2xl shadow-xs transition-all group-hover:border-[#0F3D2E]">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xs font-semibold text-[#57534e] flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <Link2 className="h-4 w-4 text-[#8CC63F]" /> Domain Rank
+                </span>
+                <span className="text-[11px] text-[#0F3D2E] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 font-bold">
+                  Profile <ArrowRight className="h-3 w-3" />
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-[#0F3D2E]">
+                {domainRank !== null ? (
+                  <>
+                    {domainRank}
+                    <span className="text-xs font-normal text-neutral-400">/100</span>
+                  </>
+                ) : (
+                  "—"
+                )}
+              </div>
+              <p className="text-[11px] text-neutral-500 mt-1">
+                {referringCount > 0
+                  ? `${formatNumber(referringCount)} referring domains`
+                  : "No backlink data yet · Click to view"}
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
 
-        <Card className="bg-white border border-[#ded9d2] rounded-2xl shadow-xs">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-xs font-semibold text-[#57534e] flex items-center gap-1.5">
-              <Bot className="h-4 w-4 text-[#8CC63F]" /> AI Citation
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-[#0F3D2E]">
-              {brandMentionRate !== null ? `${brandMentionRate}%` : "75%"}
-            </div>
-            <p className="text-[11px] text-neutral-500 mt-1">ChatGPT, Claude &amp; Perplexity</p>
-          </CardContent>
-        </Card>
+        {/* AI Citation */}
+        <Link href={`/projects/${projectId}/ai-visibility`} className="group block">
+          <Card className="h-full bg-white border border-[#ded9d2] rounded-2xl shadow-xs transition-all group-hover:border-[#0F3D2E]">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-xs font-semibold text-[#57534e] flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <Bot className="h-4 w-4 text-[#8CC63F]" /> AI Citation
+                </span>
+                <span className="text-[11px] text-[#0F3D2E] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 font-bold">
+                  Test <ArrowRight className="h-3 w-3" />
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-[#0F3D2E]">
+                {brandMentionRate !== null ? `${brandMentionRate}%` : "—"}
+              </div>
+              <p className="text-[11px] text-neutral-500 mt-1">
+                {aiVisibility && aiVisibility.totalChecks > 0
+                  ? `Across ${aiVisibility.totalChecks} engine checks`
+                  : "No AI tests run · Click to test"}
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
 
       {/* 6 Core Workflows Grid */}
