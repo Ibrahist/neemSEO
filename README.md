@@ -145,6 +145,48 @@ In Cursor Settings &rarr; Features &rarr; MCP:
 
 ## 📂 Project Structure
 
+### Visual Tree Diagram
+
+```mermaid
+graph TD
+    Root["🌿 neemSEO Platform"]
+
+    Root --> App["📁 app/ (Next.js 15 App Router)"]
+    Root --> Comp["📁 components/ (React 19 UI)"]
+    Root --> Feat["📁 features/ (Domain Logic & Services)"]
+    Root --> DB["📁 db/ (Dual-Dialect Drizzle ORM)"]
+    Root --> Lib["📁 lib/ (Engine & Core Infra)"]
+    Root --> Plugins["📁 plugins/ (Agent Skills & Manifests)"]
+
+    App --> AppPlatform["📁 (app)/ Platform Workspace"]
+    App --> AppMarketing["📁 (marketing)/ Public Pages"]
+    App --> AppAPI["📁 api/ Route Handlers"]
+
+    AppPlatform --> AppProjects["📁 projects/[projectId]/ (6 Core Workflows)"]
+    AppMarketing --> AppHome["📄 page.tsx, docs/, health/"]
+    AppAPI --> AppMCP["📁 mcp/ & agent/chat/ (Streaming AI)"]
+
+    Comp --> CompLayout["📁 layout/ (Sidebar & Project Switcher)"]
+    Comp --> CompWorkflows["📁 workflows/ (Audits, Backlinks, SERP)"]
+    Comp --> CompUI["📁 ui/ (Radix & Tailwind Primitives)"]
+
+    Feat --> FeatSEO["📁 keywords, rank-tracking, audits"]
+    Feat --> FeatIntel["📁 backlinks, competitors, ai-visibility"]
+    Feat --> FeatGSC["📁 integrations/gsc, usage"]
+
+    DB --> DBSqlite["📁 schema/sqlite/ (Local & Cloudflare D1)"]
+    DB --> DBPg["📁 schema/pg/ (PostgreSQL)"]
+
+    Lib --> LibCrawler["📁 crawler/ (SSRF Safe Crawler & Parser)"]
+    Lib --> LibSEO["📁 dataforseo/ (Live Client & Cache)"]
+    Lib --> LibSec["📄 crypto.ts (AES-256) & env.ts"]
+
+    Plugins --> AgentSpecs["📄 claude.json, cursor.json, codex.json"]
+    Plugins --> AgentSkills["📁 skills/ (6 Autonomous Tool Guides)"]
+```
+
+### Directory Tree
+
 ```text
 neemSEO/
 ├── app/                                # Next.js 15 App Router
