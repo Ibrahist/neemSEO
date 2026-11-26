@@ -7,38 +7,10 @@ import { ArrowUpRight, Github } from "lucide-react";
 export function Footer() {
   return (
     <>
-      <footer className="border-t border-[#ded9d2] bg-[#f5f1ec] pt-16 pb-12 text-[#111111]">
+      <footer className="border-t border-[#ded9d2] bg-[#f5f1ec] py-12 text-[#111111]">
         <div className="w-full px-6 md:px-8">
-          {/* Newsletter Signup Row */}
-          <div className="pb-12 border-b border-[#ded9d2] grid grid-cols-1 md:grid-cols-2 gap-8 items-center justify-between">
-            <div>
-              <h3 className="text-2xl font-bold tracking-tight text-[#0F3D2E]">
-                Stay in the loop with neemSEO
-              </h3>
-              <p className="mt-1.5 text-xs text-neutral-600">
-                Open-source releases, new MCP tools, and autonomous agent skill updates.
-              </p>
-            </div>
-            <form
-              onSubmit={(e) => e.preventDefault()}
-              className="flex items-center gap-2 max-w-md md:ml-auto w-full"
-            >
-              <input
-                type="email"
-                placeholder="developer@company.com"
-                className="flex-1 h-10 px-3.5 text-xs rounded-xl border border-[#ded9d2] bg-white text-[#111111] placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#0F3D2E]"
-              />
-              <button
-                type="submit"
-                className="h-10 px-4 rounded-xl bg-[#0F3D2E] text-white text-xs font-semibold hover:bg-[#0A291F] transition-colors shrink-0 cursor-pointer"
-              >
-                Subscribe
-              </button>
-            </form>
-          </div>
-
           {/* 5-Column Directory with neemSEO details ONLY */}
-          <div className="py-12 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 text-xs">
+          <div className="pb-12 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 text-xs">
             {/* Workflows */}
             <div className="space-y-3">
               <p className="font-bold uppercase tracking-wider text-[#0F3D2E]">Workflows</p>
