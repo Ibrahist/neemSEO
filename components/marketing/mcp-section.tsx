@@ -334,7 +334,7 @@ const CLIENT_DATA: Record<string, ClientData> = {
       "Stream multi-step SEO agent reasoning loops with Claude 3.5 Sonnet or DeepSeek directly in your browser.",
     associatedTool: "neemseo_list_projects",
     configText: `{\n  "provider": "openrouter",\n  "model": "anthropic/claude-3.5-sonnet",\n  "endpoint": "/api/agent/chat",\n  "tools": [\n    "search_keywords",\n    "track_keyword",\n    "run_audit",\n    "check_ai_visibility"\n  ]\n}`,
-    primaryActionLabel: "Launch In-App Agent",
+    primaryActionLabel: "Open In-App Agent",
     primaryActionCopyText: `{\n  "provider": "openrouter",\n  "model": "anthropic/claude-3.5-sonnet",\n  "endpoint": "/api/agent/chat"\n}`,
     secondaryAction: {
       label: "Open /agent Chat",
@@ -531,7 +531,7 @@ export function McpSection() {
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0F3D2E] text-white text-xs font-semibold hover:bg-[#16503e] shadow-xs transition-colors"
             >
               <Bot className="h-3.5 w-3.5 text-[#8CC63F]" />
-              <span>Launch In-App Agent</span>
+              <span>Open In-App Agent</span>
               <ArrowRight className="h-3 w-3" />
             </Link>
           ) : (

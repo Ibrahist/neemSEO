@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { Sparkles, Shield, Database, Lock, Gift, ArrowRight } from "lucide-react";
+import { Sparkles, Shield, Database, Lock, Gift } from "lucide-react";
 
 export function ComparisonSection() {
   const valueProps = [
@@ -72,13 +71,7 @@ export function ComparisonSection() {
             <span className="font-semibold text-white">Instant Access:</span> No registration, no
             login, and no payment required.
           </div>
-          <Link
-            href="/projects"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#8CC63F] text-[#0F3D2E] text-xs font-bold hover:bg-[#9de047] transition-colors shadow-xs shrink-0"
-          >
-            <span>Launch Free Platform</span>
-            <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
+          <span className="text-xs font-semibold text-[#8CC63F]">100% Free Forever</span>
         </div>
       </div>
     </section>

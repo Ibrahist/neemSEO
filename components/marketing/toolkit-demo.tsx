@@ -112,7 +112,7 @@ export function ToolkitDemo() {
             href={workflowLinks[activeTab] || "/projects"}
             className="inline-flex h-9 items-center justify-center rounded-lg bg-[#0F3D2E] px-4 text-xs font-semibold text-white hover:bg-[#0A291F] transition-colors shrink-0"
           >
-            Launch Workflow &rarr;
+            Explore Workflow &rarr;
           </Link>
         </div>
 

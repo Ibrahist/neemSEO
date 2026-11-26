@@ -89,7 +89,7 @@ export default async function HealthPage() {
                 href="/projects"
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0F3D2E] text-white text-xs font-semibold hover:bg-[#0A291F] shadow-xs transition-colors"
               >
-                <span>Launch Platform</span>
+                <span>Open Platform</span>
               </Link>
             </div>
           </div>

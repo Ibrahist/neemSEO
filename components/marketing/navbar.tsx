@@ -285,7 +285,7 @@ export function Navbar({ minimal }: NavbarProps = {}) {
                           onClick={() => setFeaturesOpen(false)}
                           className="font-semibold text-[#0F3D2E] hover:text-[#8CC63F] transition-colors"
                         >
-                          Launch all 6 core workflows &rarr;
+                          Explore all 6 core workflows &rarr;
                         </Link>
                         <span className="text-neutral-500">100% Free · No Login</span>
                       </div>
@@ -463,13 +463,6 @@ export function Navbar({ minimal }: NavbarProps = {}) {
               <Github className="h-4 w-4" />
               <span>★ Star on GitHub</span>
             </a>
-
-            <Link
-              href="/projects"
-              className="inline-flex h-9 items-center justify-center rounded-xl bg-[#0F3D2E] px-4 text-xs font-semibold text-white shadow-xs hover:bg-[#0A291F] transition-all"
-            >
-              Launch Platform
-            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -522,15 +515,6 @@ export function Navbar({ minimal }: NavbarProps = {}) {
             >
               System Health &amp; Diagnostics
             </Link>
-            <div className="pt-2">
-              <Link
-                href="/projects"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-3 py-2.5 text-center text-xs font-semibold text-white bg-[#0F3D2E] rounded-lg shadow-xs"
-              >
-                Launch Platform
-              </Link>
-            </div>
           </div>
         )}
       </div>
