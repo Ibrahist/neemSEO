@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/marketing/navbar";
 import { Footer } from "@/components/marketing/footer";
 import { Terminal, Server, Cpu, ShieldCheck, ExternalLink } from "lucide-react";
+import Link from "next/link";
 
 export const metadata = {
   title: "Documentation & Resources - neemSEO",
@@ -359,16 +360,24 @@ export default function DocsPage() {
                   Returns JSON health status, timestamp, and database dialect.
                 </span>
               </div>
-              <a
-                href="/api/healthz"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0F3D2E] text-white text-xs font-semibold hover:bg-[#0A291F] transition-colors shrink-0"
-              >
-                <ShieldCheck className="h-4 w-4 text-[#8CC63F]" />
-                <span>Open /api/healthz Status</span>
-                <ExternalLink className="h-3 w-3 opacity-60" />
-              </a>
+              <div className="flex flex-wrap items-center gap-2">
+                <Link
+                  href="/health"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0F3D2E] text-white text-xs font-semibold hover:bg-[#0A291F] transition-colors shrink-0"
+                >
+                  <ShieldCheck className="h-4 w-4 text-[#8CC63F]" />
+                  <span>Open System Health Dashboard</span>
+                </Link>
+                <a
+                  href="/api/healthz"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#ded9d2] bg-white text-xs font-semibold text-neutral-800 hover:bg-neutral-50 transition-colors shrink-0"
+                >
+                  <span>Raw JSON (/api/healthz)</span>
+                  <ExternalLink className="h-3 w-3 opacity-60" />
+                </a>
+              </div>
             </div>
           </section>
         </main>

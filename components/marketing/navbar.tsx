@@ -360,31 +360,29 @@ export function Navbar() {
                         </div>
                       </Link>
 
-                      {/* Live Healthcheck Status */}
-                      <a
-                        href="/api/healthz"
-                        target="_blank"
-                        rel="noreferrer"
+                      {/* Live Healthcheck Status Dashboard */}
+                      <Link
+                        href="/health"
                         onClick={() => setResourcesOpen(false)}
                         className="group flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-[#f5f1ec]"
                       >
-                        <div className="h-8 w-8 rounded-lg bg-neutral-100 text-neutral-800 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-neutral-200 transition-colors">
+                        <div className="h-8 w-8 rounded-lg bg-emerald-50 text-emerald-800 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-emerald-100 transition-colors">
                           <ShieldCheck className="h-4 w-4" />
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center justify-between">
                             <span className="block text-sm font-semibold text-neutral-900">
-                              Healthcheck Endpoint
+                              System Health &amp; Diagnostics
                             </span>
                             <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded">
-                              Live API
+                              Live Page
                             </span>
                           </div>
                           <span className="block text-xs text-neutral-500 leading-snug">
-                            Live database &amp; runtime health probe at <code>/api/healthz</code>.
+                            Live database latency, runtime status, and automated health checks.
                           </span>
                         </div>
-                      </a>
+                      </Link>
 
                       {/* Bottom Link to Full Documentation */}
                       <div className="mt-3 pt-3 border-t border-[#ded9d2] flex items-center justify-between text-xs">
@@ -476,15 +474,13 @@ export function Navbar() {
             >
               Self-Hosting Guides
             </Link>
-            <a
-              href="/api/healthz"
-              target="_blank"
-              rel="noreferrer"
+            <Link
+              href="/health"
               onClick={() => setMobileMenuOpen(false)}
               className="block px-3 py-2 text-sm font-medium text-neutral-800 hover:bg-white rounded-lg"
             >
-              System Health (/api/healthz) &rarr;
-            </a>
+              System Health &amp; Diagnostics
+            </Link>
             <div className="pt-2">
               <Link
                 href="/projects"

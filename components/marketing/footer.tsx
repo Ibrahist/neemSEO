@@ -178,14 +178,9 @@ export function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <a
-                    href="/api/healthz"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="hover:text-neutral-900 transition-colors"
-                  >
-                    Healthcheck (<code>/api/healthz</code>)
-                  </a>
+                  <Link href="/health" className="hover:text-neutral-900 transition-colors">
+                    System Health &amp; Diagnostics
+                  </Link>
                 </li>
                 <li>
                   <Link href="/docs#byok" className="hover:text-neutral-900 transition-colors">
@@ -268,7 +263,7 @@ export function Footer() {
               >
                 <Github className="h-3.5 w-3.5" /> GitHub
               </a>
-              <Link href="/api/healthz" className="hover:text-neutral-900">
+              <Link href="/health" className="hover:text-neutral-900">
                 System Health
               </Link>
               <span>© 2026 neemSEO. MIT License.</span>

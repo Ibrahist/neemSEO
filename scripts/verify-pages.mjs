@@ -102,6 +102,8 @@ async function run() {
   console.log("\n5. Testing all core workflow URLs directly:");
   const coreWorkflows = [
     "/docs",
+    "/health",
+    "/healthz",
     "/keywords",
     "/rank-tracking",
     "/competitors",
