@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { Logo } from "@/components/ui/logo";
+import { cn } from "@/lib/utils";
 import {
   ChevronDown,
   Search,
@@ -19,12 +20,28 @@ import {
   Github,
   Menu,
   X,
+  ArrowRight,
+  ExternalLink,
 } from "lucide-react";
 
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [featuresOpen, setFeaturesOpen] = React.useState(false);
   const [resourcesOpen, setResourcesOpen] = React.useState(false);
+  const navRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (navRef.current && !navRef.current.contains(event.target as Node)) {
+        setFeaturesOpen(false);
+        setResourcesOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#ded9d2] bg-[#f5f1ec]/95 backdrop-blur-xl">
@@ -40,7 +57,7 @@ export function Navbar() {
             </Link>
 
             {/* Desktop Navigation Links */}
-            <div className="hidden lg:flex items-center gap-6">
+            <div ref={navRef} className="hidden lg:flex items-center gap-6">
               {/* Features Dropdown */}
               <div
                 className="relative"
@@ -49,10 +66,19 @@ export function Navbar() {
               >
                 <button
                   type="button"
+                  onClick={() => {
+                    setFeaturesOpen((v) => !v);
+                    setResourcesOpen(false);
+                  }}
                   className="inline-flex h-10 items-center gap-1.5 text-sm font-medium text-neutral-700 transition-colors hover:text-neutral-950 cursor-pointer"
                 >
                   Features
-                  <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+                  <ChevronDown
+                    className={cn(
+                      "h-3.5 w-3.5 opacity-60 transition-transform",
+                      featuresOpen && "rotate-180"
+                    )}
+                  />
                 </button>
 
                 {featuresOpen && (
@@ -62,6 +88,7 @@ export function Navbar() {
                         {/* Keyword Research */}
                         <Link
                           href="/keywords"
+                          onClick={() => setFeaturesOpen(false)}
                           className="group flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-[#f5f1ec]"
                         >
                           <div className="h-8 w-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-emerald-100 transition-colors">
@@ -72,7 +99,7 @@ export function Navbar() {
                               Keyword Research
                             </span>
                             <span className="block text-xs text-neutral-500 leading-snug">
-                              Search volume, KD, CPC, intent classification & CSV exports.
+                              Search volume, KD, CPC, intent classification &amp; CSV exports.
                             </span>
                           </div>
                         </Link>
@@ -80,6 +107,7 @@ export function Navbar() {
                         {/* Rank Tracking */}
                         <Link
                           href="/rank-tracking"
+                          onClick={() => setFeaturesOpen(false)}
                           className="group flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-[#f5f1ec]"
                         >
                           <div className="h-8 w-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-emerald-100 transition-colors">
@@ -90,7 +118,7 @@ export function Navbar() {
                               Rank Tracking
                             </span>
                             <span className="block text-xs text-neutral-500 leading-snug">
-                              Domain keyword positions, history movement & SERP charts.
+                              Domain keyword positions, history movement &amp; SERP charts.
                             </span>
                           </div>
                         </Link>
@@ -98,6 +126,7 @@ export function Navbar() {
                         {/* Competitor Insights */}
                         <Link
                           href="/competitors"
+                          onClick={() => setFeaturesOpen(false)}
                           className="group flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-[#f5f1ec]"
                         >
                           <div className="h-8 w-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-emerald-100 transition-colors">
@@ -108,7 +137,7 @@ export function Navbar() {
                               Competitor Insights
                             </span>
                             <span className="block text-xs text-neutral-500 leading-snug">
-                              Domain overview, organic overlap & keyword gap analysis.
+                              Domain overview, organic overlap &amp; keyword gap analysis.
                             </span>
                           </div>
                         </Link>
@@ -116,6 +145,7 @@ export function Navbar() {
                         {/* Backlink Profile */}
                         <Link
                           href="/backlinks"
+                          onClick={() => setFeaturesOpen(false)}
                           className="group flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-[#f5f1ec]"
                         >
                           <div className="h-8 w-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-emerald-100 transition-colors">
@@ -126,7 +156,7 @@ export function Navbar() {
                               Backlinks Intelligence
                             </span>
                             <span className="block text-xs text-neutral-500 leading-snug">
-                              Referring domains, domain rank, anchors & link velocity.
+                              Referring domains, domain rank, anchors &amp; link velocity.
                             </span>
                           </div>
                         </Link>
@@ -134,6 +164,7 @@ export function Navbar() {
                         {/* Site Audits */}
                         <Link
                           href="/audits"
+                          onClick={() => setFeaturesOpen(false)}
                           className="group flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-[#f5f1ec]"
                         >
                           <div className="h-8 w-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-emerald-100 transition-colors">
@@ -144,7 +175,7 @@ export function Navbar() {
                               Technical Site Audits
                             </span>
                             <span className="block text-xs text-neutral-500 leading-snug">
-                              SSRF-safe crawler, robots.txt, 0-100 score & ranked issues.
+                              SSRF-safe crawler, robots.txt, 0-100 score &amp; ranked issues.
                             </span>
                           </div>
                         </Link>
@@ -152,6 +183,7 @@ export function Navbar() {
                         {/* AI Visibility */}
                         <Link
                           href="/ai-visibility"
+                          onClick={() => setFeaturesOpen(false)}
                           className="group flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-[#f5f1ec]"
                         >
                           <div className="h-8 w-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-emerald-100 transition-colors">
@@ -162,7 +194,7 @@ export function Navbar() {
                               AI Search Visibility
                             </span>
                             <span className="block text-xs text-neutral-500 leading-snug">
-                              Brand citation checks across ChatGPT, Claude, Perplexity & Gemini.
+                              Brand citation checks across ChatGPT, Claude, Perplexity &amp; Gemini.
                             </span>
                           </div>
                         </Link>
@@ -170,6 +202,7 @@ export function Navbar() {
                         {/* In-App AI Agent */}
                         <Link
                           href="/agent"
+                          onClick={() => setFeaturesOpen(false)}
                           className="group flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-[#f5f1ec]"
                         >
                           <div className="h-8 w-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-emerald-100 transition-colors">
@@ -187,7 +220,8 @@ export function Navbar() {
 
                         {/* GSC Integration */}
                         <Link
-                          href="/projects"
+                          href="/settings"
+                          onClick={() => setFeaturesOpen(false)}
                           className="group flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-[#f5f1ec]"
                         >
                           <div className="h-8 w-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-emerald-100 transition-colors">
@@ -198,7 +232,7 @@ export function Navbar() {
                               Google Search Console
                             </span>
                             <span className="block text-xs text-neutral-500 leading-snug">
-                              AES-256-GCM encrypted tokens & verified performance data.
+                              AES-256-GCM encrypted tokens &amp; verified performance data.
                             </span>
                           </div>
                         </Link>
@@ -207,11 +241,12 @@ export function Navbar() {
                       <div className="mt-4 pt-4 border-t border-[#ded9d2] flex items-center justify-between text-xs">
                         <Link
                           href="/projects"
+                          onClick={() => setFeaturesOpen(false)}
                           className="font-semibold text-[#0F3D2E] hover:text-[#8CC63F] transition-colors"
                         >
                           Launch all 6 core workflows &rarr;
                         </Link>
-                        <span className="text-neutral-500">BYOK DataForSEO · Zero Markups</span>
+                        <span className="text-neutral-500">100% Free · No Login</span>
                       </div>
                     </div>
                   </div>
@@ -226,37 +261,74 @@ export function Navbar() {
               >
                 <button
                   type="button"
+                  onClick={() => {
+                    setResourcesOpen((v) => !v);
+                    setFeaturesOpen(false);
+                  }}
                   className="inline-flex h-10 items-center gap-1.5 text-sm font-medium text-neutral-700 transition-colors hover:text-neutral-950 cursor-pointer"
                 >
                   Resources
-                  <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+                  <ChevronDown
+                    className={cn(
+                      "h-3.5 w-3.5 opacity-60 transition-transform",
+                      resourcesOpen && "rotate-180"
+                    )}
+                  />
                 </button>
 
                 {resourcesOpen && (
-                  <div className="absolute left-0 top-[calc(100%-4px)] z-30 w-[380px] pt-2">
+                  <div className="absolute left-0 top-[calc(100%-4px)] z-30 w-[420px] pt-2">
                     <div className="rounded-2xl border border-[#ded9d2] bg-white p-5 shadow-2xl shadow-neutral-900/10 space-y-2">
+                      {/* Self-Hosting Guides */}
                       <Link
-                        href="/api/mcp"
+                        href="/docs#self-hosting"
+                        onClick={() => setResourcesOpen(false)}
                         className="group flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-[#f5f1ec]"
                       >
-                        <div className="h-8 w-8 rounded-lg bg-neutral-100 text-neutral-800 flex items-center justify-center shrink-0 mt-0.5">
-                          <Terminal className="h-4 w-4" />
+                        <div className="h-8 w-8 rounded-lg bg-emerald-50 text-emerald-800 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-emerald-100 transition-colors">
+                          <Server className="h-4 w-4" />
                         </div>
                         <div>
                           <span className="block text-sm font-semibold text-neutral-900">
-                            neemSEO MCP Server
+                            Self-Hosting Guides
                           </span>
                           <span className="block text-xs text-neutral-500 leading-snug">
-                            Connect Claude Code, Cursor, Codex & agents at <code>/api/mcp</code>.
+                            Docker Compose, SQLite, Postgres &amp; Cloudflare Workers deployment.
                           </span>
                         </div>
                       </Link>
 
+                      {/* neemSEO MCP Server */}
                       <Link
-                        href="/agent"
+                        href="/docs#mcp"
+                        onClick={() => setResourcesOpen(false)}
                         className="group flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-[#f5f1ec]"
                       >
-                        <div className="h-8 w-8 rounded-lg bg-neutral-100 text-neutral-800 flex items-center justify-center shrink-0 mt-0.5">
+                        <div className="h-8 w-8 rounded-lg bg-purple-50 text-purple-800 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-purple-100 transition-colors">
+                          <Terminal className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <span className="block text-sm font-semibold text-neutral-900">
+                              neemSEO MCP Server
+                            </span>
+                            <span className="text-[10px] font-bold text-purple-700 bg-purple-100 px-1.5 py-0.2 rounded">
+                              Guide
+                            </span>
+                          </div>
+                          <span className="block text-xs text-neutral-500 leading-snug">
+                            Connect Claude Code, Cursor, Codex &amp; AI agents over MCP.
+                          </span>
+                        </div>
+                      </Link>
+
+                      {/* Agent Skills Plugin */}
+                      <Link
+                        href="/docs#agent-skills"
+                        onClick={() => setResourcesOpen(false)}
+                        className="group flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-[#f5f1ec]"
+                      >
+                        <div className="h-8 w-8 rounded-lg bg-blue-50 text-blue-800 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-blue-100 transition-colors">
                           <Cpu className="h-4 w-4" />
                         </div>
                         <div>
@@ -269,40 +341,71 @@ export function Navbar() {
                         </div>
                       </Link>
 
+                      {/* DataForSEO BYOK Guide */}
                       <Link
-                        href="/projects"
+                        href="/docs#byok"
+                        onClick={() => setResourcesOpen(false)}
                         className="group flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-[#f5f1ec]"
                       >
-                        <div className="h-8 w-8 rounded-lg bg-neutral-100 text-neutral-800 flex items-center justify-center shrink-0 mt-0.5">
-                          <Server className="h-4 w-4" />
-                        </div>
-                        <div>
-                          <span className="block text-sm font-semibold text-neutral-900">
-                            Self-Hosting Guides
-                          </span>
-                          <span className="block text-xs text-neutral-500 leading-snug">
-                            Cloudflare Workers (OpenNext) & Docker standalone instructions.
-                          </span>
-                        </div>
-                      </Link>
-
-                      <Link
-                        href="/api/healthz"
-                        className="group flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-[#f5f1ec]"
-                      >
-                        <div className="h-8 w-8 rounded-lg bg-neutral-100 text-neutral-800 flex items-center justify-center shrink-0 mt-0.5">
+                        <div className="h-8 w-8 rounded-lg bg-amber-50 text-amber-800 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-amber-100 transition-colors">
                           <ShieldCheck className="h-4 w-4" />
                         </div>
                         <div>
                           <span className="block text-sm font-semibold text-neutral-900">
-                            Healthcheck Endpoint
+                            DataForSEO BYOK Guide
                           </span>
                           <span className="block text-xs text-neutral-500 leading-snug">
-                            Automated database and runtime health probe at <code>/api/healthz</code>
-                            .
+                            Wholesale API rates ($0.002 - $0.02) &amp; 7-day automated caching.
                           </span>
                         </div>
                       </Link>
+
+                      {/* Live Healthcheck Status */}
+                      <a
+                        href="/api/healthz"
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={() => setResourcesOpen(false)}
+                        className="group flex items-start gap-3 rounded-xl p-2.5 transition-colors hover:bg-[#f5f1ec]"
+                      >
+                        <div className="h-8 w-8 rounded-lg bg-neutral-100 text-neutral-800 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-neutral-200 transition-colors">
+                          <ShieldCheck className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <span className="block text-sm font-semibold text-neutral-900">
+                              Healthcheck Endpoint
+                            </span>
+                            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded">
+                              Live API
+                            </span>
+                          </div>
+                          <span className="block text-xs text-neutral-500 leading-snug">
+                            Live database &amp; runtime health probe at <code>/api/healthz</code>.
+                          </span>
+                        </div>
+                      </a>
+
+                      {/* Bottom Link to Full Documentation */}
+                      <div className="mt-3 pt-3 border-t border-[#ded9d2] flex items-center justify-between text-xs">
+                        <Link
+                          href="/docs"
+                          onClick={() => setResourcesOpen(false)}
+                          className="font-semibold text-[#0F3D2E] hover:text-[#8CC63F] transition-colors flex items-center gap-1"
+                        >
+                          <span>Explore all documentation &amp; guides</span>
+                          <ArrowRight className="h-3.5 w-3.5" />
+                        </Link>
+                        <a
+                          href="https://github.com/Ibrahist/neemSEO"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-neutral-500 hover:text-neutral-900 flex items-center gap-1"
+                        >
+                          <span>GitHub</span>
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -344,28 +447,53 @@ export function Navbar() {
 
         {/* Mobile Dropdown Panel */}
         {mobileMenuOpen && (
-          <div className="lg:hidden py-4 border-t border-[#ded9d2] space-y-3 bg-[#f5f1ec]">
+          <div className="lg:hidden py-4 border-t border-[#ded9d2] space-y-2 bg-[#f5f1ec]">
             <Link
               href="/projects"
               onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2 text-sm font-medium text-neutral-800 hover:bg-white rounded-lg"
+              className="block px-3 py-2 text-sm font-semibold text-neutral-800 hover:bg-white rounded-lg"
             >
-              Features & Workflows
+              Platform Workflows
             </Link>
             <Link
-              href="/api/mcp"
+              href="/docs"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2 text-sm font-semibold text-neutral-800 hover:bg-white rounded-lg"
+            >
+              Documentation &amp; Guides
+            </Link>
+            <Link
+              href="/docs#mcp"
               onClick={() => setMobileMenuOpen(false)}
               className="block px-3 py-2 text-sm font-medium text-neutral-800 hover:bg-white rounded-lg"
             >
-              MCP Server
+              neemSEO MCP Server
             </Link>
             <Link
-              href="/projects"
+              href="/docs#self-hosting"
               onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2.5 text-center text-xs font-semibold text-white bg-[#0F3D2E] rounded-lg"
+              className="block px-3 py-2 text-sm font-medium text-neutral-800 hover:bg-white rounded-lg"
             >
-              Launch Platform
+              Self-Hosting Guides
             </Link>
+            <a
+              href="/api/healthz"
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => setMobileMenuOpen(false)}
+              className="block px-3 py-2 text-sm font-medium text-neutral-800 hover:bg-white rounded-lg"
+            >
+              System Health (/api/healthz) &rarr;
+            </a>
+            <div className="pt-2">
+              <Link
+                href="/projects"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-3 py-2.5 text-center text-xs font-semibold text-white bg-[#0F3D2E] rounded-lg shadow-xs"
+              >
+                Launch Platform
+              </Link>
+            </div>
           </div>
         )}
       </div>

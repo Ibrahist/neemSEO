@@ -101,6 +101,7 @@ async function run() {
   // 5. Test all core workflow direct links
   console.log("\n5. Testing all core workflow URLs directly:");
   const coreWorkflows = [
+    "/docs",
     "/keywords",
     "/rank-tracking",
     "/competitors",

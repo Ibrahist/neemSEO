@@ -86,22 +86,22 @@ export function Footer() {
               <p className="font-bold uppercase tracking-wider text-[#0F3D2E]">AI &amp; MCP</p>
               <ul className="space-y-2 text-neutral-600">
                 <li>
-                  <Link href="/api/mcp" className="hover:text-neutral-900 transition-colors">
-                    MCP Server (<code>/api/mcp</code>)
+                  <Link href="/docs#mcp" className="hover:text-neutral-900 transition-colors">
+                    neemSEO MCP Server Guide
                   </Link>
                 </li>
                 <li>
-                  <Link href="/api/mcp" className="hover:text-neutral-900 transition-colors">
+                  <Link href="/docs#mcp" className="hover:text-neutral-900 transition-colors">
                     Claude Code Tooling
                   </Link>
                 </li>
                 <li>
-                  <Link href="/api/mcp" className="hover:text-neutral-900 transition-colors">
+                  <Link href="/docs#mcp" className="hover:text-neutral-900 transition-colors">
                     Cursor MCP Integration
                   </Link>
                 </li>
                 <li>
-                  <Link href="/api/mcp" className="hover:text-neutral-900 transition-colors">
+                  <Link href="/docs#mcp" className="hover:text-neutral-900 transition-colors">
                     Codex Integration
                   </Link>
                 </li>
@@ -118,27 +118,42 @@ export function Footer() {
               <p className="font-bold uppercase tracking-wider text-[#0F3D2E]">Deployment</p>
               <ul className="space-y-2 text-neutral-600">
                 <li>
-                  <Link href="/projects" className="hover:text-neutral-900 transition-colors">
-                    Cloudflare Workers
+                  <Link
+                    href="/docs#self-hosting"
+                    className="hover:text-neutral-900 transition-colors"
+                  >
+                    Cloudflare Workers Guide
                   </Link>
                 </li>
                 <li>
-                  <Link href="/projects" className="hover:text-neutral-900 transition-colors">
+                  <Link
+                    href="/docs#self-hosting"
+                    className="hover:text-neutral-900 transition-colors"
+                  >
                     OpenNext Adapter
                   </Link>
                 </li>
                 <li>
-                  <Link href="/projects" className="hover:text-neutral-900 transition-colors">
-                    Docker Compose
+                  <Link
+                    href="/docs#self-hosting"
+                    className="hover:text-neutral-900 transition-colors"
+                  >
+                    Docker Compose (SQLite)
                   </Link>
                 </li>
                 <li>
-                  <Link href="/projects" className="hover:text-neutral-900 transition-colors">
+                  <Link
+                    href="/docs#self-hosting"
+                    className="hover:text-neutral-900 transition-colors"
+                  >
                     PostgreSQL Standalone
                   </Link>
                 </li>
                 <li>
-                  <Link href="/projects" className="hover:text-neutral-900 transition-colors">
+                  <Link
+                    href="/docs#self-hosting"
+                    className="hover:text-neutral-900 transition-colors"
+                  >
                     Cloudflare D1 &amp; SQLite
                   </Link>
                 </li>
@@ -150,23 +165,39 @@ export function Footer() {
               <p className="font-bold uppercase tracking-wider text-[#0F3D2E]">Resources</p>
               <ul className="space-y-2 text-neutral-600">
                 <li>
-                  <Link href="/settings" className="hover:text-neutral-900 transition-colors">
+                  <Link href="/docs#byok" className="hover:text-neutral-900 transition-colors">
                     BYOK DataForSEO Guide
                   </Link>
                 </li>
                 <li>
-                  <Link href="/agent" className="hover:text-neutral-900 transition-colors">
+                  <Link
+                    href="/docs#agent-skills"
+                    className="hover:text-neutral-900 transition-colors"
+                  >
                     Agent Skills Plugin
                   </Link>
                 </li>
                 <li>
-                  <Link href="/api/healthz" className="hover:text-neutral-900 transition-colors">
+                  <a
+                    href="/api/healthz"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:text-neutral-900 transition-colors"
+                  >
                     Healthcheck (<code>/api/healthz</code>)
+                  </a>
+                </li>
+                <li>
+                  <Link href="/docs#byok" className="hover:text-neutral-900 transition-colors">
+                    Cost Tracking &amp; Cache
                   </Link>
                 </li>
                 <li>
-                  <Link href="/settings" className="hover:text-neutral-900 transition-colors">
-                    Cost Tracking &amp; Cache
+                  <Link
+                    href="/docs"
+                    className="hover:text-neutral-900 transition-colors font-semibold text-[#0F3D2E]"
+                  >
+                    All Documentation &rarr;
                   </Link>
                 </li>
               </ul>
