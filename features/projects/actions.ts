@@ -17,6 +17,7 @@ export async function createProjectAction(rawInput: unknown) {
 
   const project = await projectService.createProject(user.organizationId, input);
   revalidatePath("/projects");
+  revalidatePath("/", "layout");
   return { success: true, project };
 }
 

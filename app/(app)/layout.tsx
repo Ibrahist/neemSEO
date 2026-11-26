@@ -1,7 +1,7 @@
 import { Sidebar } from "@/components/layout/sidebar";
 import { Navbar } from "@/components/marketing/navbar";
 import { getCurrentUser } from "@/lib/auth/session";
-import { listProjects, createProject } from "@/features/projects/service";
+import { listProjects } from "@/features/projects/service";
 import type { ProjectRecord } from "@/features/projects/repository";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -11,21 +11,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (user?.organizationId) {
     try {
       projects = await listProjects(user.organizationId);
-      // Auto-provision demo project if empty so platform is fully populated on first launch
-      if (projects.length === 0) {
-        await createProject(user.organizationId, {
-          name: "neemSEO Demo",
-          domain: "neemseo.com",
-          description: "Default workspace for SEO intelligence and rank monitoring",
-        });
-        projects = await listProjects(user.organizationId);
-      }
     } catch {
       projects = [];
     }
   }
-
-  const initialProjectId = projects[0]?.id;
 
   return (
     <div className="min-h-screen bg-[#ebe7e1] py-2 sm:py-4 md:py-6 px-1 sm:px-3 md:px-5 flex justify-center items-start font-sans selection:bg-[#8CC63F]/30 selection:text-[#0F3D2E]">
@@ -34,9 +23,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         {/* Strictly One Top Header with Only Logo & Name */}
         <Navbar minimal={true} />
 
-        {/* Platform Body with Sidebar & Content (Second header removed) */}
+        {/* Platform Body with Sidebar & Content */}
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden bg-[#f5f1ec]">
-          <Sidebar initialProjectId={initialProjectId} projects={projects} />
+          <Sidebar projects={projects} />
           <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
             <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-[#f5f1ec]">
               <div className="max-w-7xl mx-auto space-y-6">{children}</div>

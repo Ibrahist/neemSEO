@@ -26,6 +26,7 @@ export default function NewProjectPage() {
       const res = await createProjectAction({ name, domain, description });
       if (res?.project?.id) {
         toast.success(`Project "${res.project.name}" created`);
+        router.refresh();
         router.push(`/projects/${res.project.id}/overview`);
       }
     } catch (error: unknown) {

@@ -19,61 +19,60 @@ import type { ProjectRecord } from "@/features/projects/repository";
 
 interface SidebarProps {
   projectId?: string;
-  initialProjectId?: string;
   projects?: ProjectRecord[];
 }
 
-export function Sidebar({ projectId, initialProjectId, projects = [] }: SidebarProps) {
+export function Sidebar({ projectId, projects = [] }: SidebarProps) {
   const pathname = usePathname();
   const params = useParams();
 
-  // Resolve active project ID from props, URL path params, or initial project fallback
-  const activeProjectId = projectId || (params?.projectId as string) || initialProjectId;
+  // Resolve active project ID from props or URL path params. Do not force any default!
+  const activeProjectId = projectId || (params?.projectId as string) || undefined;
 
   const navItems = [
     {
       label: "Overview",
-      href: activeProjectId ? `/projects/${activeProjectId}/overview` : "/projects",
+      href: activeProjectId ? `/projects/${activeProjectId}/overview` : "/projects/new",
       icon: LayoutDashboard,
     },
     {
       label: "Keyword Research",
-      href: activeProjectId ? `/projects/${activeProjectId}/keywords` : "/keywords",
+      href: activeProjectId ? `/projects/${activeProjectId}/keywords` : "/projects/new",
       icon: Search,
     },
     {
       label: "Rank Tracking",
-      href: activeProjectId ? `/projects/${activeProjectId}/rank-tracking` : "/rank-tracking",
+      href: activeProjectId ? `/projects/${activeProjectId}/rank-tracking` : "/projects/new",
       icon: TrendingUp,
     },
     {
       label: "Competitors",
-      href: activeProjectId ? `/projects/${activeProjectId}/competitors` : "/competitors",
+      href: activeProjectId ? `/projects/${activeProjectId}/competitors` : "/projects/new",
       icon: Users,
     },
     {
       label: "Backlinks",
-      href: activeProjectId ? `/projects/${activeProjectId}/backlinks` : "/backlinks",
+      href: activeProjectId ? `/projects/${activeProjectId}/backlinks` : "/projects/new",
       icon: Link2,
     },
     {
       label: "Site Audits",
-      href: activeProjectId ? `/projects/${activeProjectId}/audits` : "/audits",
+      href: activeProjectId ? `/projects/${activeProjectId}/audits` : "/projects/new",
       icon: FileCheck2,
     },
     {
       label: "AI Visibility",
-      href: activeProjectId ? `/projects/${activeProjectId}/ai-visibility` : "/ai-visibility",
+      href: activeProjectId ? `/projects/${activeProjectId}/ai-visibility` : "/projects/new",
       icon: Bot,
     },
     {
       label: "AI SEO Agent",
-      href: activeProjectId ? `/projects/${activeProjectId}/agent` : "/agent",
+      href: activeProjectId ? `/projects/${activeProjectId}/agent` : "/projects/new",
       icon: Sparkles,
     },
     {
       label: "Settings",
-      href: activeProjectId ? `/projects/${activeProjectId}/settings` : "/settings",
+      href: activeProjectId ? `/projects/${activeProjectId}/settings` : "/projects/new",
       icon: Settings,
     },
   ];

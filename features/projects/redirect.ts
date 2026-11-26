@@ -1,7 +1,7 @@
 import "server-only";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/session";
-import { listProjects, createProject } from "./service";
+import { listProjects } from "./service";
 import type { ProjectRecord } from "./repository";
 
 export async function redirectToProjectWorkflow(workflowSlug: string) {
@@ -14,24 +14,12 @@ export async function redirectToProjectWorkflow(workflowSlug: string) {
     projects = [];
   }
 
-  let targetProjectId: string | undefined = projects[0]?.id;
-
-  if (!targetProjectId) {
-    try {
-      const starter = await createProject(user.organizationId, {
-        name: "neemSEO Demo",
-        domain: "neemseo.com",
-        description: "Default workspace for SEO intelligence and rank monitoring",
-      });
-      targetProjectId = starter.id;
-    } catch {
-      targetProjectId = undefined;
-    }
-  }
-
-  if (targetProjectId) {
-    redirect(`/projects/${targetProjectId}/${workflowSlug}`);
-  } else {
+  // If no project exists yet, send user directly to create a new project
+  if (projects.length === 0) {
     redirect("/projects/new");
   }
+
+  // Use the active project (most recent or first)
+  const targetProjectId = projects[0]?.id;
+  redirect(`/projects/${targetProjectId}/${workflowSlug}`);
 }

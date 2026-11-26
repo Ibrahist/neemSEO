@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/session";
-import { listProjects, createProject } from "@/features/projects/service";
+import { listProjects } from "@/features/projects/service";
 import type { ProjectRecord } from "@/features/projects/repository";
 
 export default async function ProjectsIndexPage() {
@@ -13,24 +13,11 @@ export default async function ProjectsIndexPage() {
     projects = [];
   }
 
+  // If no projects exist yet, send user directly to create a new project
   if (projects.length === 0) {
-    let starter: ProjectRecord | null = null;
-    try {
-      starter = await createProject(user.organizationId, {
-        name: "neemSEO Demo",
-        domain: "neemseo.com",
-        description: "Default workspace for SEO intelligence and rank monitoring",
-      });
-    } catch {
-      starter = null;
-    }
-
-    if (starter) {
-      redirect(`/projects/${starter.id}/overview`);
-    } else {
-      redirect("/projects/new");
-    }
+    redirect("/projects/new");
   }
 
+  // Redirect to first active project overview
   redirect(`/projects/${projects[0].id}/overview`);
 }
