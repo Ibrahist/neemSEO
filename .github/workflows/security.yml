@@ -29,6 +29,8 @@ jobs:
           node-version: 22
 
       - name: Run pnpm audit (high severity threshold)
+        # Exception: GHSA-mrhx-c7xc-m3w5 (zod <4.6.6 ReDoS/memory exhaustion) is safely ignored in
+        # pnpm-workspace.yaml auditConfig because direct dependency requires zod 3.x for ai@4 compatibility.
         run: pnpm audit --audit-level=high
 
   gitleaks:
