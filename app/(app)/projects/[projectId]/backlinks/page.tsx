@@ -5,11 +5,11 @@ import { getBacklinksOverview } from "@/features/backlinks/service";
 import { ReferringDomainsTable } from "@/components/backlinks/referring-domains-table";
 import { AnchorTextTable } from "@/components/backlinks/anchor-text-table";
 import { NewLostLinksChart } from "@/components/backlinks/new-lost-links-chart";
+import { RefreshBacklinksButton } from "@/components/backlinks/refresh-backlinks-button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { formatNumber } from "@/lib/utils";
-import { Link2, Globe, Shield, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Link2, Globe, Shield } from "lucide-react";
 
 interface BacklinksPageProps {
   params: Promise<{ projectId: string }>;
@@ -40,9 +40,7 @@ export default async function BacklinksPage({ params }: BacklinksPageProps) {
           </p>
         </div>
 
-        <Button variant="outline" size="sm" className="gap-2 text-xs h-9 self-start sm:self-auto">
-          <RefreshCw className="h-3.5 w-3.5" /> Refresh Profile
-        </Button>
+        <RefreshBacklinksButton projectId={projectId} domain={project.domain} />
       </div>
 
       {/* Snapshot Cards */}

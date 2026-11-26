@@ -14,7 +14,9 @@ test.describe("neemSEO E2E Smoke Tests", () => {
   test("landing page renders hero and navigation", async ({ page }) => {
     await page.goto("/");
     await expect(page).toHaveTitle(/neemSEO/i);
-    await expect(page.locator("h1")).toContainText(/Stop paying \$130\+\/mo/i);
+    await expect(page.locator("h1")).toContainText(
+      /Professional SEO intelligence\. Completely free, forever\./i
+    );
   });
 
   test("mcp endpoint is accessible and responds to json-rpc", async ({ request }) => {

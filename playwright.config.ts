@@ -18,7 +18,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "pnpm start",
+    command:
+      process.env.PLAYWRIGHT_SERVER_COMMAND ||
+      (process.env.CI ? "node .next/standalone/server.js" : "pnpm start"),
     url: "http://localhost:3000/api/healthz",
     reuseExistingServer: !process.env.CI,
     timeout: 60 * 1000,

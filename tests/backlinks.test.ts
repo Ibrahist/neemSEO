@@ -1,20 +1,31 @@
 import { describe, it, expect, vi } from "vitest";
 import * as backlinkService from "@/features/backlinks/service";
 import * as backlinkRepo from "@/features/backlinks/repository";
+import { refreshBacklinksAction } from "@/features/backlinks/actions";
 
-describe("Backlinks Service", () => {
+vi.mock("next/cache", () => ({
+  revalidatePath: vi.fn(),
+}));
+
+vi.mock("@/lib/auth/session", () => ({
+  requireAuth: vi
+    .fn()
+    .mockResolvedValue({ id: "user_1", email: "user@example.com", organizationId: "org_1" }),
+}));
+
+describe("Backlinks Service & Actions", () => {
+  const mockSnapshot = {
+    id: "blsnap_1",
+    projectId: "proj_1",
+    domain: "neemseo.com",
+    totalBacklinks: 15000,
+    referringDomainsCount: 500,
+    rank: 45,
+    snapshotDate: "2026-11-26",
+    createdAt: new Date(),
+  };
+
   it("should retrieve and snapshot backlinks overview with anchors and trend", async () => {
-    const mockSnapshot = {
-      id: "blsnap_1",
-      projectId: "proj_1",
-      domain: "neemseo.com",
-      totalBacklinks: 15000,
-      referringDomainsCount: 500,
-      rank: 45,
-      snapshotDate: "2026-11-26",
-      createdAt: new Date(),
-    };
-
     const mockReferring = [
       {
         id: "ref_1",
@@ -45,6 +56,24 @@ describe("Backlinks Service", () => {
     expect(result.anchors.length).toBeGreaterThan(0);
     expect(result.anchors[0].anchor).toBe("neemseo.com");
     expect(result.newLostTrend.length).toBe(14);
+
+    spyGetLatest.mockRestore();
+    spyGetRef.mockRestore();
+  });
+
+  it("should execute refreshBacklinksAction and return success", async () => {
+    const spyGetLatest = vi
+      .spyOn(backlinkRepo, "getLatestBacklinkSnapshot")
+      .mockResolvedValue(mockSnapshot);
+    const spyGetRef = vi.spyOn(backlinkRepo, "getReferringDomains").mockResolvedValue([]);
+
+    const res = await refreshBacklinksAction({
+      projectId: "proj_1",
+      domain: "neemseo.com",
+    });
+
+    expect(res.success).toBe(true);
+    expect(res.data.snapshot.domain).toBe("neemseo.com");
 
     spyGetLatest.mockRestore();
     spyGetRef.mockRestore();

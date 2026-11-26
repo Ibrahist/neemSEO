@@ -21,18 +21,11 @@
     "unresolved": "warn"
   },
   "ignoreDependencies": [
-    "@ai-sdk/react",
     "@modelcontextprotocol/sdk",
-    "ai",
-    "cheerio",
     "dataforseo-client",
     "fast-xml-parser",
     "htmlparser2",
-    "react-markdown",
     "remeda",
-    "remark-gfm",
-    "robots-parser",
-    "tldts",
     "eslint",
     "eslint-config-next",
     "prettier-plugin-tailwindcss",

@@ -1,6 +1,43 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { GscService } from "@/features/integrations/gsc/service";
 
+vi.mock("@/db/client", () => ({
+  getDb: vi.fn().mockResolvedValue({
+    db: {
+      select: vi.fn().mockReturnValue({
+        from: vi.fn().mockReturnValue({
+          where: vi.fn().mockReturnValue({
+            limit: vi.fn().mockResolvedValue([]),
+          }),
+        }),
+      }),
+      insert: vi.fn().mockReturnValue({
+        values: vi.fn().mockResolvedValue({}),
+      }),
+      update: vi.fn().mockReturnValue({
+        set: vi.fn().mockReturnValue({
+          where: vi.fn().mockResolvedValue({}),
+        }),
+      }),
+      delete: vi.fn().mockReturnValue({
+        where: vi.fn().mockResolvedValue({}),
+      }),
+    },
+    schema: {
+      projectIntegrations: {
+        id: "id",
+        projectId: "projectId",
+        provider: "provider",
+        encryptedTokens: "encryptedTokens",
+        settingsJson: "settingsJson",
+        createdAt: "createdAt",
+        updatedAt: "updatedAt",
+      },
+    },
+    dialect: "sqlite",
+  }),
+}));
+
 describe("GscService - Token Encryption & Performance", () => {
   let service: GscService;
 
